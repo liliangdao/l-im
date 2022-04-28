@@ -2,7 +2,6 @@
 
 #### 介绍
 l-im 是 lld 基于 netty 的即时通讯服务。使用私有协议进行通信
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
 
 #### 软件架构
 软件架构说明
