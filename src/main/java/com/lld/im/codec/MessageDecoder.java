@@ -18,7 +18,7 @@ import java.util.List;
  * @description: 消息解码类
  * @create: 2022-04-27 16:45
  *
- * 私有协议规则，前4位表示数据长度，接着是command，后面表示数据
+ * 私有协议规则，前4位表示数据长度，接着是command 4位，后面表示数据
  **/
 public class MessageDecoder extends ByteToMessageDecoder {
 
