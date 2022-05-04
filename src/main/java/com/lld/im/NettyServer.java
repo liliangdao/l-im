@@ -29,7 +29,7 @@ public class NettyServer {
     public static void main(String[] args) throws Exception {
 
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);// 处理客户端连接请求数
-        EventLoopGroup workerGroup = new NioEventLoopGroup(8);// 真正服务的请求线程数
+        EventLoopGroup workerGroup = new NioEventLoopGroup(8);// 真正服务的请求线程数(不填默认是cpu核心数2倍)
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
