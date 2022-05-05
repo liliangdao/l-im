@@ -5,6 +5,9 @@ import json
 import struct
 import threading
 
+userId = input("请登录 : ")
+toId = input("请输入和哪个用户进行聊天 : ")
+
 def task(scoket):
     while True:
         # datab = scoket.recv(4)
@@ -12,22 +15,29 @@ def task(scoket):
         command = struct.unpack('>I', scoket.recv(4))[0] # 接受command并且解析
         msgPack = scoket.recv(num)
         # msgPack = msgPack.decode("ascii");
-        ftm = str(num) + 's';
+        ftm = str(num) + 's'
         msgPack = struct.unpack(ftm,msgPack)[0]
-        print(type(msgPack))
         msgPack = str(msgPack, encoding = "utf-8")
         msg = json.loads(msgPack) # 通过长度获取消息体
-        print('\n接收到',msg["fromId"] , '用户发来的数据 ： ', msg["msgBody"])
 
-fromId = input("请登录 : ")
-toId = input("请输入和哪个用户进行聊天 : ")
+        if(msg["userId"] == msg["toId"]):
+            print('\n系统发来的数据 ： ', msg["data"])
+        else:
+            msgBody = json.loads(msg["data"])
+            print('\n接收到',msg["userId"] , '用户发来的数据 ： ', msgBody["msgBody"])
+            # print(msg["data"])
+
+
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.connect(("127.0.0.1",9000))
 
 
 command = 1000
-data={"fromId":fromId,"toId":toId}
+data={"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":"imei"}
+dataObj = data
+data["data"] = {"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":"imei"}
+
 jsonData = json.dumps(data)
 
 body = bytes(jsonData, 'utf-8')
@@ -45,7 +55,7 @@ t.start()
 while True:
     msgBody = input("请输入要发送的内容 : ")
     command = 8888
-    data["msgBody"] = msgBody;
+    data["data"]["msgBody"] = msgBody
     jsonData = json.dumps(data)
     body = bytes(jsonData, 'utf-8')
     body_len = len(jsonData)

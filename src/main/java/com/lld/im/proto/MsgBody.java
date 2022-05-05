@@ -2,6 +2,8 @@ package com.lld.im.proto;
 
 import com.lld.im.enums.SyncFromEnum;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -13,30 +15,41 @@ import java.io.Serializable;
 @Data
 public class MsgBody implements Serializable {
 
-    private String msgId;
-
-    private String fromId;
-
-    private String toId;
-
-    private int msgRandom;
-
-    private long msgTime;
-
-    private long msgSequence;
-
-    private Object msgBody;
+    private String userId;
     /**
-     * 这个字段缺省或者为 0 表示需要计数，为 1 表示本条消息不需要计数，即右上角图标数字不增加
+     * 应用ID
      */
-    private int badgeMode;
-
-    private Long msgLifeTime;
-
-
-    private int syncFromId = SyncFromEnum.BOTH.getCode();
-
     private Integer appId;
 
+    /**
+     * 接收方
+     */
+    private String toId;
+
+    /**
+     * 客户端标识
+     */
     private int clientType;
+
+    private int command;
+    /**
+     * 消息ID
+     */
+    private String msgId;
+
+    /**
+     * 客户端设备唯一标识
+     */
+    private String imei;
+
+    /**
+     * 数据解析类型 和具体业务无关，后续根据解析类型解析data数据 0x0:Json,0x1:ProtoBuf,0x2:Xml,默认:0x0
+     */
+    private int msgType = 0x0;
+
+    /**
+     * 业务数据对象，如果是聊天消息则不需要解析直接透传
+     */
+    private Object data;
+
 }

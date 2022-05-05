@@ -41,9 +41,13 @@ public class MessageDecoder extends ByteToMessageDecoder {
         MsgHeader msgHeader = new MsgHeader();
         msgHeader.setCommand(command);
         msgHeader.setLength(dataLength);
+
+        MsgBody body = o.toJavaObject(MsgBody.class);
+
         Msg msgBody = new Msg();
         msgBody.setMsgHeader(msgHeader);
-        msgBody.setMsgBody(o.toJavaObject(MsgBody.class));
+        msgBody.setMsgBody(body);
+
         out.add(msgBody);
     }
 

@@ -1,18 +1,28 @@
 package com.lld.im.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lld.im.constant.Constants;
 import com.lld.im.enums.MsgChatOperateType;
+import com.lld.im.model.AccountSession;
+import com.lld.im.model.req.LoginMsg;
 import com.lld.im.proto.Msg;
 import com.lld.im.proto.MsgBody;
 import com.lld.im.proto.MsgHeader;
+import com.lld.im.utils.SessionSocketHolder;
+import com.lld.im.utils.SpringBeanFactory;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,10 +35,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 
-    private static ConcurrentHashMap<String, Channel> userManage = new ConcurrentHashMap<>();
+    private final static Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
-    private static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+//    private static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+//    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+//    @Autowired
+//    StringRedisTemplate stringRedisTemplate;
 
 //    /**
 //     * 数据读取完毕处理方法
@@ -42,71 +56,69 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 //        ctx.writeAndFlush(buf);
 //    }
 
-    //读取数据
+    /** 读取数据*/
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Msg msg) {
 
         int command = msg.getMsgHeader().getCommand();
 
-//        ctx.writeAndFlush("test");
-
         if(command == MsgChatOperateType.LOGIN.getCommand()){
-            /** 登陸事件 **/
-            String fromId = msg.getMsgBody().getFromId();
-            /** 为channel设置用户id **/
-            ctx.channel().attr(AttributeKey.valueOf("userId")).set(fromId);
-            //TODO 设置userSession到redis
 
-            //TODO end
-            userManage.put(fromId,ctx.channel());
+            LoginMsg loginReq = JSONObject.parseObject(msg.getMsgBody().getData().toString(), LoginMsg.class);
+            /** 登陸事件 **/
+            String userId = msg.getMsgBody().getUserId();
+            /** 为channel设置用户id **/
+            ctx.channel().attr(AttributeKey.valueOf("userId")).set(userId);
+            // 设置userSession到redis
+            AccountSession accountSession = new AccountSession(loginReq);
+
+            StringRedisTemplate stringRedisTemplate = SpringBeanFactory.getBean(StringRedisTemplate.class);
+            stringRedisTemplate.opsForHash().put(loginReq.getAppId()+":"+ Constants.RedisConstants.accountSessionConstants+":"+userId,
+                        loginReq.getClientType()+":"+loginReq.getImei(),JSONObject.toJSONString(accountSession));
+
+            SessionSocketHolder.put(userId, (NioSocketChannel) ctx.channel());
+
         }else if(command == MsgChatOperateType.LOGOUT.getCommand()){
             /** 登出事件 **/
 //            String fromId = msgObject.getString("fromId");
 
         }else{
-            /** 测试*/
+            /** 测试Data里面是字符串 */
             String toId = msg.getMsgBody().getToId();
-            Channel channel = userManage.get(toId);
+            NioSocketChannel channel = SessionSocketHolder.get(toId);
             if(channel == null){
-
                 Msg sendPack = new Msg();
                 MsgBody body = new MsgBody();
-                body.setFromId(msg.getMsgBody().getFromId());
-                body.setMsgBody("mubiaobuzaixian");
-
+                body.setUserId(msg.getMsgBody().getUserId());
+                body.setToId(msg.getMsgBody().getUserId());
+                body.setData("目标不在线");
                 MsgHeader header = new MsgHeader();
                 header.setCommand(0x44F);
                 sendPack.setMsgHeader(header);
                 sendPack.setMsgBody(body);
-
                 ctx.channel().writeAndFlush(sendPack);
             }else{
 
                 Msg sendPack = new Msg();
                 MsgBody body = new MsgBody();
-                body.setFromId(msg.getMsgBody().getFromId());
-                body.setMsgBody(msg.getMsgBody().getMsgBody().toString());
+                body.setUserId(msg.getMsgBody().getUserId());
+                body.setToId(msg.getMsgBody().getToId());
+                body.setData(msg.getMsgBody().getData().toString());
 
                 MsgHeader header = new MsgHeader();
                 header.setCommand(0x44F);
                 sendPack.setMsgHeader(header);
                 sendPack.setMsgBody(body);
-                ctx.channel().writeAndFlush(sendPack);
+                channel.writeAndFlush(sendPack);
 //                channel.writeAndFlush(sendPack);
             }
-
         }
-
-
-
     }
 
     //表示 channel 处于不活动状态, 提示离线了
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        channelGroup.writeAndFlush("[ 客户端 ]" + ctx.channel().remoteAddress() + "退出了群聊");
-        System.out.println(ctx.channel().remoteAddress() + " 下线了" + "\n");
-        System.out.println("channelGroup size=" + channelGroup.size());
+
     }
 
     @Override
@@ -117,6 +129,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("上线");
+//        System.out.println("上线");
+        logger.info("有客户端上线了 ： {}",ctx.channel().id().asLongText());
     }
 }
