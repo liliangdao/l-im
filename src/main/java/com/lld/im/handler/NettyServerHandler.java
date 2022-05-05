@@ -80,7 +80,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 
         }else if(command == MsgChatOperateType.LOGOUT.getCommand()){
             /** 登出事件 **/
-//            String fromId = msgObject.getString("fromId");
+            SessionSocketHolder.remove((NioSocketChannel) ctx.channel());
+
+            /** TODO 去推送服务删除掉推送信息 */
 
         }else{
             /** 测试Data里面是字符串 */
@@ -118,7 +120,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
     //表示 channel 处于不活动状态, 提示离线了
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-
+        SessionSocketHolder.remove((NioSocketChannel) ctx.channel());
     }
 
     @Override

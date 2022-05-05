@@ -1,0 +1,41 @@
+
+spring:
+  profiles:
+    active: dev
+  redis:
+    host: localhost
+    port: 6379
+    jedis:
+      pool:
+        max-active: 100
+        max-idle: 100
+        max-wait: 1000
+        min-idle: 10
+  rabbitmq:
+    host: localhost
+    port: 5672
+    addresses: localhost
+    username: guest
+    password: guest
+#    virtual-host:
+    listener:
+      simple:
+        concurrency: 5
+        max-concurrency: 10
+        acknowledge-mode: MANUAL
+        prefetch: 1
+    publisher-confirms: true
+    publisher-returns: true
+    template:
+      mandatory: true
+    cache:
+      connection:
+        mode: channel
+      channel:
+        size: 36
+        checkout-timeout: 0
+
+
+# logger 配置
+logging:
+  config: classpath:logback-spring.xml

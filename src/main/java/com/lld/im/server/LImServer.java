@@ -9,6 +9,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Component;
  **/
 @Component
 public class LImServer {
+
+    private final static Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
     private EventLoopGroup mainGroup;
     private EventLoopGroup subGroup;
@@ -33,10 +37,10 @@ public class LImServer {
     }
 
     public LImServer(){
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);// 处理客户端连接请求数
-        EventLoopGroup workerGroup = new NioEventLoopGroup(8);// 真正服务的请求线程数(不填默认是cpu核心数2倍)
+        mainGroup = new NioEventLoopGroup(1);// 处理客户端连接请求数
+        subGroup = new NioEventLoopGroup(8);// 真正服务的请求线程数(不填默认是cpu核心数2倍)
         server = new ServerBootstrap();
-        server.group(bossGroup, workerGroup)
+        server.group(mainGroup, subGroup)
                 .channel(NioServerSocketChannel.class) //NioDatagramChannel.class 如果是udp使用这个类 下面设置的option也会不一样
                 //简单说：option主要是针对boss线程组，child主要是针对worker线程组
                 .option(ChannelOption.SO_BACKLOG, 10240) // 服务端可连接队列大小
@@ -69,6 +73,7 @@ public class LImServer {
 
     public void start(){
         this.future = server.bind(9000);
+        logger.info("tcp server start success");
     }
 
 
