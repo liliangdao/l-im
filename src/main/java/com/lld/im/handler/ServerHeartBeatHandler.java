@@ -8,13 +8,14 @@ import com.lld.im.utils.SessionSocketHolder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 /**
  * @author: Chackylee
- * @description:
+ * @description: 真正处理心跳超时的类
  * @create: 2022-05-06 09:22
  **/
 @Component
@@ -37,10 +38,12 @@ public class ServerHeartBeatHandler {
 
         String sessionStr = (String) stringRedisTemplate.opsForHash().get(appId + ":" + Constants.RedisConstants.accountSessionConstants + ":" + userId,
                 clientInfo);
-        AccountSession accountSession = JSONObject.parseObject(sessionStr, AccountSession.class);
-        accountSession.setConnectState(2);
-        stringRedisTemplate.opsForHash().put(appId + ":" + Constants.RedisConstants.accountSessionConstants + ":" + userId,clientInfo,
-                JSON.toJSONString(accountSession));
+        if (!StringUtils.isEmpty(sessionStr)) {
+            AccountSession accountSession = JSONObject.parseObject(sessionStr, AccountSession.class);
+            accountSession.setConnectState(2);
+            stringRedisTemplate.opsForHash().put(appId + ":" + Constants.RedisConstants.accountSessionConstants + ":" + userId,clientInfo,
+                    JSON.toJSONString(accountSession));
+        }
         SessionSocketHolder.remove((NioSocketChannel) ctx.channel());
         ctx.close();
     }

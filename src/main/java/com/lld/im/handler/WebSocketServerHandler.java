@@ -10,22 +10,14 @@ import com.lld.im.proto.MsgBody;
 import com.lld.im.proto.MsgHeader;
 import com.lld.im.utils.SessionSocketHolder;
 import com.lld.im.utils.SpringBeanFactory;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.AttributeKey;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
-import java.text.SimpleDateFormat;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @description:
@@ -33,9 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @createDate: 2022/3/12
  * @version: 1.0
  */
-public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
+public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
-    private final static Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(WebSocketServerHandler.class);
 
 //    /**
 //     * 数据读取完毕处理方法
@@ -51,7 +43,11 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 
     /** 读取数据*/
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Msg msg) {
+    protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame fram) {
+
+        String text = fram.text();
+
+        Msg msg = JSONObject.parseObject(text, Msg.class);
 
         int command = msg.getMsgHeader().getCommand();
 
