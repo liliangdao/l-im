@@ -2,6 +2,9 @@ package com.lld.im.enums;
 
 public enum MsgChatOperateType {
 
+    //心跳  0
+    PING(0x0),
+
     //登陸  1000
     LOGIN(0x3E8),
 

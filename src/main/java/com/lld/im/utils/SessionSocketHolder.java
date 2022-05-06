@@ -27,12 +27,12 @@ public class SessionSocketHolder {
      * @param id
      * @param socketChannel
      */
-    public static void put(String id, NioSocketChannel socketChannel) {
-        CHANNEL_MAP.put(id, socketChannel);
+    public static void put(Integer appId,String id, NioSocketChannel socketChannel) {
+        CHANNEL_MAP.put(appId + ":" +id, socketChannel);
     }
 
-    public static NioSocketChannel get(String id) {
-        return CHANNEL_MAP.get(id);
+    public static NioSocketChannel get(Integer appId ,String id) {
+        return CHANNEL_MAP.get(appId + ":" +id);
     }
 
     public static Map<String, NioSocketChannel> getRelationShip() {

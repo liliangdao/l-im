@@ -2,6 +2,7 @@ package com.lld.im.model;
 
 import com.lld.im.model.req.LoginMsg;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -12,6 +13,7 @@ import java.net.UnknownHostException;
  * @create: 2022-05-05 09:20
  **/
 @Data
+@NoArgsConstructor
 public class AccountSession {
 
     /**

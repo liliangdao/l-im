@@ -1,6 +1,7 @@
 package com.lld.im.publish;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lld.im.constant.Constants;
 import com.lld.im.proto.Msg;
 import com.lld.im.proto.MsgBody;
 import org.springframework.amqp.core.Binding;
@@ -33,7 +34,7 @@ public class MqMessageProducer implements CommandLineRunner {
      * @return void
     */
     public void sendMsg(MsgBody msgBody){
-        rabbitTemplate.convertAndSend("Pipeline2MessageService",
+        rabbitTemplate.convertAndSend(Constants.Mq2MsgService,
                 "", JSONObject.toJSONString(msgBody));
     }
 
@@ -47,8 +48,8 @@ public class MqMessageProducer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         RabbitAdmin admin = new RabbitAdmin(this.rabbitTemplate.getConnectionFactory());
-        Queue queue = new Queue("Pipeline2MessageService", true, false, false);
-        DirectExchange exchange = new DirectExchange("Pipeline2MessageService", true, false);//交换机与队列同名
+        Queue queue = new Queue(Constants.Mq2MsgService, true, false, false);
+        DirectExchange exchange = new DirectExchange(Constants.Mq2MsgService, true, false);//交换机与队列同名
         Binding binding = BindingBuilder.bind(queue).to(exchange).with("");
         admin.declareQueue(queue);
         admin.declareExchange(exchange);

@@ -2,6 +2,7 @@ package com.lld.im.server;
 
 import com.lld.im.codec.MessageDecoder;
 import com.lld.im.codec.MessageEncoder;
+import com.lld.im.handler.HeartBeatHandler;
 import com.lld.im.handler.NettyServerHandler;
 import com.lld.im.proto.Msg;
 import io.netty.bootstrap.ServerBootstrap;
@@ -9,6 +10,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -52,17 +54,14 @@ public class LImServer {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
-                        //加入特殊分隔符分包解码器
-                        //pipeline.addLast(new DelimiterBasedFrameDecoder(1024, Unpooled.copiedBuffer("_"
-                        // .getBytes())));
-                        //向pipeline加入解码器
-//                            pipeline.addLast("decoder", new NettyMessageDecoder(Integer.MAX_VALUE,0,4));
-//                            pipeline.addLast("decoder", new NettyMessageDecoder(1024*1024*5,0,2,
-//                                    0,0));
+                        //加入自定义包解码器
                         pipeline.addLast("decoder", new MessageDecoder());
                         //向pipeline加入编码器
-//                            pipeline.addLast("encoder", new StringEncoder());
                         pipeline.addLast("encoder", new MessageEncoder(Msg.class));
+                        //心跳检测Handler
+                        pipeline.addLast(new IdleStateHandler(8, 10, 12));
+                        // 自定义的空闲状态检测
+                        pipeline.addLast(new HeartBeatHandler());
                         //加入自己的业务处理handler
                         pipeline.addLast(new NettyServerHandler());
                     }

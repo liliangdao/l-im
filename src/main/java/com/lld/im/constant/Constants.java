@@ -7,6 +7,17 @@ package com.lld.im.constant;
  **/
 public class Constants {
 
+    /** channel绑定的userId Key*/
+    public static final String UserId = "userId";
+
+    /** channel绑定的userId Key*/
+    public static final String AppId = "appId";
+
+    /** channel绑定的clientType 和 imel Key*/
+    public static final String ClientImel = "clientImel";
+
+    public static final String Mq2MsgService = "Pipeline2MessageService";
+
     public static class RedisConstants{
 
         /**

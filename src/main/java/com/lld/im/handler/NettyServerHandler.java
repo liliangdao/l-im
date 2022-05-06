@@ -37,13 +37,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 
     private final static Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
-
-//    private static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-//    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-//    @Autowired
-//    StringRedisTemplate stringRedisTemplate;
-
 //    /**
 //     * 数据读取完毕处理方法
 //     *
@@ -68,15 +61,20 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             /** 登陸事件 **/
             String userId = msg.getMsgBody().getUserId();
             /** 为channel设置用户id **/
-            ctx.channel().attr(AttributeKey.valueOf("userId")).set(userId);
+            ctx.channel().attr(AttributeKey.valueOf(Constants.UserId)).set(userId);
+            String hashKey = loginReq.getClientType()+":"+loginReq.getImei();
+            /** 为channel设置client和imel **/
+            ctx.channel().attr(AttributeKey.valueOf(Constants.ClientImel)).set(hashKey);
+            /** 为channel设置appId **/
+            ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).set(loginReq.getAppId());
+
             // 设置userSession到redis
             AccountSession accountSession = new AccountSession(loginReq);
-
             StringRedisTemplate stringRedisTemplate = SpringBeanFactory.getBean(StringRedisTemplate.class);
             stringRedisTemplate.opsForHash().put(loginReq.getAppId()+":"+ Constants.RedisConstants.accountSessionConstants+":"+userId,
-                        loginReq.getClientType()+":"+loginReq.getImei(),JSONObject.toJSONString(accountSession));
+                    hashKey,JSONObject.toJSONString(accountSession));
+            SessionSocketHolder.put(loginReq.getAppId(),userId, (NioSocketChannel) ctx.channel());
 
-            SessionSocketHolder.put(userId, (NioSocketChannel) ctx.channel());
 
         }else if(command == MsgChatOperateType.LOGOUT.getCommand()){
             /** 登出事件 **/
@@ -87,7 +85,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
         }else{
             /** 测试Data里面是字符串 */
             String toId = msg.getMsgBody().getToId();
-            NioSocketChannel channel = SessionSocketHolder.get(toId);
+            NioSocketChannel channel = SessionSocketHolder.get(msg.getMsgBody().getAppId(),toId);
             if(channel == null){
                 Msg sendPack = new Msg();
                 MsgBody body = new MsgBody();
@@ -117,17 +115,17 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
         }
     }
 
-    //表示 channel 处于不活动状态, 提示离线了
+    //表示 channel 处于不活动状态
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         SessionSocketHolder.remove((NioSocketChannel) ctx.channel());
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        //关闭通道
-        ctx.close();
-    }
+//    @Override
+//    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+//        //关闭通道
+//        ctx.close();
+//    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
