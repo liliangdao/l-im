@@ -2,7 +2,7 @@ package com.lld.im.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.constant.Constants;
-import com.lld.im.enums.MsgChatOperateType;
+import com.lld.im.enums.MsgCommand;
 import com.lld.im.model.AccountSession;
 import com.lld.im.model.req.LoginMsg;
 import com.lld.im.proto.Msg;
@@ -55,7 +55,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 
         int command = msg.getMsgHeader().getCommand();
 
-        if(command == MsgChatOperateType.LOGIN.getCommand()){
+        if(command == MsgCommand.LOGIN.getCommand()){
 
             LoginMsg loginReq = JSONObject.parseObject(msg.getMsgBody().getData().toString(), LoginMsg.class);
             /** 登陸事件 **/
@@ -76,12 +76,14 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             SessionSocketHolder.put(loginReq.getAppId(),userId, (NioSocketChannel) ctx.channel());
 
 
-        }else if(command == MsgChatOperateType.LOGOUT.getCommand()){
+        }else if(command == MsgCommand.LOGOUT.getCommand()){
             /** 登出事件 **/
             SessionSocketHolder.remove((NioSocketChannel) ctx.channel());
 
             /** TODO 去推送服务删除掉推送信息 */
 
+        }else if(command == MsgCommand.PING.getCommand()){
+//            logger.info("{} 客户端发来ping消息",ctx.channel().id().asLongText());
         }else{
             /** 测试Data里面是字符串 */
             String toId = msg.getMsgBody().getToId();

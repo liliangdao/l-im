@@ -1,12 +1,38 @@
 
+import imp
 from re import S
 import socket
 import json
 import struct
 import threading
+import time
 
 userId = input("请登录 : ")
 toId = input("请输入和哪个用户进行聊天 : ")
+
+# def doPing(scoket):
+#     command = 0
+#     data={"userId":"123"}
+#     jsonData = json.dumps(data)
+#     body = bytes(jsonData, 'utf-8')
+#     body_len = len(jsonData)
+#     lenByte = struct.pack('>I', body_len)
+#     commandByte = struct.pack('>I', command)
+#     scoket.sendall(lenByte + commandByte + body)
+
+def ping(scoket):
+    while True:
+        time.sleep(3)
+        # doPing(scoket)
+        command = 9998
+        pingdata={};
+        jsonData = json.dumps(pingdata)
+        body = bytes(jsonData, 'utf-8')
+        body_len = len(jsonData)
+        lenByte = struct.pack('>I', body_len)
+        commandByte = struct.pack('>I', command)
+        scoket.sendall(lenByte + commandByte + body)
+    
 
 def task(scoket):
     while True:
@@ -50,6 +76,9 @@ s.sendall(lenByte + commandByte + body)
 
 # 创建一个线程专门接收服务端数据并且打印
 t = threading.Thread(target=task,args=(s,))
+t = threading.Thread(target=ping,args=(s,))
+
+
 t.start()
 
 while True:

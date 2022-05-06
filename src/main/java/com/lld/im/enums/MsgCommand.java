@@ -1,9 +1,9 @@
 package com.lld.im.enums;
 
-public enum MsgChatOperateType {
+public enum MsgCommand implements Command {
 
-    //心跳  0
-    PING(0x0),
+    //心跳  9998
+    PING(0x270e),
 
     //登陸  1000
     LOGIN(0x3E8),
@@ -96,8 +96,7 @@ public enum MsgChatOperateType {
 
     private int command;
 
-    MsgChatOperateType( int command) {
-
+    MsgCommand(int command) {
         this.command = command;
     }
 
