@@ -75,17 +75,12 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
                     hashKey,JSONObject.toJSONString(accountSession));
             SessionSocketHolder.put(loginReq.getAppId(),userId, (NioSocketChannel) ctx.channel());
 
-
         }else if(command == MsgCommand.LOGOUT.getCommand()){
             /** 登出事件 **/
-            SessionSocketHolder.remove((NioSocketChannel) ctx.channel());
-
-
-
+            SessionSocketHolder.removeAccountSession((NioSocketChannel) ctx.channel());
             /** TODO 去推送服务删除掉推送信息 */
-
         }else if(command == MsgCommand.PING.getCommand()){
-//            logger.info("{} 客户端发来ping消息",ctx.channel().id().asLongText());
+
         }else{
             /** 测试Data里面是字符串 */
             String toId = msg.getMsgBody().getToId();
@@ -134,6 +129,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 //        System.out.println("上线");
-        logger.info("有客户端上线了 ： {}",ctx.channel().id().asLongText());
+//        logger.info("有客户端上线了 ： {}",ctx.channel().id().asLongText());
     }
 }

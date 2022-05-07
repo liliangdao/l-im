@@ -1,5 +1,6 @@
 package com.lld.im.model;
 
+import com.lld.im.enums.UserPipelineConnectState;
 import com.lld.im.model.req.LoginMsg;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -54,7 +55,7 @@ public class AccountSession {
     public AccountSession(LoginMsg req) {
         this.setAppId(req.getAppId());
         this.setClientType(req.getClientType());
-        this.setConnectState(1);
+        this.setConnectState(UserPipelineConnectState.ONLINE.getCommand());
         this.setUserId(req.getUserId());
         this.setImei(req.getImei());
         try {

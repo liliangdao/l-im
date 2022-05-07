@@ -32,20 +32,7 @@ public class ServerHeartBeatHandler {
      * @return void
     */
     public void process(ChannelHandlerContext ctx){
-        String userId = (String) ctx.channel().attr(AttributeKey.valueOf(Constants.UserId)).get();
-        String clientInfo = (String) ctx.channel().attr(AttributeKey.valueOf(Constants.ClientImel)).get();
-        Integer appId = (Integer) ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).get();
-
-        String sessionStr = (String) stringRedisTemplate.opsForHash().get(appId + ":" + Constants.RedisConstants.accountSessionConstants + ":" + userId,
-                clientInfo);
-        if (!StringUtils.isEmpty(sessionStr)) {
-            AccountSession accountSession = JSONObject.parseObject(sessionStr, AccountSession.class);
-            accountSession.setConnectState(2);
-            stringRedisTemplate.opsForHash().put(appId + ":" + Constants.RedisConstants.accountSessionConstants + ":" + userId,clientInfo,
-                    JSON.toJSONString(accountSession));
-        }
-        SessionSocketHolder.remove((NioSocketChannel) ctx.channel());
-        ctx.close();
+        SessionSocketHolder.offlineAccountSession((NioSocketChannel) ctx);
     }
 
 }

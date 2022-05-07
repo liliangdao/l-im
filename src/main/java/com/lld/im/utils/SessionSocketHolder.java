@@ -1,7 +1,15 @@
 package com.lld.im.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.lld.im.constant.Constants;
+import com.lld.im.enums.UserPipelineConnectState;
 import com.lld.im.model.AccountSession;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.AttributeKey;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,16 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SessionSocketHolder {
     private static final Map<String, NioSocketChannel> CHANNEL_MAP = new ConcurrentHashMap<>(16);
-//    private static final Map<Long, String> SESSION_MAP = new ConcurrentHashMap<>(16);
-
-//    public static void saveSession(Long userId, String userName) {
-//        SESSION_MAP.put(userId, userName);
-//    }
-
-//    public static void removeSession(Long userId) {
-//        SESSION_MAP.remove(userId);
-//    }
-
     /**
      * Save the relationship between the userId and the channel.
      *
@@ -43,24 +41,51 @@ public class SessionSocketHolder {
         CHANNEL_MAP.entrySet().stream().filter(entry -> entry.getValue() == nioSocketChannel).forEach(entry -> CHANNEL_MAP.remove(entry.getKey()));
     }
 
-//    /**
-//     * 获取注册用户信息
-//     *
-//     * @param nioSocketChannel
-//     * @return
-//     */
-//    public static AccountSession getUserId(NioSocketChannel nioSocketChannel) {
-//        for (Map.Entry<String, NioSocketChannel> entry : CHANNEL_MAP.entrySet()) {
-//            NioSocketChannel value = entry.getValue();
-//            if (nioSocketChannel == value) {
-//                String key = entry.getKey();
-//                String userName = SESSION_MAP.get(key);
-////                AccountSession info = new TIMUserInfo(key, userName);
-//                return null;
-//            }
-//        }
-//        return null;
-//    }
+
+    /**
+     * @description 设置用户离线，通常用于心跳超时
+     * @author chackylee
+     * @date 2022/5/7 11:43
+     * @param [nioSocketChannel]
+     * @return void
+    */
+    public static void offlineAccountSession(NioSocketChannel nioSocketChannel) {
+
+        String userId = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get();
+        String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImel)).get();
+        Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
+
+        StringRedisTemplate stringRedisTemplate = SpringBeanFactory.getBean(StringRedisTemplate.class);
+        String sessionStr = (String) stringRedisTemplate.opsForHash().get(appId + ":" + Constants.RedisConstants.accountSessionConstants + ":" + userId,
+                clientInfo);
+        if (!StringUtils.isEmpty(sessionStr)) {
+            AccountSession accountSession = JSONObject.parseObject(sessionStr, AccountSession.class);
+            accountSession.setConnectState(UserPipelineConnectState.OFFLINE.getCommand());
+            stringRedisTemplate.opsForHash().put(appId + ":" + Constants.RedisConstants.accountSessionConstants + ":" + userId,clientInfo,
+                    JSON.toJSONString(accountSession));
+        }
+        remove(nioSocketChannel);
+        nioSocketChannel.close();
+    }
+
+    /**
+     * @description 删除用户session，通常用于用户手动下线
+     * @author chackylee
+     * @date 2022/5/7 11:43
+     * @param [nioSocketChannel]
+     * @return void
+    */
+    public static void removeAccountSession(NioSocketChannel nioSocketChannel) {
+        String userId = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get();
+        String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImel)).get();
+        Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
+        StringRedisTemplate stringRedisTemplate = SpringBeanFactory.getBean(StringRedisTemplate.class);
+        stringRedisTemplate.opsForHash().delete(appId+":"+ Constants.RedisConstants.accountSessionConstants+":"+userId,clientInfo);
+        remove(nioSocketChannel);
+        nioSocketChannel.close();
+    }
+
+
 
 
 }
