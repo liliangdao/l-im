@@ -10,10 +10,7 @@ import com.lld.im.proto.MsgBody;
 import com.lld.im.proto.MsgHeader;
 import com.lld.im.utils.SessionSocketHolder;
 import com.lld.im.utils.SpringBeanFactory;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelId;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -51,7 +48,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 
     /** 读取数据*/
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Msg msg) {
+    protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws InterruptedException {
 
         int command = msg.getMsgHeader().getCommand();
 
@@ -108,7 +105,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
                 header.setCommand(0x44F);
                 sendPack.setMsgHeader(header);
                 sendPack.setMsgBody(body);
-                channel.writeAndFlush(sendPack);
+                channel.writeAndFlush(sendPack).sync();
                 ctx.channel().writeAndFlush(sendPack);
             }
         }
@@ -117,18 +114,19 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
     //表示 channel 处于不活动状态
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        SessionSocketHolder.remove((NioSocketChannel) ctx.channel());
+        //设置离线
+        SessionSocketHolder.offlineAccountSession((NioSocketChannel) ctx.channel());
+        ctx.close();
     }
 
-//    @Override
-//    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-//        //关闭通道
-//        ctx.close();
-//    }
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        //关闭通道
+        ctx.close();
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-//        System.out.println("上线");
 //        logger.info("有客户端上线了 ： {}",ctx.channel().id().asLongText());
     }
 }

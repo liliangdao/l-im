@@ -10,7 +10,7 @@ userId = input("请登录 : ")
 toId = input("请输入和哪个用户进行聊天 : ")
 
 def doPing(scoket):
-    command = 0
+    command = 9998
     data={"userId":"123"}
     jsonData = json.dumps(data)
     body = bytes(jsonData, 'utf-8')

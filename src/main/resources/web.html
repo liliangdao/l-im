@@ -548,12 +548,12 @@ function getLen(str){
 </script>
 <form onsubmit="return false">
 
-	<textarea id="userId" name = "userId" style="width: 100px;height: 20px"></textarea>
-	<textarea name = "toUser" style="width: 100px;height: 20px"></textarea>
+	<textarea placeholder="输入登录id" id="userId" name = "userId" style="width: 100px;height: 20px"></textarea>
+	<textarea placeholder="你要发消息给谁" name = "toUser" style="width: 100px;height: 20px"></textarea>
 	<input type ="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value);">
 	
 
-    <textarea name = "message" style="width: 400px;height: 200px"></textarea>
+    <textarea placeholder="输入要发送的内容" name = "message" style="width: 200px;height: 20px"></textarea>
 	
 	
 
