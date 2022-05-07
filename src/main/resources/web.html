@@ -409,11 +409,53 @@ ByteBuffer = function (arrayBuf, offset) {
         //客户端收到服务器消息的时候就会执行这个回调方法
         socket.onmessage = function (event) {
             var ta = document.getElementById("responseText");
-            ta.value = ta.value + "\n"+event.data;
+
+
+            var bytebuf = new ByteBuffer(event.data);
+            let byteBuffer = bytebuf.int32().int32().unpack();
+
+            let bodyLen = byteBuffer[0];
+            let command = byteBuffer[1];
+            let unpack = bytebuf.vstring(null,bodyLen).unpack();
+            let msgBody = unpack[2];
+
+            var msg = eval("(" + msgBody + ")");
+
+            // console.log(msg);
+
+            let userId = document.getElementById('userId').value;
+            console.log(userId)
+
+            if(msg["userId"] == "system"){
+                ta.value = ta.value + "\n 系统："+msg.data;
+            }else if(msg["userId"] == userId){
+                let msgInfo = msg.data;
+                msgInfo = eval("(" + msgInfo + ")");
+                ta.value = ta.value + "\n"+ "自己：" + msgInfo.msgBody;
+            }
+            else{
+                let msgInfo = msg.data;
+                msgInfo = eval("(" + msgInfo + ")");
+                ta.value = ta.value + "\n" +msg.toId + "："  + msgInfo.msgBody;
+            }
+
+
+        //     if(msg["userId"] == "system"):
+        //     print('\n系统 ： ', msg["data"])
+        //     elif (msg["userId"] == userId):
+        //     msgBody = json.loads(msg["data"])
+        //     print('\n自己：', msgBody["msgBody"])
+        //     # print(msg["data"])
+        // else:
+        //     msgBody = json.loads(msg["data"])
+        //     print('\n',msg["userId"] , '： ', msgBody["msgBody"])
+
+
         }
 
         //连接建立的回调函数
         socket.onopen = function(event){
+            socket.binaryType = "arraybuffer";
             var ta = document.getElementById("responseText");
             ta.value = "连接开启";
         }
@@ -427,21 +469,7 @@ ByteBuffer = function (arrayBuf, offset) {
         alert("浏览器不支持WebSocket！");
     }
 
-    //发送数据
-    function send(message){
-        if(!window.WebSocket){
-            return;
-        }
-
-        //当websocket状态打开
-        if(socket.readyState == WebSocket.OPEN){
-            socket.send(message);
-        }else{
-            alert("连接没有开启");
-        }
-    }
-	
-	//发送数据
+	//登录
     function login(userId,toUser){
         if(!window.WebSocket){
             return;
@@ -450,86 +478,77 @@ ByteBuffer = function (arrayBuf, offset) {
 		console.log(userId + " " + toUser);
         //当websocket状态打开
         if(socket.readyState == WebSocket.OPEN){
-		
-			
-		
 			var userId = userId;
 			var toUser = toUser;
 			var command = 1000;
 			var data = {"userId":userId,"toId":toUser,"appId":10000,"clientType":1,"imei":"web"};
 			data['data'] = {"userId":userId,"toId":toUser,"appId":10000,"clientType":1,"imei":"web"};
 			var jsonData = JSON.stringify(data);
-			var dataByte = textToArrayBuffer(jsonData);
+
 			var bodyLen = jsonData.length;
 			
-			//var bodyLenByte = IntToBytesBigEndian(bodyLen,2);
-			//var commandByte = IntToBytesBigEndian(command,2);
-			
 			let loginMsg = new ByteBuffer();
-			loginMsg.byte(command).byte(bodyLen);
+			loginMsg.int32(bodyLen).int32(command).vstring(jsonData,bodyLen);
 			console.log(loginMsg.pack());
 			socket.send(loginMsg.pack());
-			
-		
+
+			// localStorage.userId = userId;
+
         }else{
             alert("连接没有开启");
         }
     }
+
+    //发消息
+    function sendMsg(userId,toId,msg){
+        if(!window.WebSocket){
+            return;
+        }
+        //当websocket状态打开
+        if(socket.readyState == WebSocket.OPEN){
+            // debugger;
+            var data={"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":"web"};
+            data.data = {"msgBody":msg};
+            var command = 8888;
+            var jsonData = JSON.stringify(data);
+            console.log(jsonData)
+            var bodyLen = getLen(jsonData);
+            // var bodyLen = jsonData.length;
+            let sendMsg = new ByteBuffer();
+            sendMsg.int32(bodyLen).int32(command).vstring(jsonData,bodyLen);
+            console.log(sendMsg.pack());
+            socket.send(sendMsg.pack());
+        }else{
+            alert("连接没有开启");
+        }
+    }
+
+function getLen(str){
+    var len = 0;
+    for (var i=0; i<str.length; i++) {
+        var c = str.charCodeAt(i);
+        //单字节加1
+        if ((c >= 0x0001 && c <= 0x007e) || (0xff60<=c && c<=0xff9f)) {
+            len++;
+        }
+        else {
+            len+=3;
+        }
+    }
+    return len;
+}
 	
-	function textToArrayBuffer(s) {
-  var i = s.length;
-  var n = 0;
-  var ba = new Array()
-  for (var j = 0; j < i;) {
-    var c = s.codePointAt(j);
-    if (c < 128) {
-      ba[n++] = c;
-      j++;
-    }
-    else if ((c > 127) && (c < 2048)) {
-      ba[n++] = (c >> 6) | 192;
-      ba[n++] = (c & 63) | 128;
-      j++;
-    }
-    else if ((c > 2047) && (c < 65536)) {
-      ba[n++] = (c >> 12) | 224;
-      ba[n++] = ((c >> 6) & 63) | 128;
-      ba[n++] = (c & 63) | 128;
-      j++;
-    }
-    else {
-      ba[n++] = (c >> 18) | 240;
-      ba[n++] = ((c >> 12) & 63) | 128;
-      ba[n++] = ((c >> 6) & 63) | 128;
-      ba[n++] = (c & 63) | 128;
-      j+=2;
-    }
-  }
-  return new Uint8Array(ba).buffer;
-}
 
 
-//大端模式
-//number 要转换的整形数值
-//length 要转成什么byte数组，规定数组的长度
-//如uint16，则lenght=2表示两个字节，转成的byte数组长度是length=2
-//如uint32，则lenght=2表示两个字节，转成的byte数组长度是length=4
-function IntToBytesBigEndian(number, length){
-    var bytes = [];
-    var i = length;
-    do {
-    bytes[--i] = number & (255);
-    number = number>>8;
-    } while (i)
-    return bytes;
-}
+
+
 
 
 	
 </script>
 <form onsubmit="return false">
 
-	<textarea name = "userId" style="width: 100px;height: 20px"></textarea>
+	<textarea id="userId" name = "userId" style="width: 100px;height: 20px"></textarea>
 	<textarea name = "toUser" style="width: 100px;height: 20px"></textarea>
 	<input type ="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value);">
 	
@@ -539,7 +558,7 @@ function IntToBytesBigEndian(number, length){
 	
 
 
-    <input type ="button" value="发送数据" onclick="send(this.form.message.value);">
+    <input type ="button" value="发送数据" onclick="sendMsg(this.form.userId.value,this.form.toUser.value,this.form.message.value);">
 
     <h3>服务器输出：</h3>
 

@@ -93,7 +93,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             if(channel == null){
                 Msg sendPack = new Msg();
                 MsgBody body = new MsgBody();
-                body.setUserId(msg.getMsgBody().getUserId());
+                body.setUserId("system");
                 body.setToId(msg.getMsgBody().getUserId());
                 body.setData("目标不在线");
                 MsgHeader header = new MsgHeader();
@@ -114,7 +114,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
                 sendPack.setMsgHeader(header);
                 sendPack.setMsgBody(body);
                 channel.writeAndFlush(sendPack);
-//                channel.writeAndFlush(sendPack);
+                ctx.channel().writeAndFlush(sendPack);
             }
         }
     }

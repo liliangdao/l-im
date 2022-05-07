@@ -3,6 +3,7 @@ package com.lld.im.server;
 import com.lld.im.codec.MessageDecoder;
 import com.lld.im.codec.MessageEncoder;
 import com.lld.im.codec.WebSocketMessageDecoder;
+import com.lld.im.codec.WebSocketMessageEncoder;
 import com.lld.im.handler.HeartBeatHandler;
 import com.lld.im.handler.NettyServerHandler;
 import com.lld.im.handler.NettyWebSocketServerHandler;
@@ -84,13 +85,14 @@ public class LImWebSocketServer {
                          * 对于websocket来讲，都是以frames进行传输的，不同的数据类型对应的frames也不同
                          */
 //                        pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
-                        //加入自定义包解码器
+
+                        //加入自定义包编解码器
                         pipeline.addLast(new WebSocketMessageDecoder());
 
                         pipeline.addLast(new NettyWebSocketServerHandler());
+                        //加入自定义包编解码器
+                        pipeline.addLast(new WebSocketMessageEncoder());
 
-                        //向pipeline加入编码器
-//                        pipeline.addLast("encoder", new MessageEncoder(Msg.class));
                         pipeline.addLast(new NettyServerHandler());
                     }
                 });
