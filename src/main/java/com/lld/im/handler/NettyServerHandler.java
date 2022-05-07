@@ -76,9 +76,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             /** 登出事件 **/
             SessionSocketHolder.removeAccountSession((NioSocketChannel) ctx.channel());
             /** TODO 去推送服务删除掉推送信息 */
-        }else if(command == MsgCommand.PING.getCommand()){
-
-        }else{
+        }else if(command == MsgCommand.TEST.getCommand()){
             /** 测试Data里面是字符串 */
             String toId = msg.getMsgBody().getToId();
             NioSocketChannel channel = SessionSocketHolder.get(msg.getMsgBody().getAppId(),toId);
@@ -93,7 +91,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
                 sendPack.setMsgHeader(header);
                 sendPack.setMsgBody(body);
                 ctx.channel().writeAndFlush(sendPack);
-            }else{
+            } else{
 
                 Msg sendPack = new Msg();
                 MsgBody body = new MsgBody();
@@ -108,6 +106,12 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
                 channel.writeAndFlush(sendPack).sync();
                 ctx.channel().writeAndFlush(sendPack);
             }
+        } else if(command == MsgCommand.PING.getCommand()){
+
+
+        } else {
+            //全往mq丢
+
         }
     }
 

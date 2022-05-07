@@ -2,6 +2,9 @@ package com.lld.im.enums;
 
 public enum MsgCommand implements Command {
 
+    //测试  8888
+    TEST(8888),
+
     //心跳  9998
     PING(0x270e),
 
