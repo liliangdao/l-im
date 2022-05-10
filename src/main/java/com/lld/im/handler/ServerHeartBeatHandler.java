@@ -3,7 +3,6 @@ package com.lld.im.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.constant.Constants;
-import com.lld.im.model.AccountSession;
 import com.lld.im.utils.SessionSocketHolder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -34,7 +33,7 @@ public class ServerHeartBeatHandler {
     public void process(ChannelHandlerContext ctx){
 //        String longId = ctx.channel().id().asLongText();
 //        System.out.println(longId + " 心跳超时");
-        SessionSocketHolder.offlineAccountSession((NioSocketChannel) ctx.channel());
+        SessionSocketHolder.offlineUserSession((NioSocketChannel) ctx.channel());
     }
 
 }

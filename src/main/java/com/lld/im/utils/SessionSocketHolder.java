@@ -4,14 +4,18 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.constant.Constants;
 import com.lld.im.enums.UserPipelineConnectState;
-import com.lld.im.model.AccountSession;
+import com.lld.im.model.UserSession;
+import io.netty.channel.Channel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,12 +29,27 @@ public class SessionSocketHolder {
      * @param id
      * @param socketChannel
      */
-    public static void put(Integer appId,String id, NioSocketChannel socketChannel) {
-        CHANNEL_MAP.put(appId + ":" +id, socketChannel);
+    public static void put(Integer appId ,String id,Integer client,String imel, NioSocketChannel socketChannel) {
+        CHANNEL_MAP.put(appId + ":" +id+":"+client + ":" + imel, socketChannel);
     }
 
-    public static NioSocketChannel get(Integer appId ,String id) {
-        return CHANNEL_MAP.get(appId + ":" +id);
+    public static NioSocketChannel get(Integer appId ,String id,Integer client,String imel) {
+        return CHANNEL_MAP.get(appId + ":" +id+":"+client + ":" + imel);
+    }
+
+    public static List<NioSocketChannel> get(Integer appId , String id) {
+
+        Set<String> keys = CHANNEL_MAP.keySet();
+        List<NioSocketChannel> channels = new ArrayList<>();
+
+        keys.forEach(key ->{
+
+            if(key.startsWith(appId+":"+id)){
+                channels.add(CHANNEL_MAP.get(key));
+            }
+        });
+
+        return channels;
     }
 
     public static Map<String, NioSocketChannel> getRelationShip() {
@@ -49,20 +68,20 @@ public class SessionSocketHolder {
      * @param [nioSocketChannel]
      * @return void
     */
-    public static void offlineAccountSession(NioSocketChannel nioSocketChannel) {
+    public static void offlineUserSession(NioSocketChannel nioSocketChannel) {
 
         String userId = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get();
-        String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImel)).get();
+        String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
         Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
 
         StringRedisTemplate stringRedisTemplate = SpringBeanFactory.getBean(StringRedisTemplate.class);
-        String sessionStr = (String) stringRedisTemplate.opsForHash().get(appId + ":" + Constants.RedisConstants.accountSessionConstants + ":" + userId,
+        String sessionStr = (String) stringRedisTemplate.opsForHash().get(appId + ":" + Constants.RedisConstants.UserSessionConstants + ":" + userId,
                 clientInfo);
         if (!StringUtils.isEmpty(sessionStr)) {
-            AccountSession accountSession = JSONObject.parseObject(sessionStr, AccountSession.class);
-            accountSession.setConnectState(UserPipelineConnectState.OFFLINE.getCommand());
-            stringRedisTemplate.opsForHash().put(appId + ":" + Constants.RedisConstants.accountSessionConstants + ":" + userId,clientInfo,
-                    JSON.toJSONString(accountSession));
+            UserSession UserSession = JSONObject.parseObject(sessionStr, UserSession.class);
+            UserSession.setConnectState(UserPipelineConnectState.OFFLINE.getCommand());
+            stringRedisTemplate.opsForHash().put(appId + ":" + Constants.RedisConstants.UserSessionConstants + ":" + userId,clientInfo,
+                    JSON.toJSONString(UserSession));
         }
         remove(nioSocketChannel);
         nioSocketChannel.close();
@@ -75,12 +94,12 @@ public class SessionSocketHolder {
      * @param [nioSocketChannel]
      * @return void
     */
-    public static void removeAccountSession(NioSocketChannel nioSocketChannel) {
+    public static void removeUserSession(NioSocketChannel nioSocketChannel) {
         String userId = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get();
-        String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImel)).get();
+        String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
         Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
         StringRedisTemplate stringRedisTemplate = SpringBeanFactory.getBean(StringRedisTemplate.class);
-        stringRedisTemplate.opsForHash().delete(appId+":"+ Constants.RedisConstants.accountSessionConstants+":"+userId,clientInfo);
+        stringRedisTemplate.opsForHash().delete(appId+":"+ Constants.RedisConstants.UserSessionConstants+":"+userId,clientInfo);
         remove(nioSocketChannel);
         nioSocketChannel.close();
     }

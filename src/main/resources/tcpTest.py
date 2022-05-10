@@ -5,9 +5,13 @@ import json
 import struct
 import threading
 import time
+import uuid
+
 
 userId = input("请登录 : ")
 toId = input("请输入和哪个用户进行聊天 : ")
+imei = str(uuid.uuid1())
+
 
 def doPing(scoket):
     command = 9998
@@ -25,13 +29,19 @@ def ping(scoket):
         doPing(scoket)
 
 
-def task(scoket):
+def task(s):
     # print("task开始")
     while True:
         # datab = scoket.recv(4)
-        num = struct.unpack('>I', scoket.recv(4))[0] # 接受包大小并且解析
-        command = struct.unpack('>I', scoket.recv(4))[0] # 接受command并且解析
-        msgPack = scoket.recv(num)
+        num = struct.unpack('>I', s.recv(4))[0] # 接受包大小并且解析
+        command = struct.unpack('>I', s.recv(4))[0] # 接受command并且解析
+        print(command)
+        if command == 2000 :
+            print("收到下线通知")
+            s.close()
+            break
+
+        msgPack = s.recv(num)
         # print(msgPack)
         # msgPack = msgPack.decode("ascii");
         ftm = str(num) + 's'
@@ -55,9 +65,9 @@ s.connect(("127.0.0.1",9000))
 
 
 command = 1000
-data={"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":"imei"}
+data={"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":imei}
 dataObj = data
-data["data"] = {"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":"imei"}
+data["data"] = {"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":imei}
 
 jsonData = json.dumps(data)
 

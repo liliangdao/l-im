@@ -11,6 +11,9 @@ public enum MsgCommand implements Command {
     //登陸  1000
     LOGIN(0x3E8),
 
+    //下线通知 用于多端互斥  2000
+    MUTUALLOGIN(2000),
+
     //登出  9999
     LOGOUT(0x270f),
 

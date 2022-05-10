@@ -1,9 +1,11 @@
 package com.lld.im.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.constant.Constants;
 import com.lld.im.enums.MsgCommand;
-import com.lld.im.model.AccountSession;
+import com.lld.im.model.UserClientDto;
+import com.lld.im.model.UserSession;
 import com.lld.im.model.req.LoginMsg;
 import com.lld.im.proto.Msg;
 import com.lld.im.proto.MsgBody;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -61,26 +64,34 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             ctx.channel().attr(AttributeKey.valueOf(Constants.UserId)).set(userId);
             String hashKey = loginReq.getClientType()+":"+loginReq.getImei();
             /** 为channel设置client和imel **/
-            ctx.channel().attr(AttributeKey.valueOf(Constants.ClientImel)).set(hashKey);
+            ctx.channel().attr(AttributeKey.valueOf(Constants.ClientImei)).set(hashKey);
             /** 为channel设置appId **/
             ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).set(loginReq.getAppId());
 
             // 设置userSession到redis
-            AccountSession accountSession = new AccountSession(loginReq);
+            UserSession UserSession = new UserSession(loginReq);
             StringRedisTemplate stringRedisTemplate = SpringBeanFactory.getBean(StringRedisTemplate.class);
-            stringRedisTemplate.opsForHash().put(loginReq.getAppId()+":"+ Constants.RedisConstants.accountSessionConstants+":"+userId,
-                    hashKey,JSONObject.toJSONString(accountSession));
-            SessionSocketHolder.put(loginReq.getAppId(),userId, (NioSocketChannel) ctx.channel());
+            stringRedisTemplate.opsForHash().put(loginReq.getAppId()+":"+ Constants.RedisConstants.UserSessionConstants+":"+userId,
+                    hashKey,JSONObject.toJSONString(UserSession));
+            SessionSocketHolder.put(loginReq.getAppId(),userId,loginReq.getClientType(),loginReq.getImei(), (NioSocketChannel) ctx.channel());
+
+            // 通知其他端下线,例如：安卓与ios互斥，windows和mac互斥，是否允许多设备登录
+            UserClientDto dto = new UserClientDto();
+            dto.setAppId(loginReq.getAppId());
+            dto.setClientType(loginReq.getClientType());
+            dto.setImei(loginReq.getImei());
+            dto.setUserId(loginReq.getUserId());
+            stringRedisTemplate.convertAndSend(Constants.RedisConstants.UserLoginChannel, JSON.toJSONString(dto));
 
         }else if(command == MsgCommand.LOGOUT.getCommand()){
             /** 登出事件 **/
-            SessionSocketHolder.removeAccountSession((NioSocketChannel) ctx.channel());
+            SessionSocketHolder.removeUserSession((NioSocketChannel) ctx.channel());
             /** TODO 去推送服务删除掉推送信息 */
         }else if(command == MsgCommand.TEST.getCommand()){
             /** 测试Data里面是字符串 */
             String toId = msg.getMsgBody().getToId();
-            NioSocketChannel channel = SessionSocketHolder.get(msg.getMsgBody().getAppId(),toId);
-            if(channel == null){
+            List<NioSocketChannel> nioSocketChannels = SessionSocketHolder.get(msg.getMsgBody().getAppId(), toId);
+            if(nioSocketChannels.isEmpty()){
                 Msg sendPack = new Msg();
                 MsgBody body = new MsgBody();
                 body.setUserId("system");
@@ -103,8 +114,11 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
                 header.setCommand(0x44F);
                 sendPack.setMsgHeader(header);
                 sendPack.setMsgBody(body);
-                channel.writeAndFlush(sendPack);
-                ctx.channel().writeAndFlush(sendPack);
+
+                nioSocketChannels.forEach(c ->{
+                    c.writeAndFlush(sendPack);
+                });
+                 ctx.channel().writeAndFlush(sendPack);
             }
         } else if(command == MsgCommand.PING.getCommand()){
 
@@ -119,7 +133,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         //设置离线
-        SessionSocketHolder.offlineAccountSession((NioSocketChannel) ctx.channel());
+        SessionSocketHolder.offlineUserSession((NioSocketChannel) ctx.channel());
         ctx.close();
     }
 

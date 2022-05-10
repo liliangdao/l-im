@@ -14,7 +14,7 @@ public class Constants {
     public static final String AppId = "appId";
 
     /** channel绑定的clientType 和 imel Key*/
-    public static final String ClientImel = "clientImel";
+    public static final String ClientImei = "clientImei";
 
     public static final String Mq2MsgService = "Pipeline2MessageService";
 
@@ -23,7 +23,12 @@ public class Constants {
         /**
          * 用户session
          */
-        public static final String accountSessionConstants = "accountSession";
+        public static final String UserSessionConstants = "accountSession";
+
+        /**
+         * 用户上线通知channel
+         */
+        public static final String UserLoginChannel = "signal/channel/LOGIN_USER_INNER_QUEUE";
 
     }
 

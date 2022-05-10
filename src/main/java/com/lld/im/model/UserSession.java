@@ -15,7 +15,7 @@ import java.net.UnknownHostException;
  **/
 @Data
 @NoArgsConstructor
-public class AccountSession {
+public class UserSession {
 
     /**
      * 用户ID
@@ -52,7 +52,7 @@ public class AccountSession {
 
 //    private Integer pipelineRpcPort;
 
-    public AccountSession(LoginMsg req) {
+    public UserSession(LoginMsg req) {
         this.setAppId(req.getAppId());
         this.setClientType(req.getClientType());
         this.setConnectState(UserPipelineConnectState.ONLINE.getCommand());
