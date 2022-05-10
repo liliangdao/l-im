@@ -2,6 +2,7 @@ package com.lld.im.model;
 
 import com.lld.im.enums.UserPipelineConnectState;
 import com.lld.im.model.req.LoginMsg;
+import com.lld.im.utils.SpringBeanFactory;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -53,6 +54,13 @@ public class UserSession {
 //    private Integer pipelineRpcPort;
 
     public UserSession(LoginMsg req) {
+        String port = "";
+        if(req.getClientType() == 1){
+            port = SpringBeanFactory.resolve("${webSocketPort}");//webSocketPort
+        }else{
+            port = SpringBeanFactory.resolve("${tcpPort}");
+        }
+
         this.setAppId(req.getAppId());
         this.setClientType(req.getClientType());
         this.setConnectState(UserPipelineConnectState.ONLINE.getCommand());
@@ -60,7 +68,7 @@ public class UserSession {
         this.setImei(req.getImei());
         try {
             InetAddress addr = InetAddress.getLocalHost();
-            this.setPipelineHost(addr.getHostAddress());//设置本机ip
+            this.setPipelineHost(addr.getHostAddress() + ":" + port);//设置本机ip
         }catch (UnknownHostException e){
             e.printStackTrace();
         }

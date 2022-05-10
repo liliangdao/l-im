@@ -1,5 +1,6 @@
 package com.lld.im.server;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -12,11 +13,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LImWebSocketStater implements ApplicationListener<ContextRefreshedEvent>  {
+
+    @Autowired
+    LImWebSocketServer lImWebSocketServer;
+
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (event.getApplicationContext().getParent() == null) {
             try {
-                LImWebSocketServer.getInstance().start();
+//                LImWebSocketServer.getInstance().start();
+                lImWebSocketServer.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -1,5 +1,6 @@
 package com.lld.im.server;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -12,11 +13,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LImStater implements ApplicationListener<ContextRefreshedEvent>  {
+
+    @Autowired
+    LImServer lImServer;
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (event.getApplicationContext().getParent() == null) {
             try {
-                LImServer.getInstance().start();
+//                LImServer.getInstance().start();
+                lImServer.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }

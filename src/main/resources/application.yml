@@ -39,3 +39,6 @@ spring:
 # logger 配置
 logging:
   config: classpath:logback-spring.xml
+
+tcpPort: 9000
+webSocketPort : 19000

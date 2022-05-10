@@ -13,6 +13,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,6 +25,9 @@ import org.springframework.stereotype.Component;
 public class LImServer {
 
     private final static Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
+
+    @Value("${tcpPort}")
+    private Integer tcpPort;
 
     private EventLoopGroup mainGroup;
     private EventLoopGroup subGroup;
@@ -71,7 +75,7 @@ public class LImServer {
     }
 
     public void start(){
-        this.future = server.bind(9000);
+        this.future = server.bind(tcpPort);
         logger.info("tcp server start success");
     }
 
