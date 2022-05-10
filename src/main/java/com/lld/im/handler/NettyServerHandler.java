@@ -103,7 +103,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
                 header.setCommand(0x44F);
                 sendPack.setMsgHeader(header);
                 sendPack.setMsgBody(body);
-                channel.writeAndFlush(sendPack).sync();
+                channel.writeAndFlush(sendPack);
                 ctx.channel().writeAndFlush(sendPack);
             }
         } else if(command == MsgCommand.PING.getCommand()){

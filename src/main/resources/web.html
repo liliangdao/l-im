@@ -438,19 +438,6 @@ ByteBuffer = function (arrayBuf, offset) {
                 msgInfo = eval("(" + msgInfo + ")");
                 ta.value = ta.value + "\n" +msg.toId + "："  + msgInfo.msgBody;
             }
-
-
-        //     if(msg["userId"] == "system"):
-        //     print('\n系统 ： ', msg["data"])
-        //     elif (msg["userId"] == userId):
-        //     msgBody = json.loads(msg["data"])
-        //     print('\n自己：', msgBody["msgBody"])
-        //     # print(msg["data"])
-        // else:
-        //     msgBody = json.loads(msg["data"])
-        //     print('\n',msg["userId"] , '： ', msgBody["msgBody"])
-
-
         }
 
         //连接建立的回调函数
@@ -489,9 +476,8 @@ ByteBuffer = function (arrayBuf, offset) {
 			
 			let loginMsg = new ByteBuffer();
 			loginMsg.int32(bodyLen).int32(command).vstring(jsonData,bodyLen);
-			console.log(loginMsg.pack());
+			// console.log(loginMsg.pack());
 			socket.send(loginMsg.pack());
-
 			// localStorage.userId = userId;
 
         }else{
