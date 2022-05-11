@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @create: 2022-05-11 14:22
  **/
 @RestController
+@RequestMapping("user")
 public class UserController {
 
     private static Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -24,9 +25,9 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @RequestMapping("/delRate")
+    @RequestMapping("/importUser")
 //    @CheckToken
-    public ResponseVO delRate(@RequestBody ImportUserReq req){//@Validated
+    public ResponseVO importUser(@RequestBody ImportUserReq req){//@Validated
         return userService.importUser(req);
     }
 
