@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
                 userDataMapper.insert(data);
                 successId.add(data.getUserId());
             }catch (Exception e){
-                logger.error("");
+                logger.error("导入用户失败 ： appId:{} ,userId : {}",data.getAppId(),data.getUserId());
                 errorId.add(data.getUserId());
             }
         }
