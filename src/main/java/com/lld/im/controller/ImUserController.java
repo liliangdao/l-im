@@ -1,8 +1,10 @@
 package com.lld.im.controller;
 
 import com.lld.im.common.ResponseVO;
+import com.lld.im.model.req.account.GetUserInfoReq;
 import com.lld.im.model.req.account.ImportUserReq;
-import com.lld.im.service.UserService;
+import com.lld.im.model.req.account.UserId;
+import com.lld.im.service.ImUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +20,26 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 @RestController
 @RequestMapping("user")
-public class UserController {
+public class ImUserController {
 
-    private static Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static Logger logger = LoggerFactory.getLogger(ImUserController.class);
 
     @Autowired
-    UserService userService;
+    ImUserService imUserService;
 
     @RequestMapping("/importUser")
-//    @CheckToken
     public ResponseVO importUser(@RequestBody ImportUserReq req){//@Validated
-        return userService.importUser(req);
+        return imUserService.importUser(req);
+    }
+
+    @RequestMapping("/getUserInfo")
+    public ResponseVO getUserInfo(@RequestBody GetUserInfoReq req){//@Validated
+        return imUserService.getUserInfo(req);
+    }
+
+    @RequestMapping("/getSingleUserInfo")
+    public ResponseVO getSingleUserInfo(@RequestBody UserId req){//@Validated
+        return imUserService.getSingleUserInfo(req.getUserId());
     }
 
 }

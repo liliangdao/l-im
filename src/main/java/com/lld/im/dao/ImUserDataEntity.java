@@ -1,5 +1,7 @@
 package com.lld.im.dao;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
@@ -9,13 +11,17 @@ import lombok.Data;
  **/
 
 @Data
-public class UserDataEntity {
+@TableName("im_user_data")
+public class ImUserDataEntity {
 
     // 用户id
+    @TableId
     private String userId;
 
     // 用户名称
     private String nickName;
+
+    private String password;
 
     // 头像
     private String photo;
@@ -34,6 +40,9 @@ public class UserDataEntity {
 
     // 禁用标识(0 未禁用 1 已禁用)
     private Integer forbiddenFlag;
+
+    // 禁言标识
+    private Integer silentFlag;
     /**
      * 用户类型 1普通用户 2客服 3机器人
      */

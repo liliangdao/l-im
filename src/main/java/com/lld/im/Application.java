@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @create: 2022-05-05 10:30
  **/
 @SpringBootApplication
-@MapperScan(basePackages = {"com.lld.dao.mapper"})
+@MapperScan(basePackages = {"com.lld.im.dao.mapper"})
 public class Application {
 
     public static void main(String[] args) {

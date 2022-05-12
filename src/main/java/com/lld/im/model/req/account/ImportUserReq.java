@@ -1,6 +1,6 @@
 package com.lld.im.model.req.account;
 
-import com.lld.im.dao.UserDataEntity;
+import com.lld.im.dao.ImUserDataEntity;
 import lombok.Data;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class ImportUserReq {
 
-    private List<UserDataEntity> userData;
+    private List<ImUserDataEntity> userData;
 
     private Integer appId;
 
