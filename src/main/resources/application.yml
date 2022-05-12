@@ -46,5 +46,8 @@ spring:
 logging:
   config: classpath:logback-spring.xml
 
+zkAddr: 127.0.0.1:2181
 tcpPort: 9000
 webSocketPort : 19000
+server:
+  port: 8081

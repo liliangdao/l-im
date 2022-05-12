@@ -18,6 +18,8 @@ public class Constants {
 
     public static final String Mq2MsgService = "Pipeline2MessageService";
 
+    public static final String IMCORE_ZK_ROOT = "/im-coreRoot";
+
     public static class RedisConstants{
 
         /**
