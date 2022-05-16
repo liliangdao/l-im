@@ -20,6 +20,10 @@ public class Constants {
 
     public static final String IMCORE_ZK_ROOT = "/im-coreRoot";
 
+    public static final String IMCORE_ZK_TCP = "/tcp";
+
+    public static final String IMCORE_ZK_WEB = "/web";
+
     public static class RedisConstants{
 
         /**

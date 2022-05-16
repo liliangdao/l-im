@@ -12,6 +12,8 @@ public enum UserErrorCode implements ApplicationExceptionEnum {
 
     IMPORT_SIZE_BEYOND(20000,"导入數量超出上限"),
     USER_IS_NOT_EXIST(20001,"用户不存在"),
+
+    SERVER_NOT_AVAILABLE(71000, "tim server is not available, please try again later!"),
             ;
 
     private int code;

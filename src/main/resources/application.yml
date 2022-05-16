@@ -51,3 +51,9 @@ tcpPort: 9000
 webSocketPort : 19000
 server:
   port: 8081
+
+appConfig:
+  zkAddr: 127.0.0.1:2181
+  zkConnectTimeOut: 5000
+  imRouteWay: 1 # 路由策略1轮训 2随机 3hash
+  consistentHashWay: 1 # 如果选用一致性hash的话具体hash算法 1TreeMap 2自定义Map

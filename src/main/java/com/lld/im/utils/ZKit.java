@@ -1,11 +1,14 @@
 package com.lld.im.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.lld.im.constant.Constants;
 import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @author: Chackylee
@@ -30,14 +33,14 @@ public class ZKit {
             zkClient.createPersistent(Constants.IMCORE_ZK_ROOT);
         }
 
-        boolean tcpExists = zkClient.exists(Constants.IMCORE_ZK_ROOT+"/tcp");
+        boolean tcpExists = zkClient.exists(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP);
         if (!tcpExists) {
-            zkClient.createPersistent(Constants.IMCORE_ZK_ROOT+"/tcp");
+            zkClient.createPersistent(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP);
         }
 
-        boolean webExists = zkClient.exists(Constants.IMCORE_ZK_ROOT+"/web");
+        boolean webExists = zkClient.exists(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB);
         if (!webExists) {
-            zkClient.createPersistent(Constants.IMCORE_ZK_ROOT+"/web");
+            zkClient.createPersistent(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB);
         }
 
     }
@@ -49,5 +52,27 @@ public class ZKit {
      */
     public void createNode(String path) {
         zkClient.createEphemeral(path);
+    }
+
+    /**
+     * get all TCP server node from zookeeper
+     *
+     * @return
+     */
+    public List<String> getAllTcpNode() {
+        List<String> children = zkClient.getChildren(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP);
+        logger.info("Query all node =[{}] success.", JSON.toJSONString(children));
+        return children;
+    }
+
+    /**
+     * get all WEB server node from zookeeper
+     *
+     * @return
+     */
+    public List<String> getAllWebNode() {
+        List<String> children = zkClient.getChildren(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB);
+        logger.info("Query all node =[{}] success.", JSON.toJSONString(children));
+        return children;
     }
 }

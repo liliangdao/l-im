@@ -14,12 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ZkConfig {
 
-    @Value("${zkAddr}")
-    String zkAddr;
 
-    @Bean
-    public ZkClient buildZKClient() {
-        return new ZkClient(zkAddr, 5000);
-    }
 
 }

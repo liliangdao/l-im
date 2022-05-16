@@ -1,25 +1,24 @@
 package com.lld.im.common;
 
-import com.lld.im.exception.ApplicationExceptionEnum;
-
 /**
  * @author: Chackylee
  * @description:
  * @create: 2022-05-11 14:33
  **/
-public enum BaseErrorCode implements ApplicationExceptionEnum {
+public enum ClientType {
 
-    SUCCESS(200,"success"),
-    SYSTEM_ERROR(90000,"服务器内部错误,请联系管理员"),
-    PARAMETER_ERROR(90001,"参数校验错误"),
-
-
+    WEBAPI(0,"webApi"),
+    WEB(1,"web"),
+    IOS(2,"ios"),
+    ANDROID(3,"android"),
+    WINDOWS(4,"windows"),
+    MAC(5,"mac"),
             ;
 
     private int code;
     private String error;
 
-    BaseErrorCode(int code, String error){
+    ClientType(int code, String error){
         this.code = code;
         this.error = error;
     }
@@ -30,5 +29,7 @@ public enum BaseErrorCode implements ApplicationExceptionEnum {
     public String getError() {
         return this.error;
     }
+
+
 
 }

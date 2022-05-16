@@ -18,4 +18,6 @@ public interface ImUserService {
     public ResponseVO getUserInfo(GetUserInfoReq req);
 
     public ResponseVO getSingleUserInfo(String userId);
+
+    public ResponseVO login(String userId);
 }

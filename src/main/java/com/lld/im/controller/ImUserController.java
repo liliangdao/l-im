@@ -1,10 +1,16 @@
 package com.lld.im.controller;
 
+import com.lld.im.common.BaseErrorCode;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.route.RouteHandle;
+import com.lld.im.common.route.RouteInfo;
 import com.lld.im.model.req.account.GetUserInfoReq;
 import com.lld.im.model.req.account.ImportUserReq;
+import com.lld.im.model.req.account.LoginReq;
 import com.lld.im.model.req.account.UserId;
+import com.lld.im.service.ImService;
 import com.lld.im.service.ImUserService;
+import com.lld.im.utils.RouteInfoParseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +33,12 @@ public class ImUserController {
     @Autowired
     ImUserService imUserService;
 
+    @Autowired
+    ImService imService;
+
+    @Autowired
+    RouteHandle routeHandle;
+
     @RequestMapping("/importUser")
     public ResponseVO importUser(@RequestBody ImportUserReq req){//@Validated
         return imUserService.importUser(req);
@@ -40,6 +52,18 @@ public class ImUserController {
     @RequestMapping("/getSingleUserInfo")
     public ResponseVO getSingleUserInfo(@RequestBody UserId req){//@Validated
         return imUserService.getSingleUserInfo(req.getUserId());
+    }
+
+    @RequestMapping("/login")
+    public ResponseVO login(@RequestBody LoginReq req){//@Validated
+        ResponseVO login = imUserService.login(req.getUserId());
+        if(login.getCode() == BaseErrorCode.SUCCESS.getCode()){
+            //返回im服务地址
+            String serverUrl = routeHandle.routeServer(imService.getAllImServerList(req.getClientType()), req.getUserId());
+            RouteInfo route = RouteInfoParseUtil.parse(serverUrl);
+            return ResponseVO.successResponse(route);
+        }
+        return login;
     }
 
 }

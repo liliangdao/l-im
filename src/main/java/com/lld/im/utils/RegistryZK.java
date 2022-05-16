@@ -32,8 +32,8 @@ public class RegistryZK implements Runnable {
         zKit.createRootNode();
 
         //是否要将自己注册到 ZK
-        String tcpPath = Constants.IMCORE_ZK_ROOT + "/tcp/" + ip + ":" + timServerPort;
-        String webPath = Constants.IMCORE_ZK_ROOT + "/web/" + ip + ":" + webSocketPort;
+        String tcpPath = Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP + "/" + ip + ":" + timServerPort;
+        String webPath = Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB + "/" + ip + ":" + webSocketPort;
         zKit.createNode(tcpPath);
         zKit.createNode(webPath);
         logger.info("Registry zookeeper tcpPath success, msg=[{}]", tcpPath);

@@ -121,4 +121,9 @@ public class ImUserServiceImpl implements ImUserService {
 
         return ResponseVO.successResponse(ImUserDataEntity);
     }
+
+    @Override
+    public ResponseVO login(String userId) {
+        return ResponseVO.successResponse();
+    }
 }
