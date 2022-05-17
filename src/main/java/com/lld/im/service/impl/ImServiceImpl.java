@@ -15,7 +15,7 @@ import java.util.List;
  * @create: 2022-05-16 10:28
  **/
 @Component
-public class ImServiceImpl implements ImService , CommandLineRunner {
+public class ImServiceImpl implements ImService {
 
     @Autowired
     private ZKit zkUtil;
@@ -30,10 +30,5 @@ public class ImServiceImpl implements ImService , CommandLineRunner {
             allNode = zkUtil.getAllTcpNode();
         }
         return allNode;
-    }
-
-
-    @Override
-    public void run(String... args) throws Exception {
     }
 }

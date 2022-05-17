@@ -4,10 +4,7 @@ import com.lld.im.common.BaseErrorCode;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.route.RouteHandle;
 import com.lld.im.common.route.RouteInfo;
-import com.lld.im.model.req.account.GetUserInfoReq;
-import com.lld.im.model.req.account.ImportUserReq;
-import com.lld.im.model.req.account.LoginReq;
-import com.lld.im.model.req.account.UserId;
+import com.lld.im.model.req.account.*;
 import com.lld.im.service.ImService;
 import com.lld.im.service.ImUserService;
 import com.lld.im.utils.RouteInfoParseUtil;
@@ -42,6 +39,11 @@ public class ImUserController {
     @RequestMapping("/importUser")
     public ResponseVO importUser(@RequestBody ImportUserReq req){//@Validated
         return imUserService.importUser(req);
+    }
+
+    @RequestMapping("/deleteUser")
+    public ResponseVO deleteUser(@RequestBody DeleteUserReq req){//@Validated
+        return imUserService.deleteUser(req);
     }
 
     /**

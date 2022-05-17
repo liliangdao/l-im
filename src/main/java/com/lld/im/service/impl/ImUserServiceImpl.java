@@ -1,10 +1,12 @@
 package com.lld.im.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.dao.ImUserDataEntity;
 import com.lld.im.dao.mapper.ImUserDataMapper;
 import com.lld.im.enums.UserErrorCode;
 import com.lld.im.exception.ApplicationException;
+import com.lld.im.model.req.account.DeleteUserReq;
 import com.lld.im.model.req.account.GetUserInfoReq;
 import com.lld.im.model.req.account.ImportUserReq;
 import com.lld.im.model.resp.account.GetUserInfoResp;
@@ -49,8 +51,8 @@ public class ImUserServiceImpl implements ImUserService {
             throw new ApplicationException(UserErrorCode.IMPORT_SIZE_BEYOND);
         }
 
-        LinkedList<String> errorId = new LinkedList();
-        LinkedList<String> successId = new LinkedList();
+        List<String> errorId = new ArrayList();
+        List<String> successId = new ArrayList();
 
 
         for (ImUserDataEntity data : req.getUserData()) {
@@ -122,8 +124,57 @@ public class ImUserServiceImpl implements ImUserService {
         return ResponseVO.successResponse(ImUserDataEntity);
     }
 
+
+    /**
+     * @description 登录用户，目前不实现
+     * @author chackylee
+     * @date 2022/5/17 17:04
+     * @param [userId]
+     * @return com.lld.im.common.ResponseVO
+    */
     @Override
     public ResponseVO login(String userId) {
         return ResponseVO.successResponse();
+    }
+
+    /**
+     * @description 删除用户
+     * @author chackylee
+     * @date 2022/5/17 17:04
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+    */
+    @Override
+    public ResponseVO deleteUser(DeleteUserReq req) {
+
+        ImUserDataEntity entity = new ImUserDataEntity();
+        entity.setDelFlag(1);
+
+        List<String> errorId = new ArrayList();
+        List<String> successId = new ArrayList();
+
+        for (String userId:
+        req.getUserId()) {
+            QueryWrapper wrapper = new QueryWrapper();
+            wrapper.eq("app_id",req.getAppId());
+            wrapper.eq("user_id",userId);
+            int update = 0;
+
+            try {
+                update =  imUserDataMapper.update(entity, wrapper);
+                if(update > 0){
+                    successId.add(userId);
+                }else{
+                    errorId.add(userId);
+                }
+            }catch (Exception e){
+                errorId.add(userId);
+            }
+        }
+
+        ImportUserResp resp = new ImportUserResp();
+        resp.setSuccessId(successId);
+        resp.setErrorId(errorId);
+        return ResponseVO.successResponse(resp);
     }
 }
