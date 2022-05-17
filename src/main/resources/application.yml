@@ -54,4 +54,11 @@ appConfig:
   zkConnectTimeOut: 5000 #zk超时时间
   imRouteWay: 1 # 路由策略1轮训 2随机 3hash
   consistentHashWay: 1 # 如果选用一致性hash的话具体hash算法 1 TreeMap 2 自定义Map
-  needWeb: true # 是否需要开启websocket
+  tcpPort: 9000 # tcp端口
+  webSocketPort: 19000 # webSocket端口
+  loginModel: 1
+#  *                多端同步模式：1 只允许一端在线，手机/电脑/web 踢掉除了本client+imel的设备
+#  *                            2 允许手机/电脑的一台设备 + web在线 踢掉除了本client+imel的非web端设备
+#  *                            3 允许手机和电脑单设备 + web 同时在线 踢掉非本client+imel的同端设备
+#  *                            4 允许所有端多设备登录 不踢任何设备
+  needWebSocket: true #是否需要开启webSocket

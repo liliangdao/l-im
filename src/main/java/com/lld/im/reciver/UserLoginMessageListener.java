@@ -1,7 +1,10 @@
 package com.lld.im.reciver;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lld.im.common.ClientType;
+import com.lld.im.config.AppConfig;
 import com.lld.im.constant.Constants;
+import com.lld.im.enums.DeviceMultiLoginEnum;
 import com.lld.im.enums.MsgCommand;
 import com.lld.im.handler.NettyServerHandler;
 import com.lld.im.model.UserClientDto;
@@ -13,6 +16,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
@@ -29,11 +34,14 @@ import java.util.List;
  * @create: 2022-05-10 10:53
  **/
 @Component
-public class UserLoginMessageListener implements MessageListener {
+public class UserLoginMessageListener implements MessageListener , CommandLineRunner {
 
     private final static Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
-    private Integer loginModel = 1;
+    @Autowired
+    private AppConfig appConfig;
+
+    private Integer loginModel;
 
     /**
      * @description
@@ -52,7 +60,7 @@ public class UserLoginMessageListener implements MessageListener {
         List<NioSocketChannel> nioSocketChannels = SessionSocketHolder.get(userClientDto.getAppId(), userClientDto.getUserId());
         for (NioSocketChannel nioSocketChannel : nioSocketChannels) {
 
-            if(loginModel == 1){
+            if(loginModel == DeviceMultiLoginEnum.ONE.getLoginMode()){
                 String ClientImei = (String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
                 if(!ClientImei.equals(userClientDto.getClientType()+":"+userClientDto.getImei())){
                     Msg sendMsg = new Msg();
@@ -66,11 +74,11 @@ public class UserLoginMessageListener implements MessageListener {
                     header.setCommand(MsgCommand.MUTUALLOGIN.getCommand());
                     nioSocketChannel.writeAndFlush(sendMsg);
                 }
-            }else if(loginModel == 2){
+            }else if(loginModel == DeviceMultiLoginEnum.TWO.getLoginMode()){
                 String ClientImei = (String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
                 String[] split = ClientImei.split(":");
                 Integer clientType = Integer.valueOf(split[0]);
-                if(clientType == 1){
+                if(clientType == ClientType.WEB.getCode()){
                     return;
                 }else{
                     //踢掉除了本客户端imel的所有channel
@@ -87,20 +95,20 @@ public class UserLoginMessageListener implements MessageListener {
                     }
                 }
 
-            }else if(loginModel == 3){
+            }else if(loginModel == DeviceMultiLoginEnum.THREE.getLoginMode()){
                 String ClientImei = (String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
                 String[] split = ClientImei.split(":");
                 Integer clientType = Integer.valueOf(split[0]);
-                if(clientType == 1){
+                if(clientType == ClientType.WEB.getCode()){
                     return;
                 }else{
 
                     Boolean isSameClient = false;
-                    if((clientType == 2 || clientType == 3) && (userClientDto.getClientType() == 2 || userClientDto.getClientType() == 3)){
+                    if((clientType == ClientType.IOS.getCode() || clientType == ClientType.ANDROID.getCode()) && (userClientDto.getClientType() == ClientType.IOS.getCode() || userClientDto.getClientType() == ClientType.ANDROID.getCode())){
                         isSameClient = true;
                     }
 
-                    if((clientType == 4 || clientType == 5) && (userClientDto.getClientType() == 4 || userClientDto.getClientType() == 5)){
+                    if((clientType == ClientType.WINDOWS.getCode() || clientType == ClientType.MAC.getCode()) && (userClientDto.getClientType() == ClientType.WINDOWS.getCode() || userClientDto.getClientType() == ClientType.MAC.getCode())){
                         isSameClient = true;
                     }
 
@@ -118,7 +126,7 @@ public class UserLoginMessageListener implements MessageListener {
                         nioSocketChannel.writeAndFlush(sendMsg);
                     }
                 }
-            }else{
+            }else {
                 return;
             }
 
@@ -126,5 +134,10 @@ public class UserLoginMessageListener implements MessageListener {
 
 
 
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        this.loginModel = appConfig.getLoginModel();
     }
 }

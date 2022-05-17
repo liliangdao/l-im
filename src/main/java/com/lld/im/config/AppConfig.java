@@ -30,7 +30,17 @@ public class AppConfig {
 
     private Integer webSocketPort;
 
-    private Boolean needWebSocket;
+    private boolean needWebSocket;
+
+    private Integer loginModel;
+
+    public Integer getLoginModel() {
+        return loginModel;
+    }
+
+    public void setLoginModel(Integer loginModel) {
+        this.loginModel = loginModel;
+    }
 
     public Boolean getNeedWebSocket() {
         return needWebSocket;

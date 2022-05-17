@@ -18,11 +18,11 @@ public class Constants {
 
     public static final String Mq2MsgService = "Pipeline2MessageService";
 
-    public static final String IMCORE_ZK_ROOT = "/im-coreRoot";
+    public static final String ImCoreZkRoot = "/im-coreRoot";
 
-    public static final String IMCORE_ZK_TCP = "/tcp";
+    public static final String ImCoreZkRootTcp = "/tcp";
 
-    public static final String IMCORE_ZK_WEB = "/web";
+    public static final String ImCoreZkRootWeb = "/web";
 
     public static class RedisConstants{
 

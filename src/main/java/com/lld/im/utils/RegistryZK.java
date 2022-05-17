@@ -34,11 +34,11 @@ public class RegistryZK implements Runnable {
         zKit.createRootNode();
 
         //是否要将自己注册到 ZK
-        String tcpPath = Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP + "/" + ip + ":" + tcpServerPort;
+        String tcpPath = Constants.ImCoreZkRoot + Constants.ImCoreZkRootTcp + "/" + ip + ":" + tcpServerPort;
         zKit.createNode(tcpPath);
         logger.info("Registry zookeeper tcpPath success, msg=[{}]", tcpPath);
         if(this.needWebSocket){
-            String webPath = Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB + "/" + ip + ":" + webSocketPort;
+            String webPath = Constants.ImCoreZkRoot + Constants.ImCoreZkRootWeb + "/" + ip + ":" + webSocketPort;
             zKit.createNode(webPath);
             logger.info("Registry zookeeper webPath success, msg=[{}]", webPath);
         }

@@ -27,20 +27,20 @@ public class ZKit {
      * 创建父级节点
      */
     public void createRootNode() {
-        boolean exists = zkClient.exists(Constants.IMCORE_ZK_ROOT);
+        boolean exists = zkClient.exists(Constants.ImCoreZkRoot);
         if (!exists) {
             //创建 root
-            zkClient.createPersistent(Constants.IMCORE_ZK_ROOT);
+            zkClient.createPersistent(Constants.ImCoreZkRoot);
         }
 
-        boolean tcpExists = zkClient.exists(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP);
+        boolean tcpExists = zkClient.exists(Constants.ImCoreZkRoot + Constants.ImCoreZkRootTcp);
         if (!tcpExists) {
-            zkClient.createPersistent(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP);
+            zkClient.createPersistent(Constants.ImCoreZkRoot + Constants.ImCoreZkRootTcp);
         }
 
-        boolean webExists = zkClient.exists(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB);
+        boolean webExists = zkClient.exists(Constants.ImCoreZkRoot + Constants.ImCoreZkRootWeb);
         if (!webExists) {
-            zkClient.createPersistent(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB);
+            zkClient.createPersistent(Constants.ImCoreZkRoot + Constants.ImCoreZkRootWeb);
         }
 
     }
@@ -60,7 +60,7 @@ public class ZKit {
      * @return
      */
     public List<String> getAllTcpNode() {
-        List<String> children = zkClient.getChildren(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP);
+        List<String> children = zkClient.getChildren(Constants.ImCoreZkRoot + Constants.ImCoreZkRootTcp);
 //        logger.info("Query all node =[{}] success.", JSON.toJSONString(children));
         return children;
     }
@@ -71,7 +71,7 @@ public class ZKit {
      * @return
      */
     public List<String> getAllWebNode() {
-        List<String> children = zkClient.getChildren(Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB);
+        List<String> children = zkClient.getChildren(Constants.ImCoreZkRoot + Constants.ImCoreZkRootWeb);
 //        logger.info("Query all node =[{}] success.", JSON.toJSONString(children));
         return children;
     }

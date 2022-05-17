@@ -2,6 +2,7 @@ package com.lld.im.server;
 
 import com.lld.im.codec.WebSocketMessageDecoder;
 import com.lld.im.codec.WebSocketMessageEncoder;
+import com.lld.im.config.AppConfig;
 import com.lld.im.handler.NettyServerHandler;
 import com.lld.im.handler.NettyWebSocketServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -15,6 +16,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +28,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LImWebSocketServer {
 
-
-    @Value("${webSocketPort}")
-    private Integer webSocketPort;
+    @Autowired
+    AppConfig appConfig;
 
     private final static Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
@@ -85,7 +86,7 @@ public class LImWebSocketServer {
     }
 
     public void start(){
-        this.future = server.bind(webSocketPort);
+        this.future = server.bind(appConfig.getWebSocketPort());
         logger.info("webSocket server start success");
     }
 
