@@ -44,16 +44,13 @@ public class ImUserController {
         return imUserService.importUser(req);
     }
 
-    @RequestMapping("/getUserInfo")
-    public ResponseVO getUserInfo(@RequestBody GetUserInfoReq req){//@Validated
-        return imUserService.getUserInfo(req);
-    }
-
-    @RequestMapping("/getSingleUserInfo")
-    public ResponseVO getSingleUserInfo(@RequestBody UserId req){//@Validated
-        return imUserService.getSingleUserInfo(req.getUserId());
-    }
-
+    /**
+     * @description im的登录接口
+     * @author chackylee
+     * @date 2022/5/17 10:23
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+    */
     @RequestMapping("/login")
     public ResponseVO login(@RequestBody LoginReq req){//@Validated
         ResponseVO login = imUserService.login(req.getUserId());

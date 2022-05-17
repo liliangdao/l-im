@@ -26,6 +26,36 @@ public class AppConfig {
     /** 如果选用一致性hash的话具体hash算法*/
     private Integer consistentHashWay;
 
+    private Integer tcpPort;
+
+    private Integer webSocketPort;
+
+    private Boolean needWebSocket;
+
+    public Boolean getNeedWebSocket() {
+        return needWebSocket;
+    }
+
+    public void setNeedWebSocket(Boolean needWebSocket) {
+        this.needWebSocket = needWebSocket;
+    }
+
+    public Integer getTcpPort() {
+        return tcpPort;
+    }
+
+    public void setTcpPort(Integer tcpPort) {
+        this.tcpPort = tcpPort;
+    }
+
+    public Integer getWebSocketPort() {
+        return webSocketPort;
+    }
+
+    public void setWebSocketPort(Integer webSocketPort) {
+        this.webSocketPort = webSocketPort;
+    }
+
     public String getZkAddr() {
         return zkAddr;
     }

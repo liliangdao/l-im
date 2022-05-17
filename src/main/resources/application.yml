@@ -46,14 +46,12 @@ spring:
 logging:
   config: classpath:logback-spring.xml
 
-zkAddr: 127.0.0.1:2181
-tcpPort: 9000
-webSocketPort : 19000
 server:
-  port: 8081
+  port: 8080
 
 appConfig:
-  zkAddr: 127.0.0.1:2181
-  zkConnectTimeOut: 5000
+  zkAddr: 127.0.0.1:2181 # zk连接地址
+  zkConnectTimeOut: 5000 #zk超时时间
   imRouteWay: 1 # 路由策略1轮训 2随机 3hash
-  consistentHashWay: 1 # 如果选用一致性hash的话具体hash算法 1TreeMap 2自定义Map
+  consistentHashWay: 1 # 如果选用一致性hash的话具体hash算法 1 TreeMap 2 自定义Map
+  needWeb: true # 是否需要开启websocket

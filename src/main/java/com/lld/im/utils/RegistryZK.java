@@ -13,15 +13,17 @@ public class RegistryZK implements Runnable {
 
     private ZKit zKit;
 
-
     private String ip;
-    private int timServerPort;
+    private int tcpServerPort;
     private int webSocketPort;
 
-    public RegistryZK(String ip, int timServerPort, int webSocketPort) {
+    private boolean needWebSocket;
+
+    public RegistryZK(String ip, int tcpServerPort, int webSocketPort,boolean needWebSocket) {
         this.ip = ip;
-        this.timServerPort = timServerPort;
+        this.tcpServerPort = tcpServerPort;
         this.webSocketPort = webSocketPort;
+        this.needWebSocket = needWebSocket;
         zKit = SpringBeanFactory.getBean(ZKit.class);
     }
 
@@ -32,11 +34,13 @@ public class RegistryZK implements Runnable {
         zKit.createRootNode();
 
         //是否要将自己注册到 ZK
-        String tcpPath = Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP + "/" + ip + ":" + timServerPort;
-        String webPath = Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB + "/" + ip + ":" + webSocketPort;
+        String tcpPath = Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_TCP + "/" + ip + ":" + tcpServerPort;
         zKit.createNode(tcpPath);
-        zKit.createNode(webPath);
         logger.info("Registry zookeeper tcpPath success, msg=[{}]", tcpPath);
-        logger.info("Registry zookeeper webPath success, msg=[{}]", webPath);
+        if(this.needWebSocket){
+            String webPath = Constants.IMCORE_ZK_ROOT + Constants.IMCORE_ZK_WEB + "/" + ip + ":" + webSocketPort;
+            zKit.createNode(webPath);
+            logger.info("Registry zookeeper webPath success, msg=[{}]", webPath);
+        }
     }
 }

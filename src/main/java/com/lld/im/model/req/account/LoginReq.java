@@ -2,6 +2,9 @@ package com.lld.im.model.req.account;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
+
 /**
  * @author: Chackylee
  * @description:
@@ -10,6 +13,7 @@ import lombok.Data;
 @Data
 public class LoginReq {
 
+    @NotNull(message = "用户id不能位空")
     private String userId;
 
     private Integer clientType;

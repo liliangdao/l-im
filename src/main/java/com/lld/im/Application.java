@@ -1,7 +1,9 @@
 package com.lld.im;
 
+import com.lld.im.config.AppConfig;
 import com.lld.im.utils.RegistryZK;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,11 +20,9 @@ import java.net.InetAddress;
 @MapperScan(basePackages = {"com.lld.im.dao.mapper"})
 public class Application implements CommandLineRunner {
 
-    @Value("${tcpPort}")
-    private Integer tcpPort;
 
-    @Value("${webSocketPort}")
-    private Integer webSocketPort;
+    @Autowired
+    AppConfig appConfig;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -32,7 +32,7 @@ public class Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
         //获得本机IP
         String addr = InetAddress.getLocalHost().getHostAddress();
-        Thread thread = new Thread(new RegistryZK(addr, tcpPort,webSocketPort));
+        Thread thread = new Thread(new RegistryZK(addr, appConfig.getTcpPort(),appConfig.getWebSocketPort(),appConfig.getNeedWebSocket()));
         thread.setName("registry-zk");
         thread.start();
     }

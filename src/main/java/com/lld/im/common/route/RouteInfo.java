@@ -1,32 +1,19 @@
 package com.lld.im.common.route;
 
+import lombok.Data;
+
 /**
  * @since JDK 1.8
  */
+
+@Data
 public final class RouteInfo {
 
     private String ip;
-    private Integer timServerPort;
+    private Integer port;
 
-    public RouteInfo(String ip, Integer timServerPort) {
+    public RouteInfo(String ip, Integer port) {
         this.ip = ip;
-        this.timServerPort = timServerPort;
+        this.port = port;
     }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public Integer getTimServerPort() {
-        return timServerPort;
-    }
-
-    public void setTimServerPort(Integer timServerPort) {
-        this.timServerPort = timServerPort;
-    }
-
 }
