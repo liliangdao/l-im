@@ -69,10 +69,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).set(loginReq.getAppId());
 
             // 设置userSession到redis
-            UserSession UserSession = new UserSession(loginReq);
+            UserSession userSession = new UserSession(loginReq);
             StringRedisTemplate stringRedisTemplate = SpringBeanFactory.getBean(StringRedisTemplate.class);
             stringRedisTemplate.opsForHash().put(loginReq.getAppId()+":"+ Constants.RedisConstants.UserSessionConstants+":"+userId,
-                    hashKey,JSONObject.toJSONString(UserSession));
+                    hashKey,JSONObject.toJSONString(userSession));
             SessionSocketHolder.put(loginReq.getAppId(),userId,loginReq.getClientType(),loginReq.getImei(), (NioSocketChannel) ctx.channel());
 
             // 通知其他端下线,例如：安卓与ios互斥，windows和mac互斥，是否允许多设备登录
