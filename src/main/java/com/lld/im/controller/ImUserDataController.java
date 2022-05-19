@@ -33,7 +33,7 @@ public class ImUserDataController {
 
     @RequestMapping("/getSingleUserInfo")
     public ResponseVO getSingleUserInfo(@RequestBody @Validated UserId req){
-        return imUserService.getSingleUserInfo(req.getUserId());
+        return imUserService.getSingleUserInfo(req.getUserId(),req.getAppId());
     }
 
 }

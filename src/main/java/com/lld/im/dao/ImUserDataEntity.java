@@ -15,7 +15,6 @@ import lombok.Data;
 public class ImUserDataEntity {
 
     // 用户id
-    @TableId
     private String userId;
 
     // 用户名称

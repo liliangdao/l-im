@@ -12,5 +12,6 @@ public class UserId {
 
     private String userId;
 
+    private Integer appId;
 
 }

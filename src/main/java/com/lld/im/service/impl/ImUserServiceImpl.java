@@ -114,9 +114,14 @@ public class ImUserServiceImpl implements ImUserService {
      * @return com.lld.im.common.ResponseVO
      */
     @Override
-    public ResponseVO getSingleUserInfo(String userId) {
+    public ResponseVO getSingleUserInfo(String userId,Integer appId) {
 
-        ImUserDataEntity ImUserDataEntity = imUserDataMapper.selectById(userId);
+
+        QueryWrapper objectQueryWrapper = new QueryWrapper<>();
+        objectQueryWrapper.eq("app_id",appId);
+        objectQueryWrapper.eq("user_id",userId);
+
+        ImUserDataEntity ImUserDataEntity = imUserDataMapper.selectOne(objectQueryWrapper);
         if(ImUserDataEntity == null){
             throw new ApplicationException(UserErrorCode.USER_IS_NOT_EXIST);
         }

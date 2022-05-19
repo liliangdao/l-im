@@ -24,6 +24,7 @@ public class Constants {
 
     public static final String ImCoreZkRootWeb = "/web";
 
+
     public static class RedisConstants{
 
         /**
@@ -35,6 +36,12 @@ public class Constants {
          * 用户上线通知channel
          */
         public static final String UserLoginChannel = "signal/channel/LOGIN_USER_INNER_QUEUE";
+
+    }
+
+    public static class SeqConstants{
+
+        public static final String FriendSeq = "friendseq";
 
     }
 

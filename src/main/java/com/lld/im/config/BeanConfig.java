@@ -2,6 +2,10 @@ package com.lld.im.config;
 
 import com.lld.im.common.route.RouteHandle;
 import com.lld.im.common.route.algorithm.consistenthash.AbstractConsistentHash;
+import com.lld.im.seq.AbstractSeq;
+import com.lld.im.seq.RedisSeq;
+import com.lld.im.seq.Seq;
+import com.lld.im.seq.SnowflakeIdWorker;
 import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.lang.reflect.Method;
 
@@ -26,6 +31,9 @@ public class BeanConfig {
 
     @Autowired
     AppConfig appConfig;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
     @Bean
     public ZkClient buildZKClient() {
@@ -67,5 +75,29 @@ public class BeanConfig {
             return routeHandle;
         }
 
+    }
+
+    @Bean("redisSeq")
+    public Seq buildRedisSeq() throws Exception {
+        Seq seq = (Seq) Class.forName("com.lld.im.seq.MyGenerateySeq").newInstance();
+        Method method = Class.forName("com.lld.im.seq.MyGenerateySeq").getMethod("setAbstractSeq", AbstractSeq.class);
+        AbstractSeq abstractSeq = (AbstractSeq)
+                Class.forName("com.lld.im.seq.RedisSeq").newInstance();
+        method.invoke(seq, abstractSeq);
+        Method stringRedisMethod = abstractSeq.getClass().getMethod("setRedis", StringRedisTemplate.class);
+        stringRedisMethod.invoke(abstractSeq, stringRedisTemplate);
+        return seq;
+    }
+
+    @Bean("snowflakeSeq")
+    public Seq buildSnowflakeSeq() throws Exception {
+        Seq seq = (Seq) Class.forName("com.lld.im.seq.MyGenerateySeq").newInstance();
+        Method method = Class.forName("com.lld.im.seq.MyGenerateySeq").getMethod("setAbstractSeq", AbstractSeq.class);
+        AbstractSeq abstractSeq = (AbstractSeq)
+                Class.forName("com.lld.im.seq.SnowflakeSeq").newInstance();
+        method.invoke(seq, abstractSeq);
+        Method stringRedisMethod = abstractSeq.getClass().getMethod("setSnowflakeIdWorker", SnowflakeIdWorker.class);
+        stringRedisMethod.invoke(abstractSeq, new SnowflakeIdWorker(1,1));
+        return seq;
     }
 }
