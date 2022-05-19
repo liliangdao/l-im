@@ -114,7 +114,7 @@ public class ImUserServiceImpl implements ImUserService {
      * @return com.lld.im.common.ResponseVO
      */
     @Override
-    public ResponseVO getSingleUserInfo(String userId,Integer appId) {
+    public ResponseVO<ImUserDataEntity> getSingleUserInfo(String userId,Integer appId) {
 
 
         QueryWrapper objectQueryWrapper = new QueryWrapper<>();

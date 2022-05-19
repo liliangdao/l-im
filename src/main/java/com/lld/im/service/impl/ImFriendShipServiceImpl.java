@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.common.BaseErrorCode;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.dao.ImFriendShipEntity;
+import com.lld.im.dao.ImUserDataEntity;
 import com.lld.im.dao.mapper.ImFriendShipMapper;
 import com.lld.im.enums.FriendShipEnum;
 import com.lld.im.enums.FriendShipErrorCode;
@@ -13,6 +14,7 @@ import com.lld.im.model.req.friendship.DeleteFriendReq;
 import com.lld.im.model.req.friendship.FriendDto;
 import com.lld.im.model.resp.friendship.AddFriendResp;
 import com.lld.im.seq.Seq;
+import com.lld.im.service.ImFriendShipRequestService;
 import com.lld.im.service.ImFriendShipService;
 import com.lld.im.service.ImUserService;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +45,9 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
     ImFriendShipService imFriendShipService;
 
     @Autowired
+    ImFriendShipRequestService imFriendShipRequestService;
+
+    @Autowired
     @Qualifier("snowflakeSeq")
     Seq seq;
 
@@ -66,7 +71,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         for (FriendDto dto : req.getAddFriendItems()) {
             AddFriendResp resp = new AddFriendResp();
             String toId = dto.getToId();
-            ResponseVO userInfo = imUserService.getSingleUserInfo(toId,req.getAppId());
+            ResponseVO<ImUserDataEntity> userInfo = imUserService.getSingleUserInfo(toId, req.getAppId());
             if (userInfo.getCode() != BaseErrorCode.SUCCESS.getCode()) {
                 //不成功
                 resp.setCode(userInfo.getCode());
@@ -74,23 +79,44 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 resp.setToId(toId);
                 result.add(resp);
             } else {
-                ResponseVO doAddFriend;
-//                try {
-                    doAddFriend = imFriendShipService.doAddFriend(req.getAppId(),req.getFromId(),dto);
-                    resp.setCode(doAddFriend.getCode());
-                    resp.setMsg(doAddFriend.getMsg());
-                    resp.setToId(toId);
-                    result.add(resp);
-//                } catch (Exception e){
-//                    resp.setCode(BaseErrorCode.SYSTEM_ERROR.getCode());
-//                    resp.setMsg(BaseErrorCode.SYSTEM_ERROR.getError());
-//                    resp.setToId(toId);
-//                    result.add(resp);
-//                }
+                ImUserDataEntity data = userInfo.getData();
+                if(data.getFriendAllowType() == 1){
+                    try {
+                        ResponseVO addFriendRequest = imFriendShipRequestService.addFriendRequest(req.getFromId(), req.getAppId(), dto);
+                        if(addFriendRequest.getCode() == BaseErrorCode.SUCCESS.getCode()){
+                            resp.setCode(FriendShipErrorCode.ADD_FRIEND_NEED_VERIFY.getCode());
+                            resp.setMsg(FriendShipErrorCode.ADD_FRIEND_NEED_VERIFY.getError());
+                            resp.setToId(toId);
+                            result.add(resp);
+                        }else{
+                            resp.setCode(addFriendRequest.getCode());
+                            resp.setMsg(addFriendRequest.getMsg());
+                            resp.setToId(toId);
+                            result.add(resp);
+                        }
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        resp.setCode(BaseErrorCode.SYSTEM_ERROR.getCode());
+                        resp.setMsg(BaseErrorCode.SYSTEM_ERROR.getError());
+                        resp.setToId(toId);
+                        result.add(resp);
+                    }
+                } else{
+                    try {
+                        ResponseVO doAddFriend = imFriendShipService.doAddFriend(req.getAppId(),req.getFromId(),dto);
+                        resp.setCode(doAddFriend.getCode());
+                        resp.setMsg(doAddFriend.getMsg());
+                        resp.setToId(toId);
+                        result.add(resp);
+                    }catch (Exception e){
+                        resp.setCode(BaseErrorCode.SYSTEM_ERROR.getCode());
+                        resp.setMsg(BaseErrorCode.SYSTEM_ERROR.getError());
+                        resp.setToId(toId);
+                        result.add(resp);
+                    }
+                }
             }
         }
-
-
         return ResponseVO.successResponse(result);
     }
 

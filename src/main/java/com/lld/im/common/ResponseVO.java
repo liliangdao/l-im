@@ -14,13 +14,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseVO {
+public class ResponseVO<T> {
 
     private int code;
 
     private String msg;
 
-    private Object data;
+    private T data;
 
     public static ResponseVO successResponse(Object data) {
         return new ResponseVO(200, "success", data);
@@ -50,7 +50,7 @@ public class ResponseVO {
         return this;
     }
 
-    public ResponseVO success(Object data){
+    public ResponseVO success(T data){
         this.code = 200;
         this.msg = "success";
         this.data = data;

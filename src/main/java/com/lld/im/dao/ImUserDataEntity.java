@@ -31,7 +31,7 @@ public class ImUserDataEntity {
     // 个性签名
     private String selfSignature;
 
-    // 加好友验证类型（Friend_AllowType）
+    // 加好友验证类型（Friend_AllowType） 1需要验证
     private Integer friendAllowType;
 
     // 管理员禁止用户添加加好友：0 未禁用 1 已禁用
