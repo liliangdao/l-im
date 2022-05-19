@@ -16,8 +16,6 @@ public class Constants {
     /** channel绑定的clientType 和 imel Key*/
     public static final String ClientImei = "clientImei";
 
-    public static final String Mq2MsgService = "Pipeline2MessageService";
-
     public static final String ImCoreZkRoot = "/im-coreRoot";
 
     public static final String ImCoreZkRootTcp = "/tcp";
@@ -44,6 +42,16 @@ public class Constants {
         public static final String FriendSeq = "friendseq";
 
     }
+
+    public static class RabbitConstants{
+
+        public static final String Im2MsgService = "Pipeline2MessageService";
+
+        public static final String FriendShip2Im = "friendShip2Pipeline";
+
+    }
+
+
 
 
 }

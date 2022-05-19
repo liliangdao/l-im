@@ -34,7 +34,7 @@ public class MqMessageProducer implements CommandLineRunner {
      * @return void
     */
     public void sendMsg(MsgBody msgBody){
-        rabbitTemplate.convertAndSend(Constants.Mq2MsgService,
+        rabbitTemplate.convertAndSend(Constants.RabbitConstants.Im2MsgService,
                 "", JSONObject.toJSONString(msgBody));
     }
 
@@ -48,8 +48,8 @@ public class MqMessageProducer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         RabbitAdmin admin = new RabbitAdmin(this.rabbitTemplate.getConnectionFactory());
-        Queue queue = new Queue(Constants.Mq2MsgService, true, false, false);
-        DirectExchange exchange = new DirectExchange(Constants.Mq2MsgService, true, false);//交换机与队列同名
+        Queue queue = new Queue(Constants.RabbitConstants.Im2MsgService, true, false, false);
+        DirectExchange exchange = new DirectExchange(Constants.RabbitConstants.Im2MsgService, true, false);//交换机与队列同名
         Binding binding = BindingBuilder.bind(queue).to(exchange).with("");
         admin.declareQueue(queue);
         admin.declareExchange(exchange);

@@ -1,5 +1,6 @@
 package com.lld.im.model;
 
+import com.lld.im.config.AppConfig;
 import com.lld.im.enums.UserPipelineConnectState;
 import com.lld.im.model.req.LoginMsg;
 import com.lld.im.utils.SpringBeanFactory;
@@ -51,24 +52,31 @@ public class UserSession {
      */
     private Integer connectState;
 
+    private String mqRouteKey;
+
 //    private Integer pipelineRpcPort;
 
     public UserSession(LoginMsg req) {
-        String port = "";
+        Integer port = null;
+
+        AppConfig appConfig = SpringBeanFactory.getBean(AppConfig.class);
         if(req.getClientType() == 1){
-            port = SpringBeanFactory.resolve("${webSocketPort}");//webSocketPort
+            port = appConfig.getWebSocketPort();//webSocketPort
         }else{
-            port = SpringBeanFactory.resolve("${tcpPort}");
+            port = appConfig.getTcpPort();
         }
 
+        String routeKey = SpringBeanFactory.resolve("${spring.application.name}");
         this.setAppId(req.getAppId());
         this.setClientType(req.getClientType());
         this.setConnectState(UserPipelineConnectState.ONLINE.getCommand());
         this.setUserId(req.getUserId());
         this.setImei(req.getImei());
+        this.setMqRouteKey(routeKey);
         try {
             InetAddress addr = InetAddress.getLocalHost();
             this.setPipelineHost(addr.getHostAddress() + ":" + port);//设置本机ip
+
         }catch (UnknownHostException e){
             e.printStackTrace();
         }
