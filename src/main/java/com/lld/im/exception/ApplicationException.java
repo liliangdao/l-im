@@ -5,7 +5,9 @@ package com.lld.im.exception;
  * @description:
  * @create: 2022-05-11 14:31
  **/
-public class ApplicationException extends RuntimeException {private int code;
+public class ApplicationException extends RuntimeException {
+
+    private int code;
 
     private String error;
 
