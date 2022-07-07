@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.lld.im</groupId>
-    <artifactId>im-core</artifactId>
+    <artifactId>lld-im-tcp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>im</name>
     <description>im project</description>
@@ -13,7 +13,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.3.2.RELEASE</version>
-        <relativePath /> <!-- lookup parent from repository -->
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
