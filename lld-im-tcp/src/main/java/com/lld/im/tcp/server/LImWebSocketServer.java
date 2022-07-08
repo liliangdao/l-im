@@ -1,6 +1,6 @@
 package com.lld.im.tcp.server;
 
-import com.lld.im.codec.AppConfig;
+import com.lld.im.codec.BootstrapConfig;
 import com.lld.im.codec.WebSocketMessageDecoder;
 import com.lld.im.codec.WebSocketMessageEncoder;
 import com.lld.im.tcp.handler.NettyServerHandler;
@@ -21,10 +21,9 @@ import org.slf4j.LoggerFactory;
  * @description:
  * @create: 2022-05-05 14:20
  **/
-//@Component
 public class LImWebSocketServer {
 
-    AppConfig appConfig;
+    BootstrapConfig config;
 
     private final static Logger logger = LoggerFactory.getLogger(LImWebSocketServer.class);
 
@@ -81,7 +80,7 @@ public class LImWebSocketServer {
     }
 
     public void start(){
-        this.future = server.bind(appConfig.getWebSocketPort());
+        this.future = server.bind(config.getLim().getWebSocketPort());
         logger.info("webSocket server start success");
     }
 

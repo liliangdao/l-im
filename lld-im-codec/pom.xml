@@ -32,7 +32,6 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.51</version>
         </dependency>
-
         <!-- common -->
 <!--        <dependency>-->
 <!--            <groupId>com.lld.im</groupId>-->

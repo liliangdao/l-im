@@ -1,9 +1,6 @@
 package com.lld.im.tcp.server;
 
-import com.lld.im.codec.AppConfig;
-import com.lld.im.codec.MessageDecoder;
-import com.lld.im.codec.MessageEncoder;
-import com.lld.im.codec.Msg;
+import com.lld.im.codec.*;
 import com.lld.im.tcp.handler.HeartBeatHandler;
 import com.lld.im.tcp.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -24,7 +21,7 @@ public class LImServer {
 
     private final static Logger logger = LoggerFactory.getLogger(LImServer.class);
 
-    AppConfig appConfig;
+    BootstrapConfig config;
 
     private EventLoopGroup mainGroup;
     private EventLoopGroup subGroup;
@@ -72,7 +69,7 @@ public class LImServer {
     }
 
     public void start(){
-        this.future = server.bind(appConfig.getTcpPort());
+        this.future = server.bind(config.getLim().getTcpPort());
         logger.info("tcp server start success");
     }
 
