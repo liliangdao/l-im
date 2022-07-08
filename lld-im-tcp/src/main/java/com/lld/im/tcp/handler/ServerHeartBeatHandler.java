@@ -19,7 +19,7 @@ public class ServerHeartBeatHandler {
      * @param [ctx]
      * @return void
     */
-    public void process(ChannelHandlerContext ctx){
+    public static void process(ChannelHandlerContext ctx){
 //        String longId = ctx.channel().id().asLongText();
 //        System.out.println(longId + " 心跳超时");
         SessionSocketHolder.offlineUserSession((NioSocketChannel) ctx.channel());

@@ -6,9 +6,15 @@ lim:
   workThreadSize: 8 # work线程 默认=cpu核心数+1
   businessThreadSize: 8 # 业务线程数 默认=cpu核心数
   enableCluster: false # 是否启用集群
+  loginModel: 1
+  #  *                多端同步模式：1 只允许一端在线，手机/电脑/web 踢掉除了本client+imel的设备
+  #  *                            2 允许手机/电脑的一台设备 + web在线 踢掉除了本client+imel的非web端设备
+  #  *                            3 允许手机和电脑单设备 + web 同时在线 踢掉非本client+imel的同端设备
+  #  *                            4 允许所有端多设备登录 不踢任何设备
   zkConfig:
     zkAddr: 127.0.0.1:2181
     zkConnectTimeOut: 5000
+
 
   redis:
     mode: single # 单机模式：single 哨兵模式：sentinel 集群模式：cluster

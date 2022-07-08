@@ -53,16 +53,15 @@ public class UserSession {
 
 //    private Integer pipelineRpcPort;
 
-//    public UserSession(LoginMsg req) {
-        Integer port = null;
-//        AppConfig appConfig = SpringBeanFactory.getBean(AppConfig.class);
-//        if(req.getClientType() == 1){
-//            port = appConfig.getWebSocketPort();//webSocketPort
-//        }else{
-//            port = appConfig.getTcpPort();
-//        }
+//    public UserSession(Integer appId,Integer clientType) {
+//        Integer port = null;
+////        AppConfig appConfig = SpringBeanFactory.getBean(AppConfig.class);
+////        if(req.getClientType() == 1){
+////            port = appConfig.getWebSocketPort();//webSocketPort
+////        }else{
+////            port = appConfig.getTcpPort();
+////        }
 //
-//        String routeKey = SpringBeanFactory.resolve("${spring.application.name}");
 //        this.setAppId(req.getAppId());
 //        this.setClientType(req.getClientType());
 //        this.setConnectState(UserPipelineConnectState.ONLINE.getCommand());

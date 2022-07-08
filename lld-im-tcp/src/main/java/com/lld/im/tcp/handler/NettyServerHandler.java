@@ -1,5 +1,6 @@
 package com.lld.im.tcp.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.proto.Msg;
 import com.lld.im.codec.proto.MsgBody;
@@ -8,13 +9,19 @@ import com.lld.im.codec.pack.LoginMsg;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.MsgCommand;
 import com.lld.im.common.model.UserClientDto;
+import com.lld.im.common.model.UserSession;
+import com.lld.im.tcp.redis.RedisManager;
 import com.lld.im.tcp.utils.SessionSocketHolder;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
+import org.redisson.api.RMap;
+import org.redisson.api.RTopic;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.util.List;
 
 /**
@@ -59,13 +66,22 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).set(loginReq.getAppId());
 
             // 设置userSession到redis
-//            UserSession userSession = new UserSession(loginReq);
+            UserSession session = new UserSession();
+            session.setAppId(loginReq.getAppId());
+            session.setClientType(loginReq.getClientType());
+            session.setImei(loginReq.getImei());
+            session.setUserId(loginReq.getUserId());
+            try{
+                InetAddress addr = InetAddress.getLocalHost();
+                session.setPipelineHost(addr.getHostAddress());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
 
-            //TODO 替换redis方式
-//            StringRedisTemplate stringRedisTemplate = SpringBeanFactory.getBean(StringRedisTemplate.class);
-//            stringRedisTemplate.opsForHash()`.put(loginReq.getAppId()+":"+ Constants.RedisConstants.UserSessionConstants+":"+userId,
-//                    hashKey,JSONObject.toJSONString(userSession));
-//            SessionSocketHolder.put(loginReq.getAppId(),userId,loginReq.getClientType(),loginReq.getImei(), (NioSocketChannel) ctx.channel());
+            RedissonClient redissonClient = RedisManager.getRedissonClient();
+            RMap<Object, Object> map = redissonClient.getMap(loginReq.getAppId() + ":" + Constants.RedisConstants.UserSessionConstants + ":" + userId);
+            map.put(hashKey,JSONObject.toJSONString(session));
+            SessionSocketHolder.put(loginReq.getAppId(),userId,loginReq.getClientType(),loginReq.getImei(), (NioSocketChannel) ctx.channel());
 
 
             // 通知其他端下线,例如：安卓与ios互斥，windows和mac互斥，是否允许多设备登录
@@ -74,7 +90,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             dto.setClientType(loginReq.getClientType());
             dto.setImei(loginReq.getImei());
             dto.setUserId(loginReq.getUserId());
-            //TODO 替换redis方式
+            RTopic topic = redissonClient.getTopic(Constants.RedisConstants.UserLoginChannel);
+            topic.publish(JSON.toJSONString(dto));
 //            stringRedisTemplate.convertAndSend(Constants.RedisConstants.UserLoginChannel, JSON.toJSONString(dto));
 
         }else if(command == MsgCommand.LOGOUT.getCommand()){

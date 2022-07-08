@@ -1,5 +1,6 @@
 package com.lld.im.service.config;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @description:
  * @create: 2022-05-16 11:10
  **/
-
+@Data
 @Component
 @ConfigurationProperties(prefix = "appconfig")
 public class AppConfig {
@@ -33,67 +34,4 @@ public class AppConfig {
 
     private Integer loginModel;
 
-    public Integer getLoginModel() {
-        return loginModel;
-    }
-
-    public void setLoginModel(Integer loginModel) {
-        this.loginModel = loginModel;
-    }
-
-    public Boolean getNeedWebSocket() {
-        return needWebSocket;
-    }
-
-    public void setNeedWebSocket(Boolean needWebSocket) {
-        this.needWebSocket = needWebSocket;
-    }
-
-    public Integer getTcpPort() {
-        return tcpPort;
-    }
-
-    public void setTcpPort(Integer tcpPort) {
-        this.tcpPort = tcpPort;
-    }
-
-    public Integer getWebSocketPort() {
-        return webSocketPort;
-    }
-
-    public void setWebSocketPort(Integer webSocketPort) {
-        this.webSocketPort = webSocketPort;
-    }
-
-    public String getZkAddr() {
-        return zkAddr;
-    }
-
-    public void setZkAddr(String zkAddr) {
-        this.zkAddr = zkAddr;
-    }
-
-    public Integer getZkConnectTimeOut() {
-        return zkConnectTimeOut;
-    }
-
-    public void setZkConnectTimeOut(Integer zkConnectTimeOut) {
-        this.zkConnectTimeOut = zkConnectTimeOut;
-    }
-
-    public Integer getImRouteWay() {
-        return imRouteWay;
-    }
-
-    public void setImRouteWay(Integer imRouteWay) {
-        this.imRouteWay = imRouteWay;
-    }
-
-    public Integer getConsistentHashWay() {
-        return consistentHashWay;
-    }
-
-    public void setConsistentHashWay(Integer consistentHashWay) {
-        this.consistentHashWay = consistentHashWay;
-    }
 }

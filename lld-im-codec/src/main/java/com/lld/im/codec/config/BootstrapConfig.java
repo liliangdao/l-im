@@ -38,6 +38,8 @@ public class BootstrapConfig {
 
         private boolean enableCluster;
 
+        private Integer loginModel;
+
         /**
          * redis配置
          */
@@ -46,7 +48,7 @@ public class BootstrapConfig {
         /**
          * zk配置
          */
-        private zkConfig zkConfig;
+        private ZkConfig zkConfig;
     }
 
 
@@ -54,7 +56,7 @@ public class BootstrapConfig {
 
 
     @Data
-    public static class zkConfig{
+    public static class ZkConfig{
         /** zk连接地址*/
         private String zkAddr;
 

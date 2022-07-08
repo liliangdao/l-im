@@ -4,6 +4,8 @@ import com.lld.im.codec.config.BootstrapConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
+import org.redisson.codec.AvroJacksonCodec;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 
@@ -31,6 +33,8 @@ public class SingleClientStrategy implements ClientStrategy {
         if (StringUtils.isNotBlank(redisConfig.getPassword())) {
             serverConfig.setPassword(redisConfig.getPassword());
         }
+        StringCodec stringCodec = new StringCodec();
+        config.setCodec(stringCodec);
         return Redisson.create(config);
     }
 }
