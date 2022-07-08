@@ -23,24 +23,22 @@ public class LImServer {
 
     private final static Logger logger = LoggerFactory.getLogger(LImServer.class);
 
-    BootstrapConfig config;
+    BootstrapConfig.TcpConfig config;
 
     private EventLoopGroup mainGroup;
     private EventLoopGroup subGroup;
     private ServerBootstrap server;
     private ChannelFuture future;
 
-    private static class SingletionLImServer {
-        static final LImServer instance = new LImServer();
-    }
 
-    public static LImServer getInstance() {
-        return SingletionLImServer.instance;
-    }
+//    public static LImServer getInstance(BootstrapConfig.TcpConfig tcpConfig) {
+//        return SingletionLImServer.instance;
+//    }
 
-    public LImServer(){
-        mainGroup = new NioEventLoopGroup(1);// 处理客户端连接请求数
-        subGroup = new NioEventLoopGroup(8);// 真正服务的请求线程数(不填默认是cpu核心数2倍)
+    public LImServer(BootstrapConfig.TcpConfig tcpConfig){
+        config = tcpConfig;
+        mainGroup = new NioEventLoopGroup(tcpConfig.getBossThreadSize());// 处理客户端连接请求数
+        subGroup = new NioEventLoopGroup(tcpConfig.getBusinessThreadSize());// 真正服务的请求线程数(不填默认是cpu核心数2倍)
         server = new ServerBootstrap();
         server.group(mainGroup, subGroup)
                 .channel(NioServerSocketChannel.class) //NioDatagramChannel.class 如果是udp使用这个类 下面设置的option也会不一样
@@ -66,12 +64,10 @@ public class LImServer {
                         pipeline.addLast(new NettyServerHandler());
                     }
                 });
-
-
     }
 
     public void start(){
-        this.future = server.bind(config.getLim().getTcpPort());
+        this.future = server.bind(config.getTcpPort());
         logger.info("tcp server start success");
     }
 

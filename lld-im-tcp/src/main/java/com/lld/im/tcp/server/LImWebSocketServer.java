@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  **/
 public class LImWebSocketServer {
 
-    BootstrapConfig config;
+    BootstrapConfig.TcpConfig config;
 
     private final static Logger logger = LoggerFactory.getLogger(LImWebSocketServer.class);
 
@@ -32,17 +32,10 @@ public class LImWebSocketServer {
     private ServerBootstrap server;
     private ChannelFuture future;
 
-    private static class SingletionLImServer {
-        static final LImWebSocketServer instance = new LImWebSocketServer();
-    }
-
-    public static LImWebSocketServer getInstance() {
-        return SingletionLImServer.instance;
-    }
-
-    public LImWebSocketServer(){
-        mainGroup = new NioEventLoopGroup(1);// 处理客户端连接请求数
-        subGroup = new NioEventLoopGroup(8);// 真正服务的请求线程数(不填默认是cpu核心数2倍)
+    public LImWebSocketServer(BootstrapConfig.TcpConfig tcpConfig){
+        config = tcpConfig;
+        mainGroup = new NioEventLoopGroup(config.getBossThreadSize());// 处理客户端连接请求数
+        subGroup = new NioEventLoopGroup(config.getBusinessThreadSize());// 真正服务的请求线程数(不填默认是cpu核心数2倍)
         server = new ServerBootstrap();
         server.group(mainGroup, subGroup)
                 .channel(NioServerSocketChannel.class) //NioDatagramChannel.class 如果是udp使用这个类 下面设置的option也会不一样
@@ -80,7 +73,7 @@ public class LImWebSocketServer {
     }
 
     public void start(){
-        this.future = server.bind(config.getLim().getWebSocketPort());
+        this.future = server.bind(config.getWebSocketPort());
         logger.info("webSocket server start success");
     }
 

@@ -3,6 +3,9 @@ package com.lld.im.tcp;
 import com.lld.im.codec.config.BootstrapConfig;
 import com.lld.im.tcp.redis.ClientFactory;
 import com.lld.im.tcp.redis.ClientStrategy;
+import com.lld.im.tcp.redis.RedisManager;
+import com.lld.im.tcp.server.LImServer;
+import com.lld.im.tcp.server.LImWebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
 
@@ -32,7 +35,8 @@ public class Starter {
     }
 
     public static void start(String path) {
-        BootstrapConfig appConfig;
+
+        BootstrapConfig appConfig = null;
         if (path != null) {
             Yaml yaml = new Yaml();
             try {
@@ -42,11 +46,23 @@ public class Starter {
                 e.printStackTrace();
             }
         }
-        //TODO 拿到配置文件后，初始化redis，tcp服务，zk
+        //TODO 拿到配置文件后，初始化redis，tcp服务，zk , 注册redis监听
+        RedisManager.init(appConfig);
+
+        new LImServer(appConfig.getLim()).start();
+        if(appConfig.getLim().isEnableWebSocket()){
+            new LImWebSocketServer(appConfig.getLim()).start();
+        }
+
+        //注册redis监听
+        RedisManager.init(appConfig);
+
+        //注册zk
+
 
     }
 
-    public void initRedis(BootstrapConfig.RedisConfig config){
+    public static void initRedis(BootstrapConfig.RedisConfig config){
         ClientStrategy clientStrategy = ClientFactory.getClientStrategy(config.getMode());
         clientStrategy.getRedissonClient(config);
     }
