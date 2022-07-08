@@ -1,4 +1,4 @@
-package com.lld.im.codec;
+package com.lld.im.codec.proto;
 
 import lombok.Data;
 

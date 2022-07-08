@@ -2,6 +2,8 @@ package com.lld.im.codec;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.lld.im.codec.proto.Msg;
+import com.lld.im.codec.proto.MsgBody;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;

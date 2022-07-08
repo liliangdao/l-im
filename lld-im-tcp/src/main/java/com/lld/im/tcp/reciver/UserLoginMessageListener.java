@@ -1,9 +1,9 @@
 //package com.lld.im.tcp.reciver;
 //
 //import com.alibaba.fastjson.JSONObject;
-//import com.lld.im.codec.Msg;
-//import com.lld.im.codec.MsgBody;
-//import com.lld.im.codec.MsgHeader;
+//import com.lld.im.codec.proto.Msg;
+//import com.lld.im.codec.proto.MsgBody;
+//import com.lld.im.codec.proto.MsgHeader;
 //import com.lld.im.common.ClientType;
 //import com.lld.im.common.constant.Constants;
 //import com.lld.im.common.enums.DeviceMultiLoginEnum;

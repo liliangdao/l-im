@@ -1,7 +1,7 @@
 //package com.lld.im.tcp.publish;
 //
 //import com.alibaba.fastjson.JSONObject;
-//import com.lld.im.codec.MsgBody;
+//import com.lld.im.codec.proto.MsgBody;
 //import com.lld.im.common.constant.Constants;
 //import org.springframework.amqp.core.Binding;
 //import org.springframework.amqp.core.BindingBuilder;

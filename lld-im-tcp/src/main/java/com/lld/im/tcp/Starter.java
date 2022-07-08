@@ -1,10 +1,11 @@
 package com.lld.im.tcp;
 
-import com.lld.im.codec.BootstrapConfig;
+import com.lld.im.codec.config.BootstrapConfig;
+import com.lld.im.tcp.redis.ClientFactory;
+import com.lld.im.tcp.redis.ClientStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -41,9 +42,13 @@ public class Starter {
                 e.printStackTrace();
             }
         }
-
         //TODO 拿到配置文件后，初始化redis，tcp服务，zk
 
+    }
+
+    public void initRedis(BootstrapConfig.RedisConfig config){
+        ClientStrategy clientStrategy = ClientFactory.getClientStrategy(config.getMode());
+        clientStrategy.getRedissonClient(config);
     }
 
 }

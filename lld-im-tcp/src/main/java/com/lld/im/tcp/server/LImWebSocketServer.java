@@ -1,6 +1,6 @@
 package com.lld.im.tcp.server;
 
-import com.lld.im.codec.BootstrapConfig;
+import com.lld.im.codec.config.BootstrapConfig;
 import com.lld.im.codec.WebSocketMessageDecoder;
 import com.lld.im.codec.WebSocketMessageEncoder;
 import com.lld.im.tcp.handler.NettyServerHandler;

@@ -1,9 +1,9 @@
 package com.lld.im.codec.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.Msg;
-import com.lld.im.codec.MsgBody;
-import com.lld.im.codec.MsgHeader;
+import com.lld.im.codec.proto.Msg;
+import com.lld.im.codec.proto.MsgBody;
+import com.lld.im.codec.proto.MsgHeader;
 import io.netty.buffer.ByteBuf;
 
 import java.io.UnsupportedEncodingException;

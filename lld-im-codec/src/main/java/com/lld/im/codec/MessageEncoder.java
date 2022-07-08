@@ -1,6 +1,8 @@
 package com.lld.im.codec;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lld.im.codec.proto.Msg;
+import com.lld.im.codec.proto.MsgBody;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -24,7 +26,7 @@ public class MessageEncoder extends MessageToByteEncoder {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
-        if(msg instanceof  Msg){
+        if(msg instanceof Msg){
             Msg msgBody = (Msg) msg;
             Integer command = msgBody.getMsgHeader().getCommand();
             MsgBody body = msgBody.getMsgBody();

@@ -1,14 +1,13 @@
 package com.lld.im.tcp.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.Msg;
-import com.lld.im.codec.MsgBody;
-import com.lld.im.codec.MsgHeader;
-import com.lld.im.codec.LoginMsg;
+import com.lld.im.codec.proto.Msg;
+import com.lld.im.codec.proto.MsgBody;
+import com.lld.im.codec.proto.MsgHeader;
+import com.lld.im.codec.pack.LoginMsg;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.MsgCommand;
 import com.lld.im.common.model.UserClientDto;
-import com.lld.im.common.model.UserSession;
 import com.lld.im.tcp.utils.SessionSocketHolder;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
