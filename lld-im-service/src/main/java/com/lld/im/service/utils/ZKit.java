@@ -21,38 +21,6 @@ public class ZKit {
 
     @Autowired
     private ZkClient zkClient;
-
-    /**
-     * 创建父级节点
-     */
-    public void createRootNode() {
-        boolean exists = zkClient.exists(Constants.ImCoreZkRoot);
-        if (!exists) {
-            //创建 root
-            zkClient.createPersistent(Constants.ImCoreZkRoot);
-        }
-
-        boolean tcpExists = zkClient.exists(Constants.ImCoreZkRoot + Constants.ImCoreZkRootTcp);
-        if (!tcpExists) {
-            zkClient.createPersistent(Constants.ImCoreZkRoot + Constants.ImCoreZkRootTcp);
-        }
-
-        boolean webExists = zkClient.exists(Constants.ImCoreZkRoot + Constants.ImCoreZkRootWeb);
-        if (!webExists) {
-            zkClient.createPersistent(Constants.ImCoreZkRoot + Constants.ImCoreZkRootWeb);
-        }
-
-    }
-
-    /**
-     * 写入指定节点 临时目录
-     *
-     * @param path
-     */
-    public void createNode(String path) {
-        zkClient.createEphemeral(path);
-    }
-
     /**
      * get all TCP server node from zookeeper
      *

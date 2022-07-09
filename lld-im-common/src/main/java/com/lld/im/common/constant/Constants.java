@@ -39,7 +39,13 @@ public class Constants {
 
     public static class SeqConstants{
 
-        public static final String FriendSeq = "friendseq";
+        public static final String user = "userSeq";
+
+        public static final String friendship = "friendshipSeq";
+
+        public static final String group = "groupSeq";
+
+        public static final String message = "messageSeq";
 
     }
 
@@ -50,8 +56,6 @@ public class Constants {
         public static final String FriendShip2Im = "friendShip2Pipeline";
 
     }
-
-
 
 
 }

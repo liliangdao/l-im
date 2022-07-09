@@ -7,8 +7,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: 123456
-    url: jdbc:mysql://139.198.177.234:3306/im-core?serverTimezone=UTC&useSSL=false
-    username: faka
+    url: jdbc:mysql://127.0.0.1:3306/im-core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
+    username: root
 
   redis:
     host: localhost
@@ -68,3 +68,6 @@ appConfig:
   #  *                            4 允许所有端多设备登录 不踢任何设备
 
 mqQueueName: 123
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml
