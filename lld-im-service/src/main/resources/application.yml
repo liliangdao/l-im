@@ -71,3 +71,6 @@ mqQueueName: 123
 
 mybatis-plus:
   mapper-locations: classpath*:mapper/*.xml
+  global-config:
+    db-config:
+      update-strategy: NOT_EMPTY

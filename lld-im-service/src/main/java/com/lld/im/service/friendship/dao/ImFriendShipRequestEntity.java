@@ -21,20 +21,20 @@ public class ImFriendShipRequestEntity {
 
     private String toId;
     /** 备注*/
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+//    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
     //是否已读 1已读
     private Integer readStatus;
 
     /** 好友来源*/
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+//    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String addSource;
 
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+//    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String addWording;
 
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+//    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long createTime;
 
 

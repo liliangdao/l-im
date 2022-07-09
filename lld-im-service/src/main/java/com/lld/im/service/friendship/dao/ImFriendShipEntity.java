@@ -26,13 +26,13 @@ public class ImFriendShipEntity {
     /** 状态 1正常 2拉黑*/
 
     private Integer black;
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+//    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long createTime;
     /** 序列号*/
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+//    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long sequence;
     /** 好友来源*/
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
+//    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String addSource;
 
 }

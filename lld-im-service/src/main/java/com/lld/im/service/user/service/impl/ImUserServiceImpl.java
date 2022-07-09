@@ -217,9 +217,8 @@ public class ImUserServiceImpl implements ImUserService {
         imUserDataMapper.update(update,query);
 
         //TODO 发送Tcp通知给用户
-
 //        imUserDataMapper.select
 
-        return null;
+        return ResponseVO.successResponse();
     }
 }
