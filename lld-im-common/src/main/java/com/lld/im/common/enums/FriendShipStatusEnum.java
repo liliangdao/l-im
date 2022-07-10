@@ -18,13 +18,19 @@ public enum FriendShipStatusEnum  {
     BLACK_STATUS_BLACKED(2,"拉黑"),
     ;
 
-    public int code;
-    public String desc;
+    private int code;
+    private String desc;
 
     FriendShipStatusEnum(int code, String desc){
         this.code = code;
         this.desc = desc;
     }
 
+    public int getCode() {
+        return code;
+    }
 
+    public String getDesc() {
+        return desc;
+    }
 }

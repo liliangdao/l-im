@@ -1,5 +1,8 @@
 package com.lld.im.service.config;
 
+import com.lld.im.common.enums.ImUrlRouteWayEnum;
+import com.lld.im.common.enums.RouteHashMethodEnum;
+import com.lld.im.common.enums.SeqMethodEnum;
 import com.lld.im.common.route.RouteHandle;
 import com.lld.im.common.route.algorithm.consistenthash.AbstractConsistentHash;
 import com.lld.im.service.service.seq.AbstractSeq;
@@ -42,29 +45,21 @@ public class BeanConfig {
     public RouteHandle buildRouteHandle() throws Exception {
         Integer imRouteWay = appConfig.getImRouteWay();
         String routeWay = "";
-        if(imRouteWay.equals(1)){
-            routeWay = "com.lld.im.common.route.algorithm.loop.LoopHandle";
-        }else if(imRouteWay.equals(2)){
-            routeWay = "com.lld.im.common.route.algorithm.random.RandomHandle";
-        }else if(imRouteWay.equals(3)){
-            routeWay = "com.lld.im.common.route.algorithm.consistenthash.ConsistentHashHandle";
-        }
+
+        ImUrlRouteWayEnum handler = ImUrlRouteWayEnum.getHandler(imRouteWay);
+        routeWay = handler.getClazz();
 
         RouteHandle routeHandle = (RouteHandle) Class.forName(routeWay).newInstance();
         logger.info("Current route algorithm is [{}]", routeHandle.getClass().getSimpleName());
-        if (routeWay.contains("ConsistentHash")) {
+        if (handler == ImUrlRouteWayEnum.HASH) {
             //一致性 hash 算法
             Method method = Class.forName(routeWay).getMethod("setHash", AbstractConsistentHash.class);
-
             Integer consistentHashWay = appConfig.getConsistentHashWay();
-
             String hashWay = "";
 
-            if(consistentHashWay.equals(1)){
-                hashWay = "com.lld.im.common.route.algorithm.consistenthash.TreeMapConsistentHash"; // TreeMap
-            }else if (consistentHashWay.equals(2)){
-                hashWay = "com.lld.im.common.route.algorithm.consistenthash.ConsistentHashHandle"; // 自定义map
-            }
+            RouteHashMethodEnum hashMethodHandler = RouteHashMethodEnum.getHandler(consistentHashWay);
+            hashWay = hashMethodHandler.getClazz();
+
             AbstractConsistentHash consistentHash = (AbstractConsistentHash)
                     Class.forName(hashWay).newInstance();
             method.invoke(routeHandle, consistentHash);
@@ -77,10 +72,10 @@ public class BeanConfig {
 
     @Bean("redisSeq")
     public Seq buildRedisSeq() throws Exception {
-        Seq seq = (Seq) Class.forName("com.lld.im.service.service.seq.MyGenerateySeq").newInstance();
-        Method method = Class.forName("com.lld.im.service.service.seq.MyGenerateySeq").getMethod("setAbstractSeq", AbstractSeq.class);
+        Seq seq = (Seq) Class.forName("com.lld.im.service.service.seq.GenerateySeq").newInstance();
+        Method method = Class.forName("com.lld.im.service.service.seq.GenerateySeq").getMethod("setAbstractSeq", AbstractSeq.class);
         AbstractSeq abstractSeq = (AbstractSeq)
-                Class.forName("com.lld.im.service.service.seq.RedisSeq").newInstance();
+                Class.forName(SeqMethodEnum.REDIS.getClazz()).newInstance();
         method.invoke(seq, abstractSeq);
         Method stringRedisMethod = abstractSeq.getClass().getMethod("setRedis", StringRedisTemplate.class);
         stringRedisMethod.invoke(abstractSeq, stringRedisTemplate);
@@ -89,10 +84,10 @@ public class BeanConfig {
 
     @Bean("snowflakeSeq")
     public Seq buildSnowflakeSeq() throws Exception {
-        Seq seq = (Seq) Class.forName("com.lld.im.service.service.seq.MyGenerateySeq").newInstance();
-        Method method = Class.forName("com.lld.im.service.service.seq.MyGenerateySeq").getMethod("setAbstractSeq", AbstractSeq.class);
+        Seq seq = (Seq) Class.forName("com.lld.im.service.service.seq.GenerateySeq").newInstance();
+        Method method = Class.forName("com.lld.im.service.service.seq.GenerateySeq").getMethod("setAbstractSeq", AbstractSeq.class);
         AbstractSeq abstractSeq = (AbstractSeq)
-                Class.forName("com.lld.im.service.service.seq.SnowflakeSeq").newInstance();
+                Class.forName(SeqMethodEnum.SNOWFLAKE.getClazz()).newInstance();
         method.invoke(seq, abstractSeq);
         Method stringRedisMethod = abstractSeq.getClass().getMethod("setSnowflakeIdWorker", SnowflakeIdWorker.class);
         stringRedisMethod.invoke(abstractSeq, new SnowflakeIdWorker(1,1));

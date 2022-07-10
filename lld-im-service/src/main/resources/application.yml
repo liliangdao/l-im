@@ -7,8 +7,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: 123456
-    url: jdbc:mysql://127.0.0.1:3306/im-core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
-    username: root
+    url: jdbc:mysql://139.198.177.234:3306/im-core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
+    username: faka
 
   redis:
     host: localhost

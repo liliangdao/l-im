@@ -1,6 +1,6 @@
 package com.lld.im.service.service.seq;
 
-public abstract class AbstractSeq {
+public abstract class AbstractSeq implements Seq{
 
     public long getSeq(String key){
         return doGetSeq(key);

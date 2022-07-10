@@ -5,7 +5,7 @@ package com.lld.im.service.service.seq;
  * @description:
  * @create: 2022-05-19 10:34
  **/
-public class MyGenerateySeq implements Seq {
+public class GenerateySeq implements Seq {
 
     private AbstractSeq abstractSeq;
 

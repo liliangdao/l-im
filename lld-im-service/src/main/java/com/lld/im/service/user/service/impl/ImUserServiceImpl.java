@@ -16,6 +16,7 @@ import com.lld.im.service.user.model.req.ModifyUserInfoReq;
 import com.lld.im.service.user.model.resp.GetUserInfoResp;
 import com.lld.im.service.user.model.resp.ImportUserResp;
 import com.lld.im.service.user.service.ImUserService;
+import com.lld.im.service.utils.WriteUserSeq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +41,9 @@ public class ImUserServiceImpl implements ImUserService {
 
     @Autowired
     ImUserDataMapper imUserDataMapper;
+
+    @Autowired
+    WriteUserSeq writeUserSeq;
 
     @Autowired
     @Qualifier("snowflakeSeq")
@@ -213,11 +217,11 @@ public class ImUserServiceImpl implements ImUserService {
 
         update.setAppId(null);
         update.setUserId(null);
-        update.setSequence(seq.getSeq(req.getAppId()+Constants.SeqConstants.user));
+        long seq = this.seq.getSeq(req.getAppId() + Constants.SeqConstants.User);
+        update.setSequence(seq);
         imUserDataMapper.update(update,query);
-
+        writeUserSeq.writeUserSeq(req.getAppId(),req.getUserId(),Constants.SeqConstants.User,seq);
         //TODO 发送Tcp通知给用户
-//        imUserDataMapper.select
 
         return ResponseVO.successResponse();
     }

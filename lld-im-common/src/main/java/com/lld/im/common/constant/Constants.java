@@ -35,17 +35,22 @@ public class Constants {
          */
         public static final String UserLoginChannel = "signal/channel/LOGIN_USER_INNER_QUEUE";
 
+
+        /**
+         * seq前缀
+         */
+        public static final String SeqPrefix = "seq";
     }
 
     public static class SeqConstants{
 
-        public static final String user = "userSeq";
+        public static final String User = "userSeq";
 
-        public static final String friendship = "friendshipSeq";
+        public static final String Friendship = "friendshipSeq";
 
-        public static final String group = "groupSeq";
+        public static final String Group = "groupSeq";
 
-        public static final String message = "messageSeq";
+        public static final String Message = "messageSeq";
 
     }
 
