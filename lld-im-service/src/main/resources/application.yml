@@ -66,6 +66,7 @@ appConfig:
   #  *                            2 允许手机/电脑的一台设备 + web在线 踢掉除了本client+imel的非web端设备
   #  *                            3 允许手机和电脑单设备 + web 同时在线 踢掉非本client+imel的同端设备
   #  *                            4 允许所有端多设备登录 不踢任何设备
+  groupMaxMemberCount: 500
 
 mqQueueName: 123
 

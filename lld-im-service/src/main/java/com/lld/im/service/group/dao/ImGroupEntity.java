@@ -1,5 +1,6 @@
 package com.lld.im.service.group.dao;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.lld.im.common.model.KetValuesBase;
 import com.lld.im.service.group.model.req.GroupMemberDto;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.List;
  * @version: 1.0
  */
 @Data
+@TableName("im_group")
 public class ImGroupEntity {
 
     private String groupId;

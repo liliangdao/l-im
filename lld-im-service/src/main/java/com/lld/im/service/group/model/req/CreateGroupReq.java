@@ -31,7 +31,7 @@ public class CreateGroupReq {
 
     private Integer privateChat; //是否禁止私聊，0 允许群成员发起私聊；1 不允许群成员发起私聊。
 
-    private String Introduction;//群简介
+    private String introduction;//群简介
 
     private String notification;//群公告
 
@@ -41,5 +41,8 @@ public class CreateGroupReq {
 
     private List<GroupMemberDto> member;
 
+    private String operate;//操作人
+
+    private Integer appId;
 
 }

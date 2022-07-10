@@ -6,5 +6,5 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ImGroupDataMapper extends BaseMapper<ImGroupEntity> {
+public interface ImGroupMapper extends BaseMapper<ImGroupEntity> {
 }

@@ -32,6 +32,13 @@ public class AppConfig {
 
     private boolean needWebSocket;
 
+//  #  *                多端同步模式：1 只允许一端在线，手机/电脑/web 踢掉除了本client+imel的设备
+//  #  *                            2 允许手机/电脑的一台设备 + web在线 踢掉除了本client+imel的非web端设备
+//  #  *                            3 允许手机和电脑单设备 + web 同时在线 踢掉非本client+imel的同端设备
+//  #  *                            4 允许所有端多设备登录 不踢任何设备
     private Integer loginModel;
+
+    //群成员的最大人数
+    private Integer groupMaxMemberCount;
 
 }

@@ -1,5 +1,6 @@
 package com.lld.im.common;
 
+import com.lld.im.common.exception.ApplicationExceptionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,6 +38,11 @@ public class ResponseVO<T> {
     public static ResponseVO errorResponse(int code, String msg) {
         return new ResponseVO(code, msg);
     }
+
+    public static ResponseVO errorResponse(ApplicationExceptionEnum enums) {
+        return new ResponseVO(enums.getCode(), enums.getError());
+    }
+
 
     public ResponseVO(int code, String msg) {
         this.code = code;
