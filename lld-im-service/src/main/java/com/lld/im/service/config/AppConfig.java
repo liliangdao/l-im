@@ -41,4 +41,6 @@ public class AppConfig {
     //群成员的最大人数
     private Integer groupMaxMemberCount;
 
+    private String callbackUrl;//回调地址
+
 }

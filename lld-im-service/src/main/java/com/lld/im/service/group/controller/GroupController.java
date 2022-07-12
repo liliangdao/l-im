@@ -31,4 +31,10 @@ public class GroupController {
         return groupService.createGroup(req);
     }
 
+    @RequestMapping("/getGroupInfo")
+    public ResponseVO getGroupInfo(@RequestBody @Validated CreateGroupReq req,Integer appId)  {
+        req.setAppId(appId);
+        return groupService.createGroup(req);
+    }
+
 }

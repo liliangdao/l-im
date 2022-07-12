@@ -1,6 +1,6 @@
 package com.lld.im.service.group.model.req;
 
-import com.lld.im.common.model.KetValuesBase;
+import com.lld.im.common.model.KeyValuesBase;
 import lombok.Data;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class CreateGroupReq {
 
     private String groupName;
 
-    private List<KetValuesBase> groupExpand;
+    private List<KeyValuesBase> groupExpand;
 
     private Integer mute;// 是否全员禁言，0 不禁言；1 全员禁言。
 

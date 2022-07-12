@@ -45,5 +45,11 @@ public class ImFriendShipController {
         return imFriendShipService.getAllFriendShip(req);
     }
 
+    @RequestMapping("/updateFriendship")
+    public ResponseVO updateFriendship(@RequestBody @Validated GetAllFriendShipReq req,Integer appId)  {//@Validated
+        req.setAppId(appId);
+        return imFriendShipService.getAllFriendShip(req);
+    }
+
 
 }
