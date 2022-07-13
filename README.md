@@ -14,6 +14,8 @@ l-im 是 lld 基于 netty 的即时通讯服务。由lld维护和支持。
 - [ ] 项目定位，明确项目定位，具体是作为im通用组件，还是作为私有的app通信项目
 - [ ]   ....
 
+[进度](im-schedule.md ':include')
+
 #### 编译
 在安装JDK1.8以上及maven的前提下，在命令行中执行mvn clean package
 
