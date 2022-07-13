@@ -59,7 +59,13 @@ public class Constants {
         public static final String Im2MsgService = "Pipeline2MessageService";
 
         public static final String FriendShip2Im = "friendShip2Pipeline";
+    }
 
+    public static class CallbackCommand{
+
+        public static final String CreateGroup = "group.create";
+
+        public static final String AddFriend = "friend.add";
     }
 
 

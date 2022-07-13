@@ -1,16 +1,19 @@
 package com.lld.im.service.group.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.config.AppConfig;
+import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.GroupErrorCode;
 import com.lld.im.common.exception.ApplicationException;
-import com.lld.im.service.config.AppConfig;
 import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMapper;
 import com.lld.im.service.group.model.req.CreateGroupReq;
 import com.lld.im.service.group.model.req.GroupMemberDto;
 import com.lld.im.service.group.service.GroupMemberService;
 import com.lld.im.service.group.service.GroupService;
+import com.lld.im.service.utils.CallbackService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Autowired
     AppConfig appConfig;
+
+    @Autowired
+    CallbackService callbackService;
 
     @Override
     @Transactional
@@ -71,6 +77,12 @@ public class GroupServiceImpl implements GroupService {
         for (GroupMemberDto dto : req.getMember()) {
             groupMemberService.addGroupMember(req.getGroupId(),req.getAppId(),dto);
         }
+
+        //TODO 发送tcp通知
+
+        //回调
+        callbackService.callback(req.getAppId(), Constants.CallbackCommand.CreateGroup, JSONObject.toJSONString(imGroupEntity));
+
 
         return ResponseVO.successResponse();
     }

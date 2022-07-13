@@ -28,6 +28,8 @@
         <redisson.version>3.15.6</redisson.version>
         <snakeyaml.version>1.27</snakeyaml.version>
         <protostuff-api>1.0.10</protostuff-api>
+
+        <apache.httpclient.version>4.5.9</apache.httpclient.version>
     </properties>
 
     <dependencies>
@@ -102,7 +104,6 @@
                 <version>2.3.2.RELEASE</version>
             </dependency>
 
-
             <!-- rabbitmq -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -124,16 +125,31 @@
                 <version>6.0.15.Final</version>
             </dependency>
 
+            <!-- redisson -->
             <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
 
+            <!-- yaml -->
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+
+            <!-- hutool -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${apache.httpclient.version}</version>
             </dependency>
 
         </dependencies>

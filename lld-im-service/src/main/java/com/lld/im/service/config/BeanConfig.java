@@ -1,5 +1,6 @@
 package com.lld.im.service.config;
 
+import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.enums.ImUrlRouteWayEnum;
 import com.lld.im.common.enums.RouteHashMethodEnum;
 import com.lld.im.common.enums.SeqMethodEnum;

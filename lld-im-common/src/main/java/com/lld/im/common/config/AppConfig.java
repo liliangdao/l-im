@@ -1,4 +1,4 @@
-package com.lld.im.service.config;
+package com.lld.im.common.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -42,5 +42,9 @@ public class AppConfig {
     private Integer groupMaxMemberCount;
 
     private String callbackUrl;//回调地址
+
+    private boolean addFriendCallback; //添加好友之后回调开关
+
+    private boolean createGroupCallback; //创建群聊之后回调开关
 
 }
