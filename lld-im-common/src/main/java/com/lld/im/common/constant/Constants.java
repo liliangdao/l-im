@@ -65,6 +65,8 @@ public class Constants {
 
         public static final String CreateGroup = "group.create";
 
+        public static final String UpdateGroup = "group.update";
+
         public static final String AddFriend = "friend.add";
     }
 

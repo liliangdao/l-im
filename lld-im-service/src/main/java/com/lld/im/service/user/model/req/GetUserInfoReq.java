@@ -1,5 +1,6 @@
 package com.lld.im.service.user.model.req;
 
+import com.lld.im.common.model.RequestBase;
 import lombok.Data;
 
 import java.util.List;
@@ -10,15 +11,12 @@ import java.util.List;
  * @create: 2022-05-12 15:23
  **/
 @Data
-public class GetUserInfoReq {
+public class GetUserInfoReq extends RequestBase {
 
     private List<String> userIds;
 
     private List<String> standardField;
 
     private List<String> customField;
-
-    private Integer appId;
-
 
 }

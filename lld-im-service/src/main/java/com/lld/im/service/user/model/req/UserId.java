@@ -1,5 +1,6 @@
 package com.lld.im.service.user.model.req;
 
+import com.lld.im.common.model.RequestBase;
 import lombok.Data;
 
 /**
@@ -8,11 +9,8 @@ import lombok.Data;
  * @create: 2022-05-12 15:38
  **/
 @Data
-public class UserId {
+public class UserId extends RequestBase {
 
     private String userId;
-
-    private Integer appId;
-
 
 }

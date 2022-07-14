@@ -1,5 +1,6 @@
 package com.lld.im.service.user.model.req;
 
+import com.lld.im.common.model.RequestBase;
 import lombok.Data;
 
 /**
@@ -9,7 +10,7 @@ import lombok.Data;
  * @version: 1.0
  */
 @Data
-public class ModifyUserInfoReq {
+public class ModifyUserInfoReq extends RequestBase {
 
     // 用户id
     private String userId;
@@ -30,10 +31,6 @@ public class ModifyUserInfoReq {
 
     // 加好友验证类型（Friend_AllowType） 1需要验证
     private Integer friendAllowType;
-
-    private Integer appId;
-
-
 
 
 }

@@ -4,14 +4,20 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.enums.GroupErrorCode;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
+import com.lld.im.common.exception.ApplicationException;
+import com.lld.im.service.Application;
 import com.lld.im.service.group.dao.ImGroupMemberEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMemberMapper;
+import com.lld.im.service.group.model.req.GetRoleInGroupReq;
 import com.lld.im.service.group.model.req.GroupMemberDto;
+import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
 import com.lld.im.service.group.service.GroupMemberService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @description:
@@ -85,6 +91,26 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
     @Override
     public ResponseVO removeGroupMember(String groupId, Integer appId, GroupMemberDto dto) {
+        return null;
+    }
+
+    @Override
+    public ResponseVO<GetRoleInGroupResp> getRoleInGroupOne(String groupId, String memberId, Integer appId) {
+
+        QueryWrapper<ImGroupMemberEntity> queryOwner = new QueryWrapper<>();
+        queryOwner.eq("group_id",groupId);
+        queryOwner.eq("app_id",appId);
+        queryOwner.eq("member_id",memberId);
+
+        ImGroupMemberEntity imGroupMemberEntity = imGroupMemberMapper.selectOne(queryOwner);
+        if(imGroupMemberEntity == null || imGroupMemberEntity.getRole() == GroupMemberRoleEnum.LEAVE.getCode()){
+            return ResponseVO.errorResponse(GroupErrorCode.MEMBER_IS_NOT_JOINED_GROUP);
+        }
+        return ResponseVO.successResponse(imGroupMemberEntity);
+    }
+
+    @Override
+    public ResponseVO<List<GetRoleInGroupResp>> getRoleInGroup(GetRoleInGroupReq req) {
         return null;
     }
 

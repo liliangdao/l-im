@@ -1,5 +1,6 @@
 package com.lld.im.service.friendship.model.req;
 
+import com.lld.im.common.model.RequestBase;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -11,13 +12,10 @@ import java.util.List;
  * @create: 2022-05-19 09:17
  **/
 @Data
-public class AddFriendReq {
+public class AddFriendReq extends RequestBase {
 
     @NotBlank(message = "用户id不能为空")
     private String fromId;
 
     private List<FriendDto> addFriendItems;
-
-    private Integer appId;
-
 }
