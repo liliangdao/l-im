@@ -209,13 +209,40 @@ public class GroupServiceImpl implements GroupService {
     /**
      * @param [req]
      * @return com.lld.im.common.ResponseVO
-     * @description 解散群组，需发送tcp通知 + 回调
+     * @description 解散群组，只支持后台管理员和群主解散，需发送tcp通知 + 回调
      * @author chackylee
      * @date 2022/7/14 11:45
      */
     @Override
     public ResponseVO destroyGroup(DestroyGroupReq req) {
-        return null;
+
+        boolean isAdmin = false;
+
+        QueryWrapper<ImGroupEntity> objectQueryWrapper = new QueryWrapper<>();
+        objectQueryWrapper.eq("group_id",req.getGroupId());
+        objectQueryWrapper.eq("app_id",req.getAppId());
+        ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(objectQueryWrapper);
+        if(imGroupEntity == null){
+            throw new ApplicationException(GroupErrorCode.GROUP_IS_NOT_EXIST);
+        }
+
+        if(!isAdmin){
+            if(!imGroupEntity.getOwnerId().equals(req.getOperater())){
+                throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
+            }
+        }
+
+        ImGroupEntity update = new ImGroupEntity();
+        update.setStatus(GroupStatusEnum.DESTROY.getCode());
+        long seq = this.seq.getSeq(req.getAppId() + Constants.SeqConstants.Group);
+        update.setSequence(seq);
+        int update1 = imGroupDataMapper.update(update, objectQueryWrapper);
+        if(update1 != 1){
+            throw new ApplicationException(GroupErrorCode.UPDATE_GROUP_BASE_INFO_ERROR);
+        }
+
+        callbackService.callback(req.getAppId(), Constants.CallbackCommand.UpdateGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
+        return ResponseVO.successResponse();
     }
 
 

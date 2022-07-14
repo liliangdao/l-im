@@ -39,7 +39,7 @@
 | /group/addMember          | 增加群成员             | 发送tcp通知未完成，添加静默加人 |  80%  |
 | /group/deleteMember       | 删除群成员             |                                 |  0%   |
 | /group/updateMember       | 修改群成员资料         | 修改单个                        |  0%   |
-| /group/destroyGroup       | 解散群                 | 需要发送tcp通知                 |  0%   |
+| /group/destroyGroup       | 解散群                 | 需要发送tcp通知未完成                 |  90%   |
 | /group/getJoinedGroup     | 获取用户所加入的群组   | 支持群类型过滤，分页拉取，分页返回小问题日后修复        |  95%   |
 | /group/getRoleInGroup     | 查询用户在群组中的身份 | 支持批量拉取                    |  0%   |
 | /group/forbidSendMsg      | 批量禁言/解禁          | ShutUpTime为0表示解禁言         |  0%   |

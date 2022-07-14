@@ -25,7 +25,9 @@ public enum GroupErrorCode implements ApplicationExceptionEnum {
 
     THIS_OPERATE_NEED_MANAGER_ROLE(40007,"该操作只允许群主/管理员操作"),
 
-    UPDATE_GROUP_BASE_INFO_ERROR(40008,"更新群信息失败"),
+    THIS_OPERATE_NEED_OWNER_ROLE(40008,"该操作只允许群主操作"),
+
+    UPDATE_GROUP_BASE_INFO_ERROR(40009,"更新群信息失败"),
 
 //    ADD_FRIEND_REQUEST_ERROR(30003,"好友验证添加失败"),
 
