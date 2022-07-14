@@ -2,7 +2,7 @@
 
 | 接口                         | 作用             | 备注                                     | 进 度 |
 | ---------------------------- | ---------------- | ---------------------------------------- | :---: |
-| /user/importUser             | 导入用户         |                                          | 100%  |
+| <font color=red>/user/importUser</font>             | 导入用户         |                                          | 100%  |
 | /user/deleteUser             | 删除用户         |                                          | 100%  |
 | /user/login                  | 登录             | 返回服务地址                             | 100%  |
 | /user/data/getUserInfo       | 获取用户         | 获取用户拓展信息，根据字段获取信息未完成 |  50%  |
@@ -35,12 +35,12 @@
 | /group/get                | 获取群组资料           | 群资料+群成员信息               |  0%   |
 | /group/getAll             | 获取所有群组           | 只支持根据群类型过滤            |  0%   |
 | /group/getGroupMember     | 获取群成员详细资料     | 分页返回                        |  0%   |
-| /group/update             | 修改群基础资料         | 修改单个群                      |  0%   |
+| <font color=red>/group/update</font>             | 修改群基础资料         | 修改单个群                      |  0%   |
 | /group/addMember          | 增加群成员             | 发送tcp通知未完成，添加静默加人 |  80%  |
-| /group/deleteMember       | 删除群成员             |                                 |  0%   |
-| /group/updateMember       | 修改群成员资料         | 修改单个                        |  0%   |
-| /group/destroyGroup       | 解散群                 | 需要发送tcp通知                 |  0%   |
-| /group/getJoinedGroup     | 获取用户所加入的群组   | 支持群类型过滤，分页拉取        |  0%   |
+| <font color=red>/group/deleteMember</font>       | 删除群成员             |                                 |  0%   |
+| <font color=red>/group/updateMember</font>       | 修改群成员资料         | 修改单个                        |  0%   |
+| <font color=red>/group/destroyGroup</font>       | 解散群                 | 需要发送tcp通知                 |  0%   |
+| <font color=red>/group/getJoinedGroup</font>     | 获取用户所加入的群组   | 支持群类型过滤，分页拉取        |  0%   |
 | /group/getRoleInGroup     | 查询用户在群组中的身份 | 支持批量拉取                    |  0%   |
 | /group/forbidSendMsg      | 批量禁言/解禁          | ShutUpTime为0表示解禁言         |  0%   |
 | /group/getGroupShuttedUin | 获取被禁言群成员列表   | 单个群                          |  0%   |
