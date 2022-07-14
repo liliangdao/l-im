@@ -1,5 +1,6 @@
 package com.lld.im.service.friendship.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.common.BaseErrorCode;
 import com.lld.im.common.ResponseVO;
@@ -17,6 +18,7 @@ import com.lld.im.service.friendship.service.ImFriendShipRequestService;
 import com.lld.im.service.friendship.service.ImFriendShipService;
 import com.lld.im.service.user.service.ImUserService;
 import com.lld.im.service.service.seq.Seq;
+import com.lld.im.service.utils.CallbackService;
 import com.lld.im.service.utils.WriteUserSeq;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,9 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
 
     @Autowired
     WriteUserSeq writeUserSeq;
+
+    @Autowired
+    CallbackService callbackService;
 
 
     /**
@@ -123,6 +128,9 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 }
             }
         }
+
+        //回调
+        callbackService.callback(req.getAppId(), Constants.CallbackCommand.AddFriend, JSONObject.toJSONString(result));
         return ResponseVO.successResponse(result);
     }
 
@@ -245,8 +253,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 .eq("to_id", req.getToId());
         ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(queryFrom);
         if (fromItem.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_DELETED.getCode()) {
-            //已经删除了
-
+            throw new ApplicationException(FriendShipErrorCode.FRIEND_IS_DELETED);
         }
 //        queryFrom
         ImFriendShipEntity update = new ImFriendShipEntity();
@@ -254,6 +261,8 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         imFriendShipMapper.update(update, queryFrom);
         //TODO 发送消息给同步端
 
+        //回调
+        callbackService.callback(req.getAppId(), Constants.CallbackCommand.DeleteFriend, JSONObject.toJSONString(req));
         return ResponseVO.successResponse();
     }
 }

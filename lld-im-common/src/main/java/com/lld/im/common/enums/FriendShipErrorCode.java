@@ -17,6 +17,8 @@ public enum FriendShipErrorCode implements ApplicationExceptionEnum {
 
     ADD_FRIEND_REQUEST_ERROR(30003,"好友验证添加失败"),
 
+    FRIEND_IS_DELETED(30004,"好友已被删除"),
+
     ;
 
     private int code;

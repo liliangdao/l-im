@@ -67,7 +67,13 @@ public class Constants {
 
         public static final String UpdateGroup = "group.update";
 
+        public static final String DestoryGroup = "group.destory";
+
         public static final String AddFriend = "friend.add";
+
+        public static final String UpdateFriend = "friend.update";
+
+        public static final String DeleteFriend = "friend.delete";
     }
 
 
