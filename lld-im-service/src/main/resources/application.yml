@@ -74,10 +74,16 @@ appConfig:
 mqQueueName: 123
 
 mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   mapper-locations: classpath*:mapper/*.xml
   global-config:
     db-config:
       update-strategy: NOT_EMPTY
+
+#mybatis:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 httpclient:
   maxTotal: 100

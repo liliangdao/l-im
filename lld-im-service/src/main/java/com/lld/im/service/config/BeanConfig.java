@@ -1,5 +1,6 @@
 package com.lld.im.service.config;
 
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.enums.ImUrlRouteWayEnum;
 import com.lld.im.common.enums.RouteHashMethodEnum;
@@ -93,5 +94,13 @@ public class BeanConfig {
         Method stringRedisMethod = abstractSeq.getClass().getMethod("setSnowflakeIdWorker", SnowflakeIdWorker.class);
         stringRedisMethod.invoke(abstractSeq, new SnowflakeIdWorker(1,1));
         return seq;
+    }
+
+    /**
+     * 分页插件
+     */
+    @Bean
+    public PaginationInterceptor paginationInterceptor() {
+        return new PaginationInterceptor();
     }
 }
