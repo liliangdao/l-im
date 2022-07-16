@@ -1,31 +1,30 @@
 package com.lld.im.service.group.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.enums.GroupErrorCode;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
+import com.lld.im.common.enums.GroupTypeEnum;
 import com.lld.im.common.exception.ApplicationException;
-import com.lld.im.service.Application;
+import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.dao.ImGroupMemberEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMemberMapper;
+import com.lld.im.service.group.model.req.AddMemberReq;
 import com.lld.im.service.group.model.req.GetJoinedGroupReq;
 import com.lld.im.service.group.model.req.GetRoleInGroupReq;
 import com.lld.im.service.group.model.req.GroupMemberDto;
+import com.lld.im.service.group.model.resp.AddMemberResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
 import com.lld.im.service.group.service.GroupMemberService;
+import com.lld.im.service.group.service.GroupService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @description:
@@ -39,11 +38,17 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     @Autowired
     ImGroupMemberMapper imGroupMemberMapper;
 
+    @Autowired
+    GroupService groupService;
+
+    @Autowired
+    GroupMemberService groupMemberService;
+
 
     /**
      * @param
      * @return com.lld.im.common.ResponseVO
-     * @description:
+     * @description: 添加群成员，内部调用
      * @author lld
      * @since 2022/7/10
      */
@@ -56,9 +61,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         query.eq("app_id", appId);
         query.eq("member_id", dto.getMemberId());
 
-        ImGroupMemberEntity memberDto = imGroupMemberMapper.selectOne(query);
-
-        if (dto.getRole() == GroupMemberRoleEnum.OWNER.getCode()) {
+        if (GroupMemberRoleEnum.OWNER.getCode() == dto.getRole()) {
             QueryWrapper<ImGroupMemberEntity> queryOwner = new QueryWrapper<>();
             queryOwner.eq("group_id", groupId);
             queryOwner.eq("app_id", appId);
@@ -68,6 +71,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
                 return ResponseVO.errorResponse(GroupErrorCode.GROUP_IS_HAVE_OWNER);
             }
         }
+
+        ImGroupMemberEntity memberDto = imGroupMemberMapper.selectOne(query);
 
         long now = System.currentTimeMillis();
         if (memberDto == null) {
@@ -83,7 +88,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
                 return ResponseVO.successResponse();
             }
             return ResponseVO.errorResponse(GroupErrorCode.USER_JOIN_GROUP_ERROR);
-        } else {
+        } else if(GroupMemberRoleEnum.LEAVE.getCode() == memberDto.getRole()){
             //重新进群
             memberDto = new ImGroupMemberEntity();
             BeanUtils.copyProperties(dto, memberDto);
@@ -94,6 +99,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             }
             return ResponseVO.errorResponse(GroupErrorCode.USER_JOIN_GROUP_ERROR);
         }
+
+        return ResponseVO.errorResponse(GroupErrorCode.USER_IS_JOINED_GROUP);
 
     }
 
@@ -147,6 +154,73 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         } else {
             return ResponseVO.successResponse(imGroupMemberMapper.getJoinedGroupId(req.getAppId(),req.getMemberId()));
         }
+    }
+
+    /**
+     * @description: 添加群成员，如果是后台管理员，则直接拉入群，如果不是则根据群类型是私有群/公开群走不同的逻辑
+     * @param
+     * @return com.lld.im.common.ResponseVO
+     * @author lld
+     * @since 2022/7/16
+     */
+    @Override
+    public ResponseVO addMember(AddMemberReq req) {
+
+        List<AddMemberResp> resp = new ArrayList<>();
+
+        boolean isAdmin = false;
+        ResponseVO<ImGroupEntity> groupResp = groupService.getGroup(req.getGroupId(), req.getAppId());
+        if(!groupResp.isOk()){
+            return groupResp;
+        }
+
+        ImGroupEntity group = groupResp.getData();
+
+        /**
+         * 私有群（private）	类似普通微信群，创建后仅支持已在群内的好友邀请加群，且无需被邀请方同意或群主审批
+         * 陌生人社交群（Public）	类似 QQ 群，创建后群主可以指定群管理员，用户搜索群 ID 发起加群申请后，需要群主或管理员审批通过才能入群
+         * 群类型 1私有群（类似微信） 2公开群(类似qq）
+         * 加入群权限，0 所有人可以加入；1 群成员可以拉人；2 群管理员或群组可以拉人。
+         *
+         */
+        if(!isAdmin){
+             if(GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()){
+                 //不是群成员无法拉人入群
+                 ResponseVO<GetRoleInGroupResp> role = getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+                 if(!role.isOk()){
+                     return role;
+                 }
+
+                 GetRoleInGroupResp data = role.getData();
+                 Integer roleInfo = data.getRole();
+
+                 boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
+                //公开群必须是管理员才能拉人
+                 if(!isManager && GroupTypeEnum.PRIVATE.getCode() == group.getGroupType()){
+                     throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+                 }
+            }
+        }
+
+        for (String memberId:
+             req.getMemberId()) {
+            GroupMemberDto groupMemberDto = new GroupMemberDto();
+            groupMemberDto.setMemberId(memberId);
+
+            ResponseVO responseVO = groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), groupMemberDto);
+            AddMemberResp addMemberResp = new AddMemberResp();
+            addMemberResp.setMemberId(memberId);
+            if(responseVO.isOk()){
+                addMemberResp.setResult(0);
+            }else if(responseVO.getCode() == GroupErrorCode.USER_IS_JOINED_GROUP.getCode()){
+                addMemberResp.setResult(2);
+            }else{
+                addMemberResp.setResult(1);
+            }
+            resp.add(addMemberResp);
+        }
+
+        return ResponseVO.successResponse(resp);
     }
 
 

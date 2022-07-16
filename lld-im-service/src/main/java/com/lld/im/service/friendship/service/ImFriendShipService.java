@@ -15,4 +15,5 @@ public interface ImFriendShipService {
 
     public ResponseVO getAllFriendShip(GetAllFriendShipReq req);
 
+    public ResponseVO getRelation(GetRelationReq req);
 }

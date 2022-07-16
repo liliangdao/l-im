@@ -1,10 +1,8 @@
 package com.lld.im.service.group.service;
 
 import com.lld.im.common.ResponseVO;
-import com.lld.im.service.group.model.req.CreateGroupReq;
-import com.lld.im.service.group.model.req.DestroyGroupReq;
-import com.lld.im.service.group.model.req.GetJoinedGroupReq;
-import com.lld.im.service.group.model.req.UpdateGroupReq;
+import com.lld.im.service.group.dao.ImGroupEntity;
+import com.lld.im.service.group.model.req.*;
 
 /**
  * @description:
@@ -21,4 +19,7 @@ public interface GroupService {
     public ResponseVO getJoinedGroup(GetJoinedGroupReq req);
 
     public ResponseVO destroyGroup(DestroyGroupReq req);
+
+    public ResponseVO<ImGroupEntity> getGroup(String groupId, Integer appId);
+
 }

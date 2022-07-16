@@ -3,7 +3,7 @@ package com.lld.im.common.enums;
 public enum GroupTypeEnum {
 
     /**
-     * //群类型 1私有群（类似微信） 2公开群(类似qq）
+     * 群类型 1私有群（类似微信） 2公开群(类似qq）
      */
     PRIVATE(1),
 

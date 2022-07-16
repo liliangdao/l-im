@@ -108,7 +108,7 @@ public class GroupServiceImpl implements GroupService {
     /**
      * @param [req]
      * @return com.lld.im.common.ResponseVO
-     * @description 修改群基础信息，如果是后台管理员调用，则不检查权限，如果不是则检查权限，如果是私有群（微信群）用户可以修改名称其他不能修改
+     * @description 修改群基础信息，如果是后台管理员调用，则不检查权限，如果不是则检查权限，如果是私有群（微信群）任何人都可以修改资料，公开群只有管理员可以修改
      * 如果是群主或者管理员可以修改其他信息。
      * @author chackylee
      * @date 2022/7/14 10:11
@@ -132,7 +132,7 @@ public class GroupServiceImpl implements GroupService {
             //不是后台调用需要检查权限
             ResponseVO<GetRoleInGroupResp> role = groupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
 
-            if(role.getCode() != 200){
+            if(!role.isOk()){
                 return role;
             }
 
@@ -140,11 +140,16 @@ public class GroupServiceImpl implements GroupService {
             Integer roleInfo = data.getRole();
 
             boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-            if ((StringUtils.isNotBlank(req.getIntroduction()) ||
+
+            if(!isManager && GroupTypeEnum.PRIVATE.getCode() == imGroupEntity.getGroupType()){
+                throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+            }
+
+            if (StringUtils.isNotBlank(req.getIntroduction()) ||StringUtils.isNotBlank(req.getGroupName()) ||
                     StringUtils.isNotBlank(req.getNotification()) ||
                     GroupPrivateChatTypeEnum.getEnum(req.getPrivateChat()) != null ||
                     StringUtils.isNotBlank(req.getPhoto()) || GroupPrivateChatTypeEnum.getEnum(req.getPrivateChat()) != null ||
-                    GroupMuteTypeEnum.getEnum(req.getJoinType()) != null) && !isManager) {
+                    GroupMuteTypeEnum.getEnum(req.getJoinType()) != null ) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
             }
         }
@@ -243,6 +248,20 @@ public class GroupServiceImpl implements GroupService {
 
         callbackService.callback(req.getAppId(), Constants.CallbackCommand.DestoryGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(objectQueryWrapper)));
         return ResponseVO.successResponse();
+    }
+
+    @Override
+    public ResponseVO getGroup(String groupId,Integer appId) {
+
+        QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
+        query.eq("app_id", appId);
+        query.eq("group_id", groupId);
+        ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(query);
+
+        if(imGroupEntity == null){
+            throw new ApplicationException(GroupErrorCode.GROUP_IS_NOT_EXIST);
+        }
+        return ResponseVO.successResponse(imGroupEntity);
     }
 
 

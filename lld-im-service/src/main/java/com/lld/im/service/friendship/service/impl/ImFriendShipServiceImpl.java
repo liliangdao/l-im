@@ -245,6 +245,16 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
     }
 
     @Override
+    public ResponseVO getRelation(GetRelationReq req) {
+
+        QueryWrapper query = new QueryWrapper<>()
+                .eq("from_id", req.getFromId())
+                .eq("to_id", req.getToId())
+                .eq("app_id", req.getAppId());
+        return ResponseVO.successResponse(imFriendShipMapper.selectOne(query));
+    }
+
+    @Override
     public ResponseVO deleteFriend(DeleteFriendReq req) {
 
         QueryWrapper queryFrom = new QueryWrapper<>()

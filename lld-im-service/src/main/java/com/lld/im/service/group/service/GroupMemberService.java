@@ -3,6 +3,7 @@ package com.lld.im.service.group.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.service.group.dao.ImGroupMemberEntity;
+import com.lld.im.service.group.model.req.AddMemberReq;
 import com.lld.im.service.group.model.req.GetJoinedGroupReq;
 import com.lld.im.service.group.model.req.GetRoleInGroupReq;
 import com.lld.im.service.group.model.req.GroupMemberDto;
@@ -28,5 +29,7 @@ public interface GroupMemberService {
     public ResponseVO<List<GetRoleInGroupResp>> getRoleInGroup(GetRoleInGroupReq req);
 
     public ResponseVO<Collection<String>> getMemberJoinedGroup(GetJoinedGroupReq req);
+
+    public ResponseVO addMember(AddMemberReq req);
 
 }

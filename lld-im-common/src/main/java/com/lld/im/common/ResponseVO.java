@@ -43,6 +43,10 @@ public class ResponseVO<T> {
         return new ResponseVO(enums.getCode(), enums.getError());
     }
 
+    public boolean isOk(){
+        return this.code == 200;
+    }
+
 
     public ResponseVO(int code, String msg) {
         this.code = code;

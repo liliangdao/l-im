@@ -3,10 +3,8 @@ package com.lld.im.service.group.controller;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.service.friendship.model.req.AddFriendReq;
 import com.lld.im.service.friendship.service.ImFriendShipService;
-import com.lld.im.service.group.model.req.CreateGroupReq;
-import com.lld.im.service.group.model.req.DestroyGroupReq;
-import com.lld.im.service.group.model.req.GetJoinedGroupReq;
-import com.lld.im.service.group.model.req.UpdateGroupReq;
+import com.lld.im.service.group.model.req.*;
+import com.lld.im.service.group.service.GroupMemberService;
 import com.lld.im.service.group.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -27,6 +25,9 @@ public class GroupController {
 
     @Autowired
     GroupService groupService;
+
+    @Autowired
+    GroupMemberService groupMemberService;
 
     @RequestMapping("/createGroup")
     public ResponseVO createGroup(@RequestBody @Validated CreateGroupReq req,Integer appId,String identifier)  {
@@ -60,6 +61,13 @@ public class GroupController {
         req.setAppId(appId);
         req.setOperater(identifier);
         return groupService.destroyGroup(req);
+    }
+
+    @RequestMapping("/addMember")
+    public ResponseVO addMember(@RequestBody @Validated AddMemberReq req, Integer appId, String identifier)  {
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return groupMemberService.addMember(req);
     }
 
 }
