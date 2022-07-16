@@ -47,7 +47,7 @@ public class ImGroupEntity {
 
     private Integer maxMemberCount;//群成员上限
 
-    private Integer status;//群状态 0正常 1解散
+        private Integer status;//群状态 0正常 1解散
 
     private Long sequence;
 

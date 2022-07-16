@@ -1,9 +1,11 @@
 package com.lld.im.service.group.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.GroupErrorCode;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
 import com.lld.im.common.enums.GroupTypeEnum;
@@ -11,6 +13,7 @@ import com.lld.im.common.exception.ApplicationException;
 import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.dao.ImGroupMemberEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMemberMapper;
+import com.lld.im.service.group.model.callback.AddMemberCallback;
 import com.lld.im.service.group.model.req.AddMemberReq;
 import com.lld.im.service.group.model.req.GetJoinedGroupReq;
 import com.lld.im.service.group.model.req.GetRoleInGroupReq;
@@ -19,6 +22,7 @@ import com.lld.im.service.group.model.resp.AddMemberResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
 import com.lld.im.service.group.service.GroupMemberService;
 import com.lld.im.service.group.service.GroupService;
+import com.lld.im.service.utils.CallbackService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +48,9 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     @Autowired
     GroupMemberService groupMemberService;
 
+    @Autowired
+    CallbackService callbackService;
+
 
     /**
      * @param
@@ -61,7 +68,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         query.eq("app_id", appId);
         query.eq("member_id", dto.getMemberId());
 
-        if (GroupMemberRoleEnum.OWNER.getCode() == dto.getRole()) {
+        if (dto.getRole() != null && GroupMemberRoleEnum.OWNER.getCode() == dto.getRole()) {
             QueryWrapper<ImGroupMemberEntity> queryOwner = new QueryWrapper<>();
             queryOwner.eq("group_id", groupId);
             queryOwner.eq("app_id", appId);
@@ -202,6 +209,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             }
         }
 
+        List<String> successId = new ArrayList<>();
         for (String memberId:
              req.getMemberId()) {
             GroupMemberDto groupMemberDto = new GroupMemberDto();
@@ -215,10 +223,21 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             }else if(responseVO.getCode() == GroupErrorCode.USER_IS_JOINED_GROUP.getCode()){
                 addMemberResp.setResult(2);
             }else{
+                successId.add(memberId);
                 addMemberResp.setResult(1);
             }
             resp.add(addMemberResp);
         }
+
+        AddMemberCallback addMemberCallback = new AddMemberCallback();
+        addMemberCallback.setGroupId(req.getGroupId());
+        addMemberCallback.setGroupType(group.getGroupType());
+        addMemberCallback.setMemberId(successId);
+        addMemberCallback.setOperater(req.getOperater());
+        addMemberCallback.setJoinType(1);
+        callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberAdd, JSONObject.toJSONString(addMemberCallback));
+
+        //TODO tcp通知
 
         return ResponseVO.successResponse(resp);
     }
