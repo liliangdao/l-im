@@ -74,8 +74,9 @@ public class BeanConfig {
 
     @Bean("redisSeq")
     public Seq buildRedisSeq() throws Exception {
-        Seq seq = (Seq) Class.forName("com.lld.im.service.service.seq.GenerateySeq").newInstance();
-        Method method = Class.forName("com.lld.im.service.service.seq.GenerateySeq").getMethod("setAbstractSeq", AbstractSeq.class);
+        Class<?> clazz = Class.forName("com.lld.im.service.service.seq.GenerateySeq");
+        Seq seq = (Seq) clazz.newInstance();
+        Method method = clazz.getMethod("setAbstractSeq", AbstractSeq.class);
         AbstractSeq abstractSeq = (AbstractSeq)
                 Class.forName(SeqMethodEnum.REDIS.getClazz()).newInstance();
         method.invoke(seq, abstractSeq);
@@ -86,8 +87,9 @@ public class BeanConfig {
 
     @Bean("snowflakeSeq")
     public Seq buildSnowflakeSeq() throws Exception {
-        Seq seq = (Seq) Class.forName("com.lld.im.service.service.seq.GenerateySeq").newInstance();
-        Method method = Class.forName("com.lld.im.service.service.seq.GenerateySeq").getMethod("setAbstractSeq", AbstractSeq.class);
+        Class<?> clazz = Class.forName("com.lld.im.service.service.seq.GenerateySeq");
+        Seq seq = (Seq) clazz.newInstance();
+        Method method = clazz.getMethod("setAbstractSeq", AbstractSeq.class);
         AbstractSeq abstractSeq = (AbstractSeq)
                 Class.forName(SeqMethodEnum.SNOWFLAKE.getClazz()).newInstance();
         method.invoke(seq, abstractSeq);
