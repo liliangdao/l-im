@@ -16,8 +16,7 @@ l-im 是 lld 基于 netty 的即时通讯服务。由lld维护和支持。
 
 [进度](im-schedule.md ':include')
 
-pandoc -o im-schedule.md
-
+markdown source.md
 
 
 
