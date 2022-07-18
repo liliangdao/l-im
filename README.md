@@ -10,7 +10,7 @@ l-im 是 lld 基于 netty 的即时通讯服务。由lld维护和支持。
 - 拥有机器人和频道功能。
 
 # TODO List
-- [ ] 项目重构，会剥离出im-tcp和im-server
+- [X] 项目重构，会剥离出im-tcp和im-server
 - [ ] 项目定位，明确项目定位，具体是作为im通用组件，还是作为私有的app通信项目
 - [ ]   ....
 
