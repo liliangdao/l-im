@@ -22,4 +22,6 @@ public interface GroupService {
 
     public ResponseVO<ImGroupEntity> getGroup(String groupId, Integer appId);
 
+    public ResponseVO getGroup(GetGroupReq req);
+
 }

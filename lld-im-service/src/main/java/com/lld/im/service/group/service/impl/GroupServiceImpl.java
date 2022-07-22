@@ -12,6 +12,7 @@ import com.lld.im.common.exception.ApplicationException;
 import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMapper;
 import com.lld.im.service.group.model.req.*;
+import com.lld.im.service.group.model.resp.GetGroupResp;
 import com.lld.im.service.group.model.resp.GetJoinedGroupResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
 import com.lld.im.service.group.service.GroupMemberService;
@@ -262,6 +263,33 @@ public class GroupServiceImpl implements GroupService {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_NOT_EXIST);
         }
         return ResponseVO.successResponse(imGroupEntity);
+    }
+
+    @Override
+    public ResponseVO getGroup(GetGroupReq req) {
+
+        QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
+
+        query.eq("app_id", req.getAppId());
+        query.in("group_id",req.getGroupId());
+        List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
+
+        List<GetGroupResp> resp = new ArrayList<>(req.getGroupId().size());
+
+        imGroupEntities.forEach(g ->{
+
+            GetGroupResp getGroupResp = new GetGroupResp();
+            BeanUtils.copyProperties(g,getGroupResp);
+            try {
+                ResponseVO<List<GroupMemberDto>> groupMember = groupMemberService.getGroupMember(g.getGroupId(), req.getAppId());
+                if(groupMember.isOk()){
+                    getGroupResp.setMemberList(groupMember.getData());
+                }
+            }catch (Exception e){
+
+            }
+        });
+        return ResponseVO.successResponse(resp);
     }
 
 

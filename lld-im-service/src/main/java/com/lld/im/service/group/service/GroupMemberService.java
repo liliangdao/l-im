@@ -32,4 +32,6 @@ public interface GroupMemberService {
 
     public ResponseVO addMember(AddMemberReq req);
 
+    public ResponseVO<List<GroupMemberDto>> getGroupMember(String groupId,Integer appId);
+
 }

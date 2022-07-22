@@ -3,6 +3,7 @@ package com.lld.im.service.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.service.Application;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.dao.ImUserDataEntity;
@@ -133,10 +134,10 @@ public class ImUserServiceImpl implements ImUserService {
     @Override
     public ResponseVO<ImUserDataEntity> getSingleUserInfo(String userId,Integer appId) {
 
-
         QueryWrapper objectQueryWrapper = new QueryWrapper<>();
         objectQueryWrapper.eq("app_id",appId);
         objectQueryWrapper.eq("user_id",userId);
+        objectQueryWrapper.eq("del_flag", DelFlagEnum.NORMAL.getCode());
 
         ImUserDataEntity ImUserDataEntity = imUserDataMapper.selectOne(objectQueryWrapper);
         if(ImUserDataEntity == null){

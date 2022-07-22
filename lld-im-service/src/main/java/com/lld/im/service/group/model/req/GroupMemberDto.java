@@ -24,4 +24,6 @@ public class GroupMemberDto {
 
     private String joinType;
 
+    private Long joinTime;
+
 }
