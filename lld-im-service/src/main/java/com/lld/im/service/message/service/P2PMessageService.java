@@ -4,6 +4,7 @@ import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.ChatMessageContent;
+import com.lld.im.common.model.msg.MessageAck;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
 import org.slf4j.Logger;
@@ -38,6 +39,9 @@ public class P2PMessageService {
     @Qualifier("redisSeq")
     Seq seq;
 
+    @Autowired
+    MessageStoreService messageStoreService;
+
     private final ThreadPoolExecutor threadPoolExecutor;
 
     {
@@ -69,10 +73,10 @@ public class P2PMessageService {
             chatMessageData.setMessageSequence(seq);
             //落库+回包+分发（发送给同步端和接收方的所有端）
             threadPoolExecutor.execute(() -> {
-
-                //插入历史库
-                //
-
+                //插入历史库和msgBody
+                messageStoreService.storeMessage(chatMessageData);
+                //回包
+                ack(chatMessageData,ResponseVO.successResponse());
             });
         } else {
             ack(chatMessageData, responseVO);
@@ -88,11 +92,10 @@ public class P2PMessageService {
      * @date 2022/7/22 16:29
      */
     private void ack(ChatMessageContent content, ResponseVO result) {
-//        logger.info("checkResult = {}",result);
-//        logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", msgId, msgSequence, result);
-//        MessageAck ackData = new MessageAck(msgId, msgSequence, msgConversationService.convertConversationId(ToTypeEnum.C2C.getCode(), fromId, toId));
-//        IMRespBase<Object> wrappedResp = IMRespBase.build().success(ackData);
-//        wrappedResp.setCode(result);
+        logger.info("result = {}",result);
+        logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
+        MessageAck ackData = new MessageAck(content.getMessageId(), content.getMessageSequence());
+        result.setData(ackData);
 //        messageProducer.sendToUserAppointedClient(fromId, MQChatOperateType.MSG_ACK, wrappedResp, clientInfo);
     }
 

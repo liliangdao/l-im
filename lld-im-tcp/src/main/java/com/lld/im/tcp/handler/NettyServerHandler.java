@@ -79,10 +79,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             }
 
             RedissonClient redissonClient = RedisManager.getRedissonClient();
-            RMap<Object, Object> map = redissonClient.getMap(loginReq.getAppId() + ":" + Constants.RedisConstants.UserSessionConstants + ":" + userId);
+            RMap<Object, Object> map = redissonClient.getMap(loginReq.getAppId() + Constants.RedisConstants.UserSessionConstants + userId);
             map.put(hashKey,JSONObject.toJSONString(session));
             SessionSocketHolder.put(loginReq.getAppId(),userId,loginReq.getClientType(),loginReq.getImei(), (NioSocketChannel) ctx.channel());
-
 
             // 通知其他端下线,例如：安卓与ios互斥，windows和mac互斥，是否允许多设备登录
             UserClientDto dto = new UserClientDto();

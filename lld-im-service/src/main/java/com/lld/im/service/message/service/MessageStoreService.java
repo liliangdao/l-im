@@ -44,14 +44,13 @@ public class MessageStoreService {
      * @since 2022/7/23
      */
     public void storeMessage(ChatMessageContent chatMessageContent) {
-
         ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
         imMessageBodyMapper.insert(imMessageBodyEntity);
         List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToMessageHistory(chatMessageContent);
+        imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
     }
 
     public List<ImMessageHistoryEntity> extractToMessageHistory(ChatMessageContent content) {
-
 
 
         List<ImMessageHistoryEntity> list = new ArrayList<>();

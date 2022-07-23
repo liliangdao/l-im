@@ -28,7 +28,7 @@ public class Constants {
         /**
          * 用户session
          */
-        public static final String UserSessionConstants = "accountSession";
+        public static final String UserSessionConstants = ":accountSession:";
 
         /**
          * 用户上线通知channel
@@ -57,6 +57,8 @@ public class Constants {
     public static class RabbitConstants{
 
         public static final String Im2MessageService = "pipeline2MessageService";
+
+        public static final String MessageService2Im = "messageService2Pipeline";
 
         public static final String FriendShip2Im = "friendShip2Pipeline";
 

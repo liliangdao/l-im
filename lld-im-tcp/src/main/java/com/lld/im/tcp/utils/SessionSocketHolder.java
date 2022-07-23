@@ -75,7 +75,7 @@ public class SessionSocketHolder {
         Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
 
         RedissonClient redissonClient = RedisManager.getRedissonClient();
-        RMap<String, String> map = redissonClient.getMap(appId + ":" + Constants.RedisConstants.UserSessionConstants + ":" + userId);
+        RMap<String, String> map = redissonClient.getMap(appId + Constants.RedisConstants.UserSessionConstants  + userId);
         String sessionStr = map.get(clientInfo);
 
         if (!StringUtils.isEmpty(sessionStr)) {
@@ -100,7 +100,7 @@ public class SessionSocketHolder {
         Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
 
         RedissonClient redissonClient = RedisManager.getRedissonClient();
-        RMap<Object, Object> map = redissonClient.getMap(appId + ":" + Constants.RedisConstants.UserSessionConstants + ":" + userId);
+        RMap<Object, Object> map = redissonClient.getMap(appId + Constants.RedisConstants.UserSessionConstants + userId);
         map.remove(clientInfo);
         remove(nioSocketChannel);
         nioSocketChannel.close();
