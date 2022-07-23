@@ -66,10 +66,10 @@ public class MessageProducer {
     }
 
 
-    private boolean isMatch(UserSession sessionDto, ClientInfo clientInfo) {
-        return Objects.equals(sessionDto.getAppId(), clientInfo.getAppId())
-                && Objects.equals(sessionDto.getImei(), clientInfo.getImei())
-                && Objects.equals(sessionDto.getClientType(), clientInfo.getClientType());
-    }
+//    private boolean isMatch(UserSession sessionDto, ClientInfo clientInfo) {
+//        return Objects.equals(sessionDto.getAppId(), clientInfo.getAppId())
+//                && Objects.equals(sessionDto.getImei(), clientInfo.getImei())
+//                && Objects.equals(sessionDto.getClientType(), clientInfo.getClientType());
+//    }
 
 }
