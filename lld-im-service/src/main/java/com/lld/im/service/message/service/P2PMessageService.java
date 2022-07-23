@@ -1,12 +1,15 @@
 package com.lld.im.service.message.service;
 
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.constant.Constants;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.ChatMessageContent;
+import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,6 +34,10 @@ public class P2PMessageService {
     @Autowired
     CheckSendMessageService checkSendMessageService;
 
+    @Autowired
+    @Qualifier("redisSeq")
+    Seq seq;
+
     private final ThreadPoolExecutor threadPoolExecutor;
 
     {
@@ -49,30 +56,38 @@ public class P2PMessageService {
     }
 
 
-    public void process(ChatMessageContent chatMessageData){
+    public void process(ChatMessageContent chatMessageData) {
 
         long t0 = System.currentTimeMillis();
         String fromId = chatMessageData.getFromId();
         String toId = chatMessageData.getToId();
 
-        ResponseVO responseVO = imServerpermissionCheck(chatMessageData.getFromId(), chatMessageData.getToId(), chatMessageData.getAppId());
-        if(responseVO.isOk()){
-            //落库+回包+分发（发送给同步端和接收方的所有端）
+        ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
 
-        } else{
-            ack(chatMessageData,responseVO);
+        if (responseVO.isOk()) {
+            long seq = this.seq.getSeq(Constants.SeqConstants.Message);
+            chatMessageData.setMessageSequence(seq);
+            //落库+回包+分发（发送给同步端和接收方的所有端）
+            threadPoolExecutor.execute(() -> {
+
+                //插入历史库
+                //
+
+            });
+        } else {
+            ack(chatMessageData, responseVO);
         }
 
     }
 
     /**
+     * @param content result
+     * @return void
      * @description ack回包，消息发给指定的端
      * @author chackylee
      * @date 2022/7/22 16:29
-     * @param content result
-     * @return void
-    */
-    private void ack(ChatMessageContent content,ResponseVO result) {
+     */
+    private void ack(ChatMessageContent content, ResponseVO result) {
 //        logger.info("checkResult = {}",result);
 //        logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", msgId, msgSequence, result);
 //        MessageAck ackData = new MessageAck(msgId, msgSequence, msgConversationService.convertConversationId(ToTypeEnum.C2C.getCode(), fromId, toId));
@@ -83,16 +98,16 @@ public class P2PMessageService {
 
 
     /**
+     * @param fromId, toId, appId
+     * @return com.lld.im.common.ResponseVO
      * @description 消息收发-双方关系校验（好友、拉黑关系、禁收禁发等），校验通过返回 0
      * @author chackylee
      * @date 2022/7/22 16:01
-     * @param fromId, toId, appId
-     * @return com.lld.im.common.ResponseVO
-    */
+     */
     public ResponseVO imServerpermissionCheck(String fromId, String toId, Integer appId) {
 
         ResponseVO checkForbidden = checkSendMessageService.checkUserForbidAndMute(fromId, toId, appId);
-        if(!checkForbidden.isOk()){
+        if (!checkForbidden.isOk()) {
             return checkForbidden;
         }
         return ResponseVO.successResponse();

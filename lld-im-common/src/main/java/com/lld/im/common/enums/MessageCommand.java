@@ -1,6 +1,6 @@
 package com.lld.im.common.enums;
 
-public enum MsgCommand implements Command {
+public enum MessageCommand implements Command {
 
     //测试  8888
     TEST(8888),
@@ -102,7 +102,7 @@ public enum MsgCommand implements Command {
 
     private int command;
 
-    MsgCommand(int command) {
+    MessageCommand(int command) {
         this.command = command;
     }
 

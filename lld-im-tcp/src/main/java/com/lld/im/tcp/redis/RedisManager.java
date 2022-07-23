@@ -8,7 +8,7 @@ import com.lld.im.codec.proto.MsgHeader;
 import com.lld.im.common.ClientType;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.DeviceMultiLoginEnum;
-import com.lld.im.common.enums.MsgCommand;
+import com.lld.im.common.enums.MessageCommand;
 import com.lld.im.common.model.UserClientDto;
 import com.lld.im.tcp.utils.SessionSocketHolder;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -80,10 +80,10 @@ public class RedisManager {
                             MsgBody msgBody = new MsgBody();
                             msgBody.setToId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                             msgBody.setUserId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
-                            msgBody.setCommand(MsgCommand.MUTUALLOGIN.getCommand());
+                            msgBody.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
                             sendMsg.setMsgBody(msgBody);
                             sendMsg.setMsgHeader(header);
-                            header.setCommand(MsgCommand.MUTUALLOGIN.getCommand());
+                            header.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
                             nioSocketChannel.writeAndFlush(sendMsg);
                         }
                     }else if(loginModel == DeviceMultiLoginEnum.TWO.getLoginMode()){
@@ -100,9 +100,9 @@ public class RedisManager {
                                 MsgBody msgBody = new MsgBody();
                                 msgBody.setToId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setUserId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
-                                msgBody.setCommand(MsgCommand.MUTUALLOGIN.getCommand());
+                                msgBody.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
                                 sendMsg.setMsgBody(msgBody);
-                                header.setCommand(MsgCommand.MUTUALLOGIN.getCommand());
+                                header.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
                                 nioSocketChannel.writeAndFlush(sendMsg);
                             }
                         }
@@ -132,9 +132,9 @@ public class RedisManager {
                                 MsgBody msgBody = new MsgBody();
                                 msgBody.setToId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setUserId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
-                                msgBody.setCommand(MsgCommand.MUTUALLOGIN.getCommand());
+                                msgBody.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
                                 sendMsg.setMsgBody(msgBody);
-                                header.setCommand(MsgCommand.MUTUALLOGIN.getCommand());
+                                header.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
                                 nioSocketChannel.writeAndFlush(sendMsg);
                             }
                         }

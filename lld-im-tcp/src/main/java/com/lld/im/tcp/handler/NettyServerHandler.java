@@ -7,7 +7,7 @@ import com.lld.im.codec.proto.MsgBody;
 import com.lld.im.codec.proto.MsgHeader;
 import com.lld.im.codec.pack.LoginMsg;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.common.enums.MsgCommand;
+import com.lld.im.common.enums.MessageCommand;
 import com.lld.im.common.model.UserClientDto;
 import com.lld.im.common.model.UserSession;
 import com.lld.im.tcp.redis.RedisManager;
@@ -52,7 +52,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 
         int command = msg.getMsgHeader().getCommand();
 
-        if(command == MsgCommand.LOGIN.getCommand()){
+        if(command == MessageCommand.LOGIN.getCommand()){
 
             LoginMsg loginReq = JSONObject.parseObject(msg.getMsgBody().getData().toString(), LoginMsg.class);
             /** 登陸事件 **/
@@ -94,11 +94,11 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             topic.publish(JSON.toJSONString(dto));
 //            stringRedisTemplate.convertAndSend(Constants.RedisConstants.UserLoginChannel, JSON.toJSONString(dto));
 
-        }else if(command == MsgCommand.LOGOUT.getCommand()){
+        }else if(command == MessageCommand.LOGOUT.getCommand()){
             /** 登出事件 **/
             SessionSocketHolder.removeUserSession((NioSocketChannel) ctx.channel());
             /** TODO 去推送服务删除掉推送信息 */
-        }else if(command == MsgCommand.TEST.getCommand()){
+        }else if(command == MessageCommand.TEST.getCommand()){
             /** 测试Data里面是字符串 */
             String toId = msg.getMsgBody().getToId();
             List<NioSocketChannel> nioSocketChannels = SessionSocketHolder.get(msg.getMsgBody().getAppId(), toId);
@@ -131,7 +131,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
                 });
                  ctx.channel().writeAndFlush(sendPack);
             }
-        } else if(command == MsgCommand.PING.getCommand()){
+        } else if(command == MessageCommand.PING.getCommand()){
 
 
         } else {

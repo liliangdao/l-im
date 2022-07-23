@@ -28,7 +28,7 @@
         <redisson.version>3.15.6</redisson.version>
         <snakeyaml.version>1.27</snakeyaml.version>
         <protostuff-api>1.0.10</protostuff-api>
-
+        <zkClient.version>0.1</zkClient.version>
         <apache.httpclient.version>4.5.9</apache.httpclient.version>
     </properties>
 
@@ -150,6 +150,12 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${apache.httpclient.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.sgroschupf</groupId>
+                <artifactId>zkclient</artifactId>
+                <version>${zkClient.version}</version>
             </dependency>
 
         </dependencies>

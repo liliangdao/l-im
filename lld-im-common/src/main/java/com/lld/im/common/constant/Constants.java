@@ -56,9 +56,10 @@ public class Constants {
 
     public static class RabbitConstants{
 
-        public static final String Im2MsgService = "Pipeline2MessageService";
+        public static final String Im2MessageService = "pipeline2MessageService";
 
         public static final String FriendShip2Im = "friendShip2Pipeline";
+
     }
 
     public static class CallbackCommand{
