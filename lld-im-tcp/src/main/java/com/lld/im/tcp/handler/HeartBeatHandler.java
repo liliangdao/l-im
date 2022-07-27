@@ -25,6 +25,7 @@ public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
                 //TODO 改为不使用spring
 //                ServerHeartBeatHandler heartBeatHandler = SpringBeanFactory.getBean(ServerHeartBeatHandler.class);
 //                heartBeatHandler.process(ctx);
+                ServerHeartBeatHandler.process(ctx);
             }
         }
 

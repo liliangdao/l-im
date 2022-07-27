@@ -106,7 +106,4 @@ public class SessionSocketHolder {
         nioSocketChannel.close();
     }
 
-
-
-
 }

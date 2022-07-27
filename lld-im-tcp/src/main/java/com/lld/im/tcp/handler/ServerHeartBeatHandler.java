@@ -9,8 +9,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
  * @description: 真正处理心跳超时的类
  * @create: 2022-05-06 09:22
  **/
-//@Component
-    //TODO 改成非spring
 public class ServerHeartBeatHandler {
     /**
      * @description 处理用户心跳超时,设置session的connectState为离线

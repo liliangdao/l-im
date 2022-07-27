@@ -65,6 +65,7 @@ public class Starter {
 
             //注册zk
             registerZk(appConfig);
+
         } catch (Exception e) {
             log.error("启动失败 {}", e.getMessage());
             e.printStackTrace();
