@@ -32,11 +32,11 @@ public class MessageServiceReciver {
         try {
             Connection connection = MqFactoryUtils.getConnection();
             final Channel channel = connection.createChannel();
-            channel.queueDeclare(Constants.RabbitConstants.MessageService2Im, false, false, false, null);
-            channel.queueBind(Constants.RabbitConstants.MessageService2Im, Constants.RabbitConstants.MessageService2Im
+            channel.queueDeclare(Constants.RabbitConstants.MessageService2Im + brokerId, false, false, false, null);
+            channel.queueBind(Constants.RabbitConstants.MessageService2Im + brokerId, Constants.RabbitConstants.MessageService2Im
                     , brokerId);
 //            channel.basicQos(1);
-            channel.basicConsume(Constants.RabbitConstants.MessageService2Im , false , new DefaultConsumer(channel){
+            channel.basicConsume(Constants.RabbitConstants.MessageService2Im + brokerId, false , new DefaultConsumer(channel){
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                     String msgStr = new String(body);
