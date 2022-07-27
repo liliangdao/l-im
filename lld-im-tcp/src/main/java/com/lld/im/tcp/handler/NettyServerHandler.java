@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.codec.proto.MessageHeader;
-import com.lld.im.codec.pack.LoginMsg;
+import com.lld.im.codec.pack.LoginPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.MessageCommand;
 import com.lld.im.common.model.UserClientDto;
@@ -54,7 +54,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
         if(command == MessageCommand.LOGIN.getCommand()){
 
-            LoginMsg loginReq = JSONObject.parseObject(msg.getMessagePack().getData().toString(), LoginMsg.class);
+            LoginPack loginReq = JSONObject.parseObject(msg.getMessagePack().getData().toString(), LoginPack.class);
             /** 登陸事件 **/
             String userId = msg.getMessagePack().getUserId();
             /** 为channel设置用户id **/

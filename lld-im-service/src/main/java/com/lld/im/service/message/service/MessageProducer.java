@@ -69,10 +69,10 @@ public class MessageProducer {
                 //如果找不到用户连接的管道地址 则不发消息
                 continue;
             }
-            if (!Objects.equals(ImConnectStatusEnum.ONLINE_STATUS.getCode(), session.getConnectState())) {    //加枚举
-                //会话如果是保存长连接状态，才会发消息。
-                continue;
-            }
+//            if (!Objects.equals(ImConnectStatusEnum.ONLINE_STATUS.getCode(), session.getConnectState())) {    //加枚举
+//                //会话如果是保存长连接状态，才会发消息。
+//                continue;
+//            }
             sessionList.add(session);
         }
         return sessionList;
@@ -126,8 +126,18 @@ public class MessageProducer {
         return true;
     }
 
+    private List<UserSession> getSessionsExceptClient(List<UserSession> sessionList, ClientInfo clientInfo) {
+        List<UserSession> results = new ArrayList<>();
+        for (UserSession session : sessionList) {
+            if(!isMatch(session, clientInfo)){
+                results.add(session);
+            }
+        }
+        return results;
+    }
+
     /**
-     * 发布消息至user下指定clientInfo的设备(如果在线的话）
+     * 发布消息至user下指定clientInfo的设备
      */
     public boolean sendToUserAppointedClient(String toId ,Command command, Object data , ClientInfo clientInfo){
         UserSession userSession = userSessionUtils.getUserSession(toId, clientInfo.getClientType(), clientInfo.getImei(), clientInfo.getAppId());
@@ -137,6 +147,36 @@ public class MessageProducer {
 //        }
 //        return false;
         return sendPack(toId,command,data,userSession);
+    }
+
+    /**
+     *  发布消息至user下所有session,除了指定clientInfo的设备.
+     */
+    public void sendToUserExceptClient(String toId ,Command command, Object data , ClientInfo clientInfo){
+        List<UserSession> sessionList = pipeLineConnectedSessions(toId,clientInfo.getAppId());
+        for (UserSession session : getSessionsExceptClient(sessionList, clientInfo)) {
+            sendPack(toId,command,data,session);
+        };
+    }
+
+    /**
+     * 发布消息至user下指定clientType的设备
+     */
+    public List<ClientInfo> sendToUserAppointedClient(String toId ,Command command, Object data , int clientType,Integer appId){
+
+        List<UserSession> sessionList = pipeLineConnectedSessions(toId,appId);
+        sessionList.removeIf(o->!o.getClientType().equals(clientType));
+
+        logger.info("ready to send pack to {},sessionList: {},data: {} ", toId, sessionList, JSON.toJSONString(data));
+
+        List<ClientInfo> successResults = new ArrayList<>();
+        for (UserSession session : sessionList) {
+            boolean sendOk = sendPack(toId, command, data, session);
+            if (sendOk) {
+                successResults.add(new ClientInfo(session.getAppId(),session.getClientType(),session.getImei()));
+            }
+        }
+        return successResults;
     }
 
     private boolean sendMessage(UserSession session, Object msg) {
@@ -150,5 +190,12 @@ public class MessageProducer {
             return false;
         }
     }
+
+    private boolean isMatch(UserSession sessionDto, ClientInfo clientInfo) {
+        return Objects.equals(sessionDto.getAppId(), clientInfo.getAppId())
+                && Objects.equals(sessionDto.getImei(), clientInfo.getImei())
+                && Objects.equals(sessionDto.getClientType(), clientInfo.getClientType());
+    }
+
 
 }

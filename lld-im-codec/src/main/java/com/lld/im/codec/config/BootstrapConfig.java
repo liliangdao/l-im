@@ -13,18 +13,18 @@ import lombok.NoArgsConstructor;
 @Data
 public class BootstrapConfig {
 
-
-    public BootstrapConfig defaultConfig(){
+    public BootstrapConfig defaultConfig() {
         return null;
     }
 
-
-//    @JsonProperty("lim")
+    //    @JsonProperty("lim")
     private TcpConfig lim;
 
     @Data
-    public static class TcpConfig{
+    public static class TcpConfig {
         private Integer tcpPort;// tcp 绑定的端口号
+
+        private String brokerId;// 集群brokerId
 
         private Integer webSocketPort; // webSocket 绑定的端口号
 
@@ -52,15 +52,16 @@ public class BootstrapConfig {
     }
 
 
-
-
-
     @Data
-    public static class ZkConfig{
-        /** zk连接地址*/
+    public static class ZkConfig {
+        /**
+         * zk连接地址
+         */
         private String zkAddr;
 
-        /** zk连接超时时间*/
+        /**
+         * zk连接超时时间
+         */
         private Integer zkConnectTimeOut;
     }
 
@@ -126,7 +127,6 @@ public class BootstrapConfig {
         private RedisSentinel sentinel;
 
     }
-
 
     /**
      * redis单机配置

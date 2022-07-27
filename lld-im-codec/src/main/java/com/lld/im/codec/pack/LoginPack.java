@@ -8,7 +8,7 @@ import lombok.Data;
  * @create: 2022-05-05 09:26
  **/
 @Data
-public class LoginMsg {
+public class LoginPack {
 
     private String userId;
 

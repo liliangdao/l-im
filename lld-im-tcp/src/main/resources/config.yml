@@ -6,6 +6,7 @@ lim:
   workThreadSize: 8 # work线程 默认=cpu核心数+1
   businessThreadSize: 8 # 业务线程数 默认=cpu核心数
   enableCluster: false # 是否启用集群
+  brokerId: 10000 # 集群brokerId
   loginModel: 1
   #  *                多端同步模式：1 只允许一端在线，手机/电脑/web 踢掉除了本client+imel的设备
   #  *                            2 允许手机/电脑的一台设备 + web在线 踢掉除了本client+imel的非web端设备
