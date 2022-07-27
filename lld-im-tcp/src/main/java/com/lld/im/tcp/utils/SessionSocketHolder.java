@@ -34,7 +34,8 @@ public class SessionSocketHolder {
     }
 
     public static NioSocketChannel get(Integer appId ,String id,Integer client,String imel) {
-        return CHANNEL_MAP.get(appId + ":" +id+":"+client + ":" + imel);
+        String s = appId + ":" + id + ":" + client + ":" + imel;
+        return CHANNEL_MAP.get(s);
     }
 
     public static List<NioSocketChannel> get(Integer appId , String id) {

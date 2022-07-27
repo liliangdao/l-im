@@ -1,10 +1,16 @@
 package com.lld.im.tcp.reciver;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.WebSocketMessageEncoder;
+import com.lld.im.codec.proto.Message;
+import com.lld.im.codec.proto.MessageHeader;
+import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.tcp.utils.MqFactoryUtils;
+import com.lld.im.tcp.utils.SessionSocketHolder;
 import com.rabbitmq.client.*;
 import com.sun.org.apache.bcel.internal.ExceptionConst;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +41,20 @@ public class MessageServiceReciver {
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                     String msgStr = new String(body);
                     System.out.println("收到消息：" + msgStr);
+                    MessagePack messagePack = JSONObject.parseObject(msgStr, MessagePack.class);
                     try {
                         //TODO 处理消息
+                        NioSocketChannel nioSocketChannel = SessionSocketHolder.get(messagePack.getAppId(), messagePack.getToId(), messagePack.getClientType(), messagePack.getImei());
+                        if(nioSocketChannel == null){
+                            //TODO 退回给离线消息
+                        }else{
+                            Message sendPack = new Message();
+                            MessageHeader header = new MessageHeader();
+                            header.setCommand(messagePack.getCommand());
+                            sendPack.setMessageHeader(header);
+                            sendPack.setMessagePack(messagePack);
+                            nioSocketChannel.writeAndFlush(sendPack);
+                        }
                         channel.basicAck(envelope.getDeliveryTag() , false);
                     }catch (Exception e){
                         channel.basicNack(envelope.getDeliveryTag(),false,false);

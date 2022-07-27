@@ -426,24 +426,29 @@
             let unpack = bytebuf.vstring(null, bodyLen).unpack();
             let msgBody = unpack[2];
 
-            var msg = eval("(" + msgBody + ")");
+            if(command == 1046){
+                console.log(msg);
 
-            // console.log(msg);
+            }else{
+                var msg = eval("(" + msgBody + ")");
 
-            let userId = document.getElementById('userId').value;
-            console.log(userId)
+                let userId = document.getElementById('userId').value;
+                console.log(userId)
 
-            if (msg["userId"] == "system") {
-                ta.value = ta.value + "\n 系统：" + msg.data;
-            } else if (msg["userId"] == userId) {
-                let msgInfo = msg.data;
-                msgInfo = eval("(" + msgInfo + ")");
-                ta.value = ta.value + "\n" + "自己：" + msgInfo.msgBody;
-            } else {
-                let msgInfo = msg.data;
-                msgInfo = eval("(" + msgInfo + ")");
-                ta.value = ta.value + "\n" + msg.toId + "：" + msgInfo.msgBody;
+                if (msg["userId"] == "system") {
+                    ta.value = ta.value + "\n 系统：" + msg.data;
+                } else if (msg["userId"] == userId) {
+                    let msgInfo = msg.data;
+                    msgInfo = eval("(" + msgInfo + ")");
+                    ta.value = ta.value + "\n" + "自己：" + msgInfo.msgBody;
+                } else {
+                    let msgInfo = msg.data;
+                    msgInfo = eval("(" + msgInfo + ")");
+                    ta.value = ta.value + "\n" + msg.toId + "：" + msgInfo.msgBody;
+                }
             }
+
+
         }
 
         //连接建立的回调函数

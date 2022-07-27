@@ -66,7 +66,7 @@ public class LImWebSocketServer {
                         pipeline.addLast(new WebSocketMessageDecoder());
                         pipeline.addLast(new WebSocketMessageEncoder());
 
-                        pipeline.addLast(new NettyServerHandler());
+                        pipeline.addLast(new NettyServerHandler(tcpConfig.getBrokerId()));
                     }
                 });
 

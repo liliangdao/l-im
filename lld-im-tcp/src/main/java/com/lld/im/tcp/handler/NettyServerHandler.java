@@ -35,6 +35,13 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
     private final static Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
+    private String brokerId;
+
+    public NettyServerHandler(String brokerId){
+        super();
+        this.brokerId = brokerId;
+    }
+
 //    /**
 //     * 数据读取完毕处理方法
 //     *
@@ -75,6 +82,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             try{
                 InetAddress addr = InetAddress.getLocalHost();
                 session.setPipelineHost(addr.getHostAddress());
+                session.setMqRouteKey(brokerId);
             }catch (Exception e){
                 e.printStackTrace();
             }

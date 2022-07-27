@@ -24,19 +24,24 @@ public class WebSocketMessageEncoder extends MessageToMessageEncoder<Message> {
     private static Logger log = LoggerFactory.getLogger(WebSocketMessageEncoder.class);
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out)  {
 
-        Message msgBody = (Message) msg;
-        Integer command = msgBody.getMessageHeader().getCommand();
-        MessagePack body = msgBody.getMessagePack();
+        try {
+            Message msgBody = (Message) msg;
+            Integer command = msgBody.getMessageHeader().getCommand();
+            MessagePack body = msgBody.getMessagePack();
 
-        String s = JSONObject.toJSONString(body);
-        ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());
+            String s = JSONObject.toJSONString(body);
+            ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());
 
-        byte[] bytes = s.getBytes();
-        byteBuf.writeInt(bytes.length);
-        byteBuf.writeInt(command);
-        byteBuf.writeBytes(bytes);
-        out.add(new BinaryWebSocketFrame(byteBuf));
+            byte[] bytes = s.getBytes();
+            byteBuf.writeInt(bytes.length);
+            byteBuf.writeInt(command);
+            byteBuf.writeBytes(bytes);
+            out.add(new BinaryWebSocketFrame(byteBuf));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }
