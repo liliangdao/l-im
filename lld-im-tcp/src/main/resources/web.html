@@ -500,6 +500,7 @@
         if (socket.readyState == WebSocket.OPEN) {
             // debugger;
             var command = 1103;
+            var imei = "web"
             var data = {
                 "userId": userId,
                 "toId": toId,
@@ -508,7 +509,7 @@
                 "imei": imei,
                 "command": command
             }
-            var imei = "web"
+
             var messageId = uuid();
             var messageData = {
                 "messageId": messageId,
