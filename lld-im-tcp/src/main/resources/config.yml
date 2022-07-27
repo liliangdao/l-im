@@ -16,7 +16,6 @@ lim:
     zkAddr: 127.0.0.1:2181
     zkConnectTimeOut: 5000
 
-
   redis:
     mode: single # 单机模式：single 哨兵模式：sentinel 集群模式：cluster
     database: 0
@@ -38,3 +37,10 @@ lim:
     sentinel: #redis哨兵配置
       master: mymaster
       nodes: 127.0.0.1:26379,127.0.0.1:26379,127.0.0.1:26379
+
+  rabbitmq:
+    host: xxx
+    port: 5672
+    virtualHost:
+    username:
+    password:

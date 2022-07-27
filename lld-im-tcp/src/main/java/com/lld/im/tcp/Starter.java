@@ -7,6 +7,7 @@ import com.lld.im.tcp.redis.RedisManager;
 import com.lld.im.tcp.register.RegistryZK;
 import com.lld.im.tcp.server.LImServer;
 import com.lld.im.tcp.server.LImWebSocketServer;
+import com.lld.im.tcp.utils.MqFactoryUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.ZkClient;
 import org.yaml.snakeyaml.Yaml;
@@ -59,9 +60,11 @@ public class Starter {
 
             RedisManager.init(appConfig);
 
+            //初始化mq工厂
+            MqFactoryUtils.init(appConfig.getLim().getRabbitmq());
+
             //注册zk
             registerZk(appConfig);
-//        new Thread(new RegistryZK();
         } catch (Exception e) {
             log.error("启动失败 {}", e.getMessage());
             e.printStackTrace();
