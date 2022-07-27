@@ -32,7 +32,7 @@ public class MqFactoryUtils {
     }
 
     public synchronized static void init(BootstrapConfig.Rabbitmq rabbitmq){
-        if(rabbitmq == null){
+        if(MqFactoryUtils.rabbitmq == null){
             MqFactoryUtils.rabbitmq = rabbitmq;
         }
     }

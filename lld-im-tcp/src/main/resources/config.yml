@@ -39,8 +39,8 @@ lim:
       nodes: 127.0.0.1:26379,127.0.0.1:26379,127.0.0.1:26379
 
   rabbitmq:
-    host: xxx
+    host: 127.0.0.1
     port: 5672
-    virtualHost:
-    username:
-    password:
+    virtualHost: /
+    userName: guest
+    password: guest

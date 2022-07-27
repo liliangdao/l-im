@@ -1,6 +1,7 @@
 package com.lld.im.tcp;
 
 import com.lld.im.codec.config.BootstrapConfig;
+import com.lld.im.tcp.reciver.MessageServiceReciver;
 import com.lld.im.tcp.redis.ClientFactory;
 import com.lld.im.tcp.redis.ClientStrategy;
 import com.lld.im.tcp.redis.RedisManager;
@@ -60,9 +61,10 @@ public class Starter {
 
             RedisManager.init(appConfig);
 
-            //初始化mq工厂
+            // 初始化mq工厂
             MqFactoryUtils.init(appConfig.getLim().getRabbitmq());
-
+            // 启动mq监听消息服务消息
+            MessageServiceReciver.init(appConfig.getLim().getBrokerId());
             //注册zk
             registerZk(appConfig);
 

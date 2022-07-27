@@ -51,6 +51,7 @@ public class ZKit {
      * @param path
      */
     public void createNode(String path) {
+        if(!zkClient.exists(path))
         zkClient.createEphemeral(path);
     }
 
