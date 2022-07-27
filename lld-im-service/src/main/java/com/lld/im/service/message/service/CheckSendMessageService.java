@@ -1,10 +1,11 @@
 package com.lld.im.service.message.service;
 
 import com.lld.im.common.ResponseVO;
-import com.lld.im.common.enums.MessageErrorCode;
-import com.lld.im.common.enums.UserErrorCode;
-import com.lld.im.common.enums.UserForbiddenFlagEnum;
-import com.lld.im.common.enums.UserSilentFlagEnum;
+import com.lld.im.common.config.AppConfig;
+import com.lld.im.common.enums.*;
+import com.lld.im.service.friendship.dao.ImFriendShipEntity;
+import com.lld.im.service.friendship.model.req.GetRelationReq;
+import com.lld.im.service.friendship.service.ImFriendShipService;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.service.ImUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,12 @@ public class CheckSendMessageService {
 
     @Autowired
     ImUserService imUserService;
+
+    @Autowired
+    AppConfig appConfig;
+
+    @Autowired
+    ImFriendShipService imFriendShipService;
 
     /**
      * @description 校验用户是否被禁用/发送方是否被禁言
@@ -60,6 +67,56 @@ public class CheckSendMessageService {
 //        }else if(toer.getSilentFlag() == UserSilentFlagEnum.MUTE.getCode()){
 //            return ResponseVO.errorResponse(MessageErrorCode.FROMER_IS_MUTE);
 //        }
+
+        return ResponseVO.successResponse();
+    }
+
+    /**
+     * @description 校验双方关系链，
+     * @author chackylee
+     * @date 2022/7/27 8:44
+     * @param [from, to, appId]
+     * @return com.lld.im.common.ResponseVO
+    */
+    public ResponseVO checkFriendShip(String from,String to,Integer appId){
+
+        if(appConfig.isSendMessageCheckFriend()){
+            GetRelationReq fromReq = new GetRelationReq();
+            fromReq.setFromId(from);
+            fromReq.setToId(to);
+            fromReq.setAppId(appId);
+            ResponseVO<ImFriendShipEntity> fromResp = imFriendShipService.getRelation(fromReq);
+            if(!fromResp.isOk()){
+                return fromResp;
+            }
+
+            GetRelationReq toReq = new GetRelationReq();
+            toReq.setFromId(to);
+            toReq.setToId(from);
+            toReq.setAppId(appId);
+            ResponseVO<ImFriendShipEntity> toResp = imFriendShipService.getRelation(toReq);
+            if(!toResp.isOk()){
+                return toResp;
+            }
+
+            if(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode() != fromResp.getData().getStatus()){
+                return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_DELETED);
+            }
+
+            ImFriendShipEntity toData = toResp.getData();
+            if(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode() != toData.getStatus()){
+                return ResponseVO.errorResponse(FriendShipErrorCode.TARGET_IS_DELETE_YOU);
+            }
+
+            if(appConfig.isSendMessageCheckFriend()){
+                if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode() != fromResp.getData().getBlack()){
+                    return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_DELETED);
+                }
+                if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode() != toData.getBlack()){
+                    return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_DELETED);
+                }
+            }
+        }
 
         return ResponseVO.successResponse();
     }

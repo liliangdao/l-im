@@ -1,9 +1,9 @@
 package com.lld.im.codec.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.proto.Msg;
-import com.lld.im.codec.proto.MsgBody;
-import com.lld.im.codec.proto.MsgHeader;
+import com.lld.im.codec.proto.Message;
+import com.lld.im.codec.proto.MessagePack;
+import com.lld.im.codec.proto.MessageHeader;
 import io.netty.buffer.ByteBuf;
 
 import java.io.UnsupportedEncodingException;
@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
  **/
 public class ByteBufToMsgUtils {
 
-    public static Msg transition(ByteBuf byteBuf) throws UnsupportedEncodingException {
+    public static Message transition(ByteBuf byteBuf) throws UnsupportedEncodingException {
 
         /** 获取数据长度*/
         int dataLength = byteBuf.readInt();
@@ -32,18 +32,18 @@ public class ByteBufToMsgUtils {
         JSONObject o = (JSONObject) JSONObject.parse(msgString);
 
         /** 填充数据头*/
-        MsgHeader msgHeader = new MsgHeader();
+        MessageHeader msgHeader = new MessageHeader();
         msgHeader.setCommand(command);
         msgHeader.setLength(dataLength);
 
-        /** 填充msgBody*/
-        MsgBody body = o.toJavaObject(MsgBody.class);
+        /** 填充MessagePack*/
+        MessagePack body = o.toJavaObject(MessagePack.class);
         /** 完整的Msg*/
-        Msg msgBody = new Msg();
-        msgBody.setMsgHeader(msgHeader);
-        msgBody.setMsgBody(body);
+        Message message = new Message();
+        message.setMessageHeader(msgHeader);
+        message.setMessagePack(body);
 
-        return msgBody;
+        return message;
     }
 
 }

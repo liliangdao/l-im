@@ -245,13 +245,18 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
     }
 
     @Override
-    public ResponseVO getRelation(GetRelationReq req) {
+    public ResponseVO<ImFriendShipEntity> getRelation(GetRelationReq req) {
 
         QueryWrapper query = new QueryWrapper<>()
                 .eq("from_id", req.getFromId())
                 .eq("to_id", req.getToId())
                 .eq("app_id", req.getAppId());
-        return ResponseVO.successResponse(imFriendShipMapper.selectOne(query));
+        ImFriendShipEntity imFriendShipEntity = imFriendShipMapper.selectOne(query);
+        if(imFriendShipEntity == null){
+            return ResponseVO.errorResponse(FriendShipErrorCode.REPEATSHIP_IS_NOT_EXIST.getCode()
+                    ,FriendShipErrorCode.REPEATSHIP_IS_NOT_EXIST.getError());
+        }
+        return ResponseVO.successResponse(imFriendShipEntity);
     }
 
     @Override

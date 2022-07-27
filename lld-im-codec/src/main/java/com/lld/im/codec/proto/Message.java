@@ -8,10 +8,10 @@ import lombok.Data;
  * @create: 2022-04-25 09:02
  **/
 @Data
-public class Msg {
+public class Message {
 
-    private MsgHeader msgHeader;
+    private MessageHeader messageHeader;
 
-    private MsgBody msgBody;
+    private MessagePack messagePack;
 
 }

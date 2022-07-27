@@ -5,6 +5,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.ChatMessageContent;
 import com.lld.im.common.model.msg.MessageAck;
+import com.lld.im.common.model.msg.MessageContent;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
 import org.slf4j.Logger;
@@ -41,6 +42,9 @@ public class P2PMessageService {
 
     @Autowired
     MessageStoreService messageStoreService;
+
+    @Autowired
+    MessageProducer messageProducer;
 
     private final ThreadPoolExecutor threadPoolExecutor;
 
@@ -91,7 +95,7 @@ public class P2PMessageService {
      * @author chackylee
      * @date 2022/7/22 16:29
      */
-    private void ack(ChatMessageContent content, ResponseVO result) {
+    private void ack(MessageContent content, ResponseVO result) {
         logger.info("result = {}",result);
         logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
         MessageAck ackData = new MessageAck(content.getMessageId(), content.getMessageSequence());
@@ -112,6 +116,12 @@ public class P2PMessageService {
         ResponseVO checkForbidden = checkSendMessageService.checkUserForbidAndMute(fromId, toId, appId);
         if (!checkForbidden.isOk()) {
             return checkForbidden;
+        }
+
+        ResponseVO friendCheck = checkSendMessageService.checkFriendShip(fromId, toId, appId);
+
+        if (!friendCheck.isOk()) {
+            return friendCheck;
         }
         return ResponseVO.successResponse();
     }

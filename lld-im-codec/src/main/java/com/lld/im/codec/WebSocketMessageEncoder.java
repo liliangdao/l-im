@@ -2,8 +2,8 @@ package com.lld.im.codec;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.proto.Msg;
-import com.lld.im.codec.proto.MsgBody;
+import com.lld.im.codec.proto.Message;
+import com.lld.im.codec.proto.MessagePack;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,16 +19,16 @@ import java.util.List;
  * @description:
  * @create: 2022-05-07 08:51
  **/
-public class WebSocketMessageEncoder extends MessageToMessageEncoder<Msg> {
+public class WebSocketMessageEncoder extends MessageToMessageEncoder<Message> {
 
     private static Logger log = LoggerFactory.getLogger(WebSocketMessageEncoder.class);
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Msg msg, List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out) throws Exception {
 
-        Msg msgBody = (Msg) msg;
-        Integer command = msgBody.getMsgHeader().getCommand();
-        MsgBody body = msgBody.getMsgBody();
+        Message msgBody = (Message) msg;
+        Integer command = msgBody.getMessageHeader().getCommand();
+        MessagePack body = msgBody.getMessagePack();
 
         String s = JSONObject.toJSONString(body);
         ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());

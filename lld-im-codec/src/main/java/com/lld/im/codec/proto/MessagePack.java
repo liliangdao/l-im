@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @create: 2022-04-28 10:12
  **/
 @Data
-public class MsgBody implements Serializable {
+public class MessagePack<T> implements Serializable {
 
     private String userId;
     /**
@@ -47,6 +47,9 @@ public class MsgBody implements Serializable {
     /**
      * 业务数据对象，如果是聊天消息则不需要解析直接透传
      */
-    private Object data;
+    /**
+     * 业务数据对象
+     */
+    private T data;
 
 }

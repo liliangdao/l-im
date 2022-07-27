@@ -14,5 +14,5 @@ public class GetRelationReq extends RequestBase {
 
     private String fromId;
 
-    private Integer toId;
+    private String toId;
 }

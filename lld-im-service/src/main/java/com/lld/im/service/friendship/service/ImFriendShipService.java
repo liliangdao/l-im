@@ -1,6 +1,7 @@
 package com.lld.im.service.friendship.service;
 
 import com.lld.im.common.ResponseVO;
+import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.*;
 
 public interface ImFriendShipService {
@@ -15,5 +16,5 @@ public interface ImFriendShipService {
 
     public ResponseVO getAllFriendShip(GetAllFriendShipReq req);
 
-    public ResponseVO getRelation(GetRelationReq req);
+    public ResponseVO<ImFriendShipEntity> getRelation(GetRelationReq req);
 }

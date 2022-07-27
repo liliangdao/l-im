@@ -1,13 +1,23 @@
 package com.lld.im.service.message.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.lld.im.codec.proto.Message;
+import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.ClientType;
+import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.Command;
 import com.lld.im.common.enums.ImConnectStatusEnum;
+import com.lld.im.common.enums.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.UserSession;
+import com.lld.im.common.model.msg.MessageAck;
 import com.lld.im.service.utils.UserSessionUtils;
 import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @description:
@@ -24,6 +35,8 @@ import java.util.Objects;
  */
 @Service
 public class MessageProducer {
+
+    private static Logger logger = LoggerFactory.getLogger(MessageProducer.class);
 
     @Autowired
     RabbitTemplate rabbitTemplate;
@@ -65,11 +78,64 @@ public class MessageProducer {
         return sessionList;
     }
 
+    /**
+     * @description
+     * @author chackylee
+     * @date 2022/7/27 9:34
+     * @param [toId, command, bizData, session] 
+     * @return boolean
+    */
+    private boolean sendPack(String toId , Command command, Object bizData, UserSession session){
 
-//    private boolean isMatch(UserSession sessionDto, ClientInfo clientInfo) {
-//        return Objects.equals(sessionDto.getAppId(), clientInfo.getAppId())
-//                && Objects.equals(sessionDto.getImei(), clientInfo.getImei())
-//                && Objects.equals(sessionDto.getClientType(), clientInfo.getClientType());
-//    }
+//        if (Objects.equals(session.getConnectState(), ImConnectStatusEnum.OFFLINE_STATUS.getCode()) ) {
+//            //如果待接收端已处于PUSH_OFFLINE_STATE状态，则他只接收 REPEAT_LOGIN类型的消息 &&(command.getCommand() != MQAccountOperateType.FORCE_LOGOUT.getCommand()&& command.getCommand() != MQAccountOperateType.REPEATLOGIN.getCommand())
+//            logger.info("session {} in PUSH_OFFLINE_STATE,the msg-passage was only open for REPEAT_LOGIN ", session);
+//            return false;
+//        }
+
+        //构造消息内容
+        MessagePack msgPack = new MessagePack<>();
+        msgPack.setCommand(command.getCommand());
+        msgPack.setToId(toId);
+        msgPack.setClientType(session.getClientType());
+        msgPack.setAppId(session.getAppId());
+        msgPack.setImei(session.getImei());
+
+        JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(bizData));
+        //msgId要特殊处理，如果是回包消息，data里不需要填充msgId,把里层的msgId赋值给外层。
+        //如果是其他类型的消息，data里面和外面的 msgId需要保持一致，如果data里没有msgId,那么需要生成一个插入。
+        if(command == MessageCommand.MSG_ACK || command == MessageCommand.GROUP_MSG_ACK) {
+            ResponseVO<MessageAck> ackData = (ResponseVO<MessageAck>) bizData;
+            String ackMsgId = ackData.getData().getMessageId();
+            msgPack.setMsgId(ackMsgId);
+        }else{
+            String bizMsgId = jsonObject.getString("msgId");
+            if(StringUtils.isEmpty(bizMsgId)){
+                String genUid = UUID.randomUUID().toString().replace("-","");
+                jsonObject.put("msgId",genUid);
+                msgPack.setMsgId(genUid);
+            }else{
+                msgPack.setMsgId(bizMsgId);
+            }
+        }
+//
+        msgPack.setData(jsonObject);
+        //发送消息
+        String msg = JSON.toJSONString(msgPack);
+        sendMessage(session, msg);
+        return true;
+    }
+
+    private boolean sendMessage(UserSession session, Object msg) {
+        try {
+            logger.debug("send MessagePack==" + msg);
+            rabbitTemplate.convertAndSend(queueName, session.getMqRouteKey(), msg);
+            //rabbitTemplate.convertAndSend(mqQueueName_msToChannel, "", msg);
+            return true;
+        } catch (Exception e) {
+            logger.error("publish-error",e);
+            return false;
+        }
+    }
 
 }

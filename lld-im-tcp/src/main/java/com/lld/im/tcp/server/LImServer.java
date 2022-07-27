@@ -2,7 +2,7 @@ package com.lld.im.tcp.server;
 
 import com.lld.im.codec.*;
 import com.lld.im.codec.config.BootstrapConfig;
-import com.lld.im.codec.proto.Msg;
+import com.lld.im.codec.proto.Message;
 import com.lld.im.tcp.handler.HeartBeatHandler;
 import com.lld.im.tcp.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -55,7 +55,7 @@ public class LImServer {
                         //加入自定义包解码器
                         pipeline.addLast("decoder", new MessageDecoder());
                         //向pipeline加入编码器
-                        pipeline.addLast("encoder", new MessageEncoder(Msg.class));
+                        pipeline.addLast("encoder", new MessageEncoder(Message.class));
                         //心跳检测Handler
                         pipeline.addLast(new IdleStateHandler(8, 10, 12));
                         // 自定义的空闲状态检测

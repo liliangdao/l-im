@@ -2,9 +2,9 @@ package com.lld.im.tcp.redis;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.config.BootstrapConfig;
-import com.lld.im.codec.proto.Msg;
-import com.lld.im.codec.proto.MsgBody;
-import com.lld.im.codec.proto.MsgHeader;
+import com.lld.im.codec.proto.Message;
+import com.lld.im.codec.proto.MessagePack;
+import com.lld.im.codec.proto.MessageHeader;
 import com.lld.im.common.ClientType;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.DeviceMultiLoginEnum;
@@ -75,14 +75,14 @@ public class RedisManager {
                     if(loginModel == DeviceMultiLoginEnum.ONE.getLoginMode()){
                         String ClientImei = (String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
                         if(!ClientImei.equals(userClientDto.getClientType()+":"+userClientDto.getImei())){
-                            Msg sendMsg = new Msg();
-                            MsgHeader header = new MsgHeader();
-                            MsgBody msgBody = new MsgBody();
-                            msgBody.setToId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
-                            msgBody.setUserId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
-                            msgBody.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
-                            sendMsg.setMsgBody(msgBody);
-                            sendMsg.setMsgHeader(header);
+                            Message sendMsg = new Message();
+                            MessageHeader header = new MessageHeader();
+                            MessagePack pack = new MessagePack();
+                            pack.setToId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
+                            pack.setUserId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
+                            pack.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
+                            sendMsg.setMessagePack(pack);
+                            sendMsg.setMessageHeader(header);
                             header.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
                             nioSocketChannel.writeAndFlush(sendMsg);
                         }
@@ -95,13 +95,13 @@ public class RedisManager {
                         }else{
                             //踢掉除了本客户端imel的所有channel
                             if(!ClientImei.equals(userClientDto.getClientType()+":"+userClientDto.getImei())){
-                                Msg sendMsg = new Msg();
-                                MsgHeader header = new MsgHeader();
-                                MsgBody msgBody = new MsgBody();
+                                Message sendMsg = new Message();
+                                MessageHeader header = new MessageHeader();
+                                MessagePack msgBody = new MessagePack();
                                 msgBody.setToId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setUserId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
-                                sendMsg.setMsgBody(msgBody);
+                                sendMsg.setMessagePack(msgBody);
                                 header.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
                                 nioSocketChannel.writeAndFlush(sendMsg);
                             }
@@ -127,13 +127,13 @@ public class RedisManager {
                             //踢掉同端的其他连接
                             if(isSameClient &&
                                     !ClientImei.equals(userClientDto.getClientType()+":"+userClientDto.getImei())){
-                                Msg sendMsg = new Msg();
-                                MsgHeader header = new MsgHeader();
-                                MsgBody msgBody = new MsgBody();
+                                Message sendMsg = new Message();
+                                MessageHeader header = new MessageHeader();
+                                MessagePack msgBody = new MessagePack();
                                 msgBody.setToId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setUserId((String)nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
-                                sendMsg.setMsgBody(msgBody);
+                                sendMsg.setMessagePack(msgBody);
                                 header.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
                                 nioSocketChannel.writeAndFlush(sendMsg);
                             }

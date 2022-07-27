@@ -2,9 +2,9 @@ package com.lld.im.tcp.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.proto.Msg;
-import com.lld.im.codec.proto.MsgBody;
-import com.lld.im.codec.proto.MsgHeader;
+import com.lld.im.codec.proto.Message;
+import com.lld.im.codec.proto.MessagePack;
+import com.lld.im.codec.proto.MessageHeader;
 import com.lld.im.codec.pack.LoginMsg;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.MessageCommand;
@@ -30,7 +30,7 @@ import java.util.List;
  * @createDate: 2022/3/12
  * @version: 1.0
  */
-public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
+public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
     private final static Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
@@ -48,15 +48,15 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
 
     /** 读取数据*/
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws InterruptedException {
+    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws InterruptedException {
 
-        int command = msg.getMsgHeader().getCommand();
+        int command = msg.getMessageHeader().getCommand();
 
         if(command == MessageCommand.LOGIN.getCommand()){
 
-            LoginMsg loginReq = JSONObject.parseObject(msg.getMsgBody().getData().toString(), LoginMsg.class);
+            LoginMsg loginReq = JSONObject.parseObject(msg.getMessagePack().getData().toString(), LoginMsg.class);
             /** 登陸事件 **/
-            String userId = msg.getMsgBody().getUserId();
+            String userId = msg.getMessagePack().getUserId();
             /** 为channel设置用户id **/
             ctx.channel().attr(AttributeKey.valueOf(Constants.UserId)).set(userId);
             String hashKey = loginReq.getClientType()+":"+loginReq.getImei();
@@ -99,31 +99,31 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Msg> {
             /** TODO 去推送服务删除掉推送信息 */
         }else if(command == MessageCommand.TEST.getCommand()){
             /** 测试Data里面是字符串 */
-            String toId = msg.getMsgBody().getToId();
-            List<NioSocketChannel> nioSocketChannels = SessionSocketHolder.get(msg.getMsgBody().getAppId(), toId);
+            String toId = msg.getMessagePack().getToId();
+            List<NioSocketChannel> nioSocketChannels = SessionSocketHolder.get(msg.getMessagePack().getAppId(), toId);
             if(nioSocketChannels.isEmpty()){
-                Msg sendPack = new Msg();
-                MsgBody body = new MsgBody();
+                Message sendPack = new Message();
+                MessagePack body = new MessagePack();
                 body.setUserId("system");
-                body.setToId(msg.getMsgBody().getUserId());
+                body.setToId(msg.getMessagePack().getUserId());
                 body.setData("目标不在线");
-                MsgHeader header = new MsgHeader();
+                MessageHeader header = new MessageHeader();
                 header.setCommand(0x44F);
-                sendPack.setMsgHeader(header);
-                sendPack.setMsgBody(body);
+                sendPack.setMessageHeader(header);
+                sendPack.setMessagePack(body);
                 ctx.channel().writeAndFlush(sendPack);
             } else{
 
-                Msg sendPack = new Msg();
-                MsgBody body = new MsgBody();
-                body.setUserId(msg.getMsgBody().getUserId());
-                body.setToId(msg.getMsgBody().getToId());
-                body.setData(msg.getMsgBody().getData().toString());
+                Message sendPack = new Message();
+                MessagePack body = new MessagePack();
+                body.setUserId(msg.getMessagePack().getUserId());
+                body.setToId(msg.getMessagePack().getToId());
+                body.setData(msg.getMessagePack().getData().toString());
 
-                MsgHeader header = new MsgHeader();
+                MessageHeader header = new MessageHeader();
                 header.setCommand(0x44F);
-                sendPack.setMsgHeader(header);
-                sendPack.setMsgBody(body);
+                sendPack.setMessageHeader(header);
+                sendPack.setMessagePack(body);
 
                 nioSocketChannels.forEach(c ->{
                     c.writeAndFlush(sendPack);

@@ -9,7 +9,7 @@ import lombok.Data;
  **/
 
 @Data
-public class MsgHeader {
+public class MessageHeader {
     //消息操作指令 十六进制
     private Integer command;
     private int length;

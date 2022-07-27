@@ -1,8 +1,8 @@
 package com.lld.im.codec;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.proto.Msg;
-import com.lld.im.codec.proto.MsgBody;
+import com.lld.im.codec.proto.Message;
+import com.lld.im.codec.proto.MessagePack;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -26,10 +26,10 @@ public class MessageEncoder extends MessageToByteEncoder {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
-        if(msg instanceof Msg){
-            Msg msgBody = (Msg) msg;
-            Integer command = msgBody.getMsgHeader().getCommand();
-            MsgBody body = msgBody.getMsgBody();
+        if(msg instanceof Message){
+            Message msgBody = (Message) msg;
+            Integer command = msgBody.getMessageHeader().getCommand();
+            MessagePack body = msgBody.getMessagePack();
 
             String s = JSONObject.toJSONString(body);
             byte[] bytes = s.getBytes();
@@ -44,7 +44,7 @@ public class MessageEncoder extends MessageToByteEncoder {
      * @param obj byte数组的object对象
      * @return
      */
-    public static byte[] toByteArray(MsgBody obj) {
+    public static byte[] toByteArray(MessagePack obj) {
         byte[] bytes = null;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {

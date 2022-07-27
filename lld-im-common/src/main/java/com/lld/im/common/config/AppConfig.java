@@ -41,6 +41,10 @@ public class AppConfig {
     //群成员的最大人数
     private Integer groupMaxMemberCount;
 
+    private boolean sendMessageCheckFriend; //发送消息是否校验关系链
+
+    private boolean sendMessageCheckBlack; //发送消息是否校验黑名单
+
     private String callbackUrl;//回调地址
 
     private boolean addFriendCallback; //添加好友之后回调开关
