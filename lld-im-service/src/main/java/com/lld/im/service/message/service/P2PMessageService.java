@@ -2,6 +2,7 @@ package com.lld.im.service.message.service;
 
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.ChatMessageContent;
 import com.lld.im.common.model.msg.MessageAck;
@@ -100,7 +101,7 @@ public class P2PMessageService {
         logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
         MessageAck ackData = new MessageAck(content.getMessageId(), content.getMessageSequence());
         result.setData(ackData);
-//        messageProducer.sendToUserAppointedClient(fromId, MQChatOperateType.MSG_ACK, wrappedResp, clientInfo);
+        messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.MSG_ACK, ackData, content);
     }
 
 

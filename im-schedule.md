@@ -81,7 +81,7 @@
 | 单聊消息Ack               | ack方法封装                             |  10%  |
 | 发送消息给tcp服务方法封装 |                                         |  0%   |
 | 消息持久化 |                                         |  70%   |
-| 工具类封装 | session工具类，messageProdecer工具...                                        |  50%   |
+| 工具类封装 | session工具类，messageProdecer工具...                                        |  90%   |
 
 
 

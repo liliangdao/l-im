@@ -126,6 +126,19 @@ public class MessageProducer {
         return true;
     }
 
+    /**
+     * 发布消息至user下指定clientInfo的设备(如果在线的话）
+     */
+    public boolean sendToUserAppointedClient(String toId ,Command command, Object data , ClientInfo clientInfo){
+        UserSession userSession = userSessionUtils.getUserSession(toId, clientInfo.getClientType(), clientInfo.getImei(), clientInfo.getAppId());
+        logger.info("ready to send pack to {},sessionList: {},data: {} ", toId, userSession, JSON.toJSONString(data));
+//        if(userSession!=null&&Objects.equals(ImConnectStatusEnum.ONLINE_STATE.getCode(), userSession.getConnectState())){
+//            return sendPack(toId,command,data,userSession);
+//        }
+//        return false;
+        return sendPack(toId,command,data,userSession);
+    }
+
     private boolean sendMessage(UserSession session, Object msg) {
         try {
             logger.debug("send MessagePack==" + msg);

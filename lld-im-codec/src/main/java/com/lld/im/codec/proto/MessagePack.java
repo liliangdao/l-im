@@ -47,9 +47,6 @@ public class MessagePack<T> implements Serializable {
     /**
      * 业务数据对象，如果是聊天消息则不需要解析直接透传
      */
-    /**
-     * 业务数据对象
-     */
     private T data;
 
 }
