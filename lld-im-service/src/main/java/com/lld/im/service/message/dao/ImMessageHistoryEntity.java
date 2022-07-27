@@ -25,7 +25,7 @@ public class ImMessageHistoryEntity {
     /** messageBodyId*/
     private String messageKey;
     /** 序列号*/
-    private Long msgSequence;
+    private Long messageSequence;
 
     private String messageRandom;
 
@@ -34,7 +34,7 @@ public class ImMessageHistoryEntity {
     private Long createTime;
 
     /** 删除标识*/
-    private String delFlag;
+    private Integer delFlag;
 
 
 }

@@ -1,5 +1,8 @@
 package com.lld.im.service.message.service;
 
+import cn.hutool.core.util.RandomUtil;
+import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.SyncFromEnum;
 import com.lld.im.common.model.msg.ChatMessageContent;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
@@ -7,6 +10,7 @@ import com.lld.im.service.message.dao.ImMessageHistoryEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
 import com.lld.im.service.message.dao.mapper.ImMessageHistoryMapper;
 import com.lld.im.service.service.seq.Seq;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @description: 消息存储服务
@@ -46,29 +51,49 @@ public class MessageStoreService {
     public void storeMessage(ChatMessageContent chatMessageContent) {
         ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
         imMessageBodyMapper.insert(imMessageBodyEntity);
-        List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToMessageHistory(chatMessageContent);
+        List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToMessageHistory(chatMessageContent,imMessageBodyEntity);
         imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
     }
 
-    public List<ImMessageHistoryEntity> extractToMessageHistory(ChatMessageContent content) {
-
-
+    public List<ImMessageHistoryEntity> extractToMessageHistory(ChatMessageContent content,ImMessageBodyEntity imMessageBodyEntity) {
         List<ImMessageHistoryEntity> list = new ArrayList<>();
         // 1 2 存2份
-
         ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
-        list.add(fromHistory);
         BeanUtils.copyProperties(content, fromHistory);
-//        if (content.getSyncFromId() == SyncFromEnum.BOTH.getCode()) {
-//        }
+        fromHistory.setOwnerId(content.getFromId());
+        long seq = this.seq.getSeq(Constants.SeqConstants.Message);
+        fromHistory.setMessageHistroyId(seq);
+        fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
+        fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
+        fromHistory.setMessageSequence(content.getMessageSequence());
+        fromHistory.setCreateTime(System.currentTimeMillis());
+        list.add(fromHistory);
+        if (content.getSyncFromId() == SyncFromEnum.BOTH.getCode()) {
+            ImMessageHistoryEntity toHistory = new ImMessageHistoryEntity();
+            BeanUtils.copyProperties(content, toHistory);
+            toHistory.setOwnerId(content.getToId());
+            long seq2 = this.seq.getSeq(Constants.SeqConstants.Message);
+            toHistory.setMessageHistroyId(seq2);
+            toHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
+            toHistory.setMessageSequence(content.getMessageSequence());
+            toHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
+            toHistory.setCreateTime(System.currentTimeMillis());
+            list.add(toHistory);
+        }
 
-
-        return null;
+        return list;
     }
 
 
     public ImMessageBodyEntity extractMessageBody(ChatMessageContent content) {
 
-        return null;
+        ImMessageBodyEntity body = new ImMessageBodyEntity();
+        body.setAppId(content.getAppId());
+        body.setCreateTime(System.currentTimeMillis());
+        body.setMessageBody(content.getMessageBody());
+        body.setMessageKey(RandomUtil.randomString(16));
+        body.setSecurityKey("");
+        body.setMessageTime(content.getMessageTime());
+        return body;
     }
 }

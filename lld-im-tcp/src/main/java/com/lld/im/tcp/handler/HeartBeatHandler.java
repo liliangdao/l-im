@@ -22,9 +22,6 @@ public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
             } else if (event.state() == IdleState.WRITER_IDLE) {
 //                System.out.println("进入写空闲...");
             } else if (event.state() == IdleState.ALL_IDLE) {
-                //TODO 改为不使用spring
-//                ServerHeartBeatHandler heartBeatHandler = SpringBeanFactory.getBean(ServerHeartBeatHandler.class);
-//                heartBeatHandler.process(ctx);
                 ServerHeartBeatHandler.process(ctx);
             }
         }

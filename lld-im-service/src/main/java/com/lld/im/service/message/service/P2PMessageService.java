@@ -97,11 +97,11 @@ public class P2PMessageService {
      * @date 2022/7/22 16:29
      */
     private void ack(MessageContent content, ResponseVO result) {
-        logger.info("result = {}",result);
+        logger.debug("result = {}",result);
         logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
         MessageAck ackData = new MessageAck(content.getMessageId(), content.getMessageSequence());
         result.setData(ackData);
-        messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.MSG_ACK, ackData, content);
+        messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.MSG_ACK, result, content);
     }
 
 

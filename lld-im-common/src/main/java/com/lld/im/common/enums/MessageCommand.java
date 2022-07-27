@@ -38,7 +38,7 @@ public enum MessageCommand implements Command {
     //推送系统通知
     MSG_SYS(0x44C),
 
-    //单聊消息ACK
+    //单聊消息ACK 1046
     MSG_ACK(0x416),
 
     //群聊消息ACK

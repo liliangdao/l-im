@@ -9,7 +9,7 @@ import lombok.Data;
  * @create: 2022-07-22 15:38
  **/
 @Data
-@TableName("im_message_history")
+@TableName("im_message_body")
 public class ImMessageBodyEntity {
 
     private Integer appId;

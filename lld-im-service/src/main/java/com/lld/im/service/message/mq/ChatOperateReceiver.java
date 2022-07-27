@@ -48,7 +48,6 @@ public class ChatOperateReceiver {
                               @Headers Map<String, Object> headers,
                               Channel channel) throws Exception {
 
-
         long start = System.currentTimeMillis();
         Thread t = Thread.currentThread();
         String msg = new String(message.getBody(), "utf-8");
@@ -66,6 +65,8 @@ public class ChatOperateReceiver {
                 }.getType());
                 p2PMessageService.process(messageContent);
             }
+
+            channel.basicAck(deliveryTag,false);
 
         }catch (Exception e){
             logger.error("处理消息出现异常：{}",e.getMessage());

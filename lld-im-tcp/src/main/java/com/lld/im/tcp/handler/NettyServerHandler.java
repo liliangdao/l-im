@@ -10,6 +10,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.MessageCommand;
 import com.lld.im.common.model.UserClientDto;
 import com.lld.im.common.model.UserSession;
+import com.lld.im.tcp.publish.MqMessageProducer;
 import com.lld.im.tcp.redis.RedisManager;
 import com.lld.im.tcp.utils.SessionSocketHolder;
 import io.netty.channel.*;
@@ -133,6 +134,12 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         } else if(command == MessageCommand.PING.getCommand()){
 
 
+        }else if(command == MessageCommand.MSG_P2P.getCommand()){
+            try {
+                MqMessageProducer.sendMessageToMessageService(msg.getMessagePack().getData());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         } else {
             //全往mq丢
 

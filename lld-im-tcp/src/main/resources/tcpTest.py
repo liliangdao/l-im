@@ -22,6 +22,7 @@ def doPing(scoket):
     lenByte = struct.pack('>I', body_len)
     commandByte = struct.pack('>I', command)
     scoket.sendall(lenByte + commandByte + body)
+    # print("doPing")
 
 def ping(scoket):
     while True:
@@ -35,11 +36,14 @@ def task(s):
         # datab = scoket.recv(4)
         num = struct.unpack('>I', s.recv(4))[0] # 接受包大小并且解析
         command = struct.unpack('>I', s.recv(4))[0] # 接受command并且解析
-        print(command)
+        # print(command)
         if command == 2000 :
             print("收到下线通知")
             s.close()
             break
+
+        if command == 1046 :
+            print("收到单聊ACK消息")
 
         msgPack = s.recv(num)
         # print(msgPack)
@@ -61,12 +65,13 @@ def task(s):
 
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.connect(("127.0.0.1",5000))
+s.connect(("127.0.0.1",9000))
 
 
 command = 1000
 data={"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":imei}
 dataObj = data
+
 data["data"] = {"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":imei}
 
 jsonData = json.dumps(data)
@@ -87,8 +92,13 @@ t2.start()
 
 while True:
     msgBody = input("请输入要发送的内容 : ")
-    command = 8888
-    data["data"]["msgBody"] = msgBody
+    command = 1103
+    messageId = str(uuid.uuid1())
+
+    data = {"userId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":imei,"command":command}
+    messageData = {"messageId":messageId,"fromId":userId,"toId":toId,"appId":10000,"clientType":4,"imei":imei,"messageBody":msgBody,"command":command}
+    data["data"] = messageData
+
     jsonData = json.dumps(data)
     body = bytes(jsonData, 'utf-8')
     body_len = len(jsonData)
