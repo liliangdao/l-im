@@ -76,8 +76,10 @@ public class UserSessionUtils {
         return StringUtils.isNotEmpty(userSessionDto.getUserId()) &&
                 userSessionDto.getAppId() != null &&
                 userSessionDto.getClientType() != null &&
-                userSessionDto.getImei() != null&&
-                userSessionDto.getConnectState() !=null;
+                userSessionDto.getImei() != null
+//                &&
+//                userSessionDto.getConnectState() !=null
+                ;
     }
 
 }

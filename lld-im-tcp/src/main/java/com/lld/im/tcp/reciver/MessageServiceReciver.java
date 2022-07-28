@@ -6,6 +6,7 @@ import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.proto.MessageHeader;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.MessageCommand;
 import com.lld.im.tcp.utils.MqFactoryUtils;
 import com.lld.im.tcp.utils.SessionSocketHolder;
 import com.rabbitmq.client.*;
@@ -30,8 +31,7 @@ public class MessageServiceReciver {
 
     public static void startReciverMessage() {
         try {
-            Connection connection = MqFactoryUtils.getConnection();
-            final Channel channel = connection.createChannel();
+            final Channel channel = MqFactoryUtils.getChannel(Constants.RabbitConstants.MessageService2Im);
             channel.queueDeclare(Constants.RabbitConstants.MessageService2Im + brokerId, false, false, false, null);
             channel.queueBind(Constants.RabbitConstants.MessageService2Im + brokerId, Constants.RabbitConstants.MessageService2Im
                     , brokerId);
@@ -42,21 +42,36 @@ public class MessageServiceReciver {
                     String msgStr = new String(body);
                     System.out.println("收到消息：" + msgStr);
                     MessagePack messagePack = JSONObject.parseObject(msgStr, MessagePack.class);
+
                     try {
-                        //TODO 处理消息
-                        NioSocketChannel nioSocketChannel = SessionSocketHolder.get(messagePack.getAppId(), messagePack.getToId(), messagePack.getClientType(), messagePack.getImei());
-                        if(nioSocketChannel == null){
-                            //TODO 退回给离线消息
-                        }else{
-                            Message sendPack = new Message();
-                            MessageHeader header = new MessageHeader();
-                            header.setCommand(messagePack.getCommand());
-                            sendPack.setMessageHeader(header);
-                            sendPack.setMessagePack(messagePack);
-                            nioSocketChannel.writeAndFlush(sendPack);
+                        if(messagePack.getCommand() == MessageCommand.MSG_ACK.getCommand()){
+                            NioSocketChannel nioSocketChannel = SessionSocketHolder.get(messagePack.getAppId(), messagePack.getToId(), messagePack.getClientType(), messagePack.getImei());
+                            if(nioSocketChannel != null){
+                                Message sendPack = new Message();
+                                MessageHeader header = new MessageHeader();
+                                header.setCommand(messagePack.getCommand());
+                                sendPack.setMessageHeader(header);
+                                sendPack.setMessagePack(messagePack);
+                                nioSocketChannel.writeAndFlush(sendPack);
+                            }
+                        }
+                        if(messagePack.getCommand() == MessageCommand.MSG_P2P.getCommand()){
+                            NioSocketChannel nioSocketChannel = SessionSocketHolder.get(messagePack.getAppId(), messagePack.getToId(), messagePack.getClientType(), messagePack.getImei());
+                            if(nioSocketChannel != null){
+                                Message sendPack = new Message();
+                                MessageHeader header = new MessageHeader();
+                                header.setCommand(messagePack.getCommand());
+                                sendPack.setMessageHeader(header);
+                                sendPack.setMessagePack(messagePack);
+                                nioSocketChannel.writeAndFlush(sendPack);
+                            }else {
+                                channel.basicPublish(Constants.RabbitConstants.Im2MessageService,
+                                        "",MessageProperties.PERSISTENT_TEXT_PLAIN,
+                                        JSONObject.toJSONString(messagePack).getBytes());
+                            }
                         }
                         channel.basicAck(envelope.getDeliveryTag() , false);
-                    }catch (Exception e){
+                    } catch (Exception e){
                         channel.basicNack(envelope.getDeliveryTag(),false,false);
                     }
                 }

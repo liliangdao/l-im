@@ -4,17 +4,18 @@ import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
-import com.lld.im.common.model.msg.ChatMessageContent;
-import com.lld.im.common.model.msg.MessageAck;
-import com.lld.im.common.model.msg.MessageContent;
+import com.lld.im.common.model.msg.*;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -79,9 +80,12 @@ public class P2PMessageService {
             //落库+回包+分发（发送给同步端和接收方的所有端）
             threadPoolExecutor.execute(() -> {
                 //插入历史库和msgBody
-                messageStoreService.storeMessage(chatMessageData);
+                String messageKey = messageStoreService.storeMessage(chatMessageData);
+                chatMessageData.setMessageKey(messageKey);
                 //回包
                 ack(chatMessageData,ResponseVO.successResponse());
+                //消息分发 给同步端和接收方
+                dispatchMessage(chatMessageData,chatMessageData.getOfflinePushInfo());
             });
         } else {
             ack(chatMessageData, responseVO);
@@ -125,6 +129,36 @@ public class P2PMessageService {
             return friendCheck;
         }
         return ResponseVO.successResponse();
+    }
+
+    public void dispatchMessage(MessageContent messageContent, OfflinePushInfo offlinePushInfo) {
+
+        logger.debug("dispatchMessage : {}", messageContent);
+        String toId = messageContent.getToId();
+
+        P2PMessageContent p2PMessagePack = new P2PMessageContent();
+        BeanUtils.copyProperties(messageContent, p2PMessagePack);
+
+        if (p2PMessagePack.getMessageLifeTime() != null && p2PMessagePack.getMessageLifeTime() != 0) {
+            p2PMessagePack.setMessageLifeTime(0L);
+        }
+
+        List<ClientInfo> successResults = messageProducer.sendToUser(toId, MessageCommand.MSG_P2P, p2PMessagePack,messageContent.getAppId());
+
+        logger.debug("messageProducer.sendToUser msgId:{}, success sent Result ： {}", messageContent.getMessageId(), successResults);
+
+        // 如果成功的session列表中不包括手机，则需要推送离线消息。
+//        if (!SessionUtil.containMobile(successResults)) {
+//            //如果发送失败，则推送离线消息，并入同步库
+//            pushService.pushOfflineInfo(offlinePushInfo, messageContent);
+//        }
+
+//        if (!Objects.equals(0L, messageContent.getmess())) {
+//            //根据多端登陆模式的配置。决定未发送成功的消息存到哪几张离线消息表
+//            //根据LOGINMODE，和 successResults 决定哪几张表需要存同步消息
+//            Set<SyncTerminalEnum> terminalsNotInSessions = SessionUtil.findTerminalsNotInSessions(successResults,messageContent.getAppId());
+//            syncMessageService.syncPeerToPeerReceiveMsg(messageContent, terminalsNotInSessions);
+//        }
     }
 
 }

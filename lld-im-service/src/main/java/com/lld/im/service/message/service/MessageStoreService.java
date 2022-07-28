@@ -48,11 +48,12 @@ public class MessageStoreService {
      * @author lld
      * @since 2022/7/23
      */
-    public void storeMessage(ChatMessageContent chatMessageContent) {
+    public String storeMessage(ChatMessageContent chatMessageContent) {
         ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
         imMessageBodyMapper.insert(imMessageBodyEntity);
         List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToMessageHistory(chatMessageContent,imMessageBodyEntity);
         imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
+        return imMessageBodyEntity.getMessageKey();
     }
 
     public List<ImMessageHistoryEntity> extractToMessageHistory(ChatMessageContent content,ImMessageBodyEntity imMessageBodyEntity) {

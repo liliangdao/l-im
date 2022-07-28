@@ -416,7 +416,7 @@
         //客户端收到服务器消息的时候就会执行这个回调方法
         socket.onmessage = function (event) {
             var ta = document.getElementById("responseText");
-
+            console.log("onmessage")
 
             var bytebuf = new ByteBuffer(event.data);
             let byteBuffer = bytebuf.int32().int32().unpack();
@@ -426,8 +426,9 @@
             let unpack = bytebuf.vstring(null, bodyLen).unpack();
             let msgBody = unpack[2];
 
+            console.log("收到服务端发来的消息: " + msgBody);
+
             if(command == 1046){
-                console.log(msg);
 
             }else{
                 var msg = eval("(" + msgBody + ")");
@@ -447,8 +448,6 @@
                     ta.value = ta.value + "\n" + msg.toId + "：" + msgInfo.msgBody;
                 }
             }
-
-
         }
 
         //连接建立的回调函数

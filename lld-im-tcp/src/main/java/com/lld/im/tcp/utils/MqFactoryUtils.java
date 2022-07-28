@@ -1,10 +1,14 @@
 package com.lld.im.tcp.utils;
 
 import com.lld.im.codec.config.BootstrapConfig;
+import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -14,14 +18,24 @@ import java.util.concurrent.TimeoutException;
  **/
 public class MqFactoryUtils {
 
-//    private static BootstrapConfig.Rabbitmq rabbitmq;
-
     private static ConnectionFactory factory = null;
 
-    public static Connection getConnection() throws IOException, TimeoutException {
+    private static ConcurrentHashMap<String, Channel> channelMap = new ConcurrentHashMap<>();
+
+    private static Connection getConnection() throws IOException, TimeoutException {
         //通过工厂对象获取连接
         Connection connection = factory.newConnection();
         return connection;
+    }
+
+    public static Channel getChannel(String channelName) throws IOException, TimeoutException {
+        //通过工厂对象获取连接
+        if(channelMap.containsKey(channelName)){
+            return channelMap.get(channelName);
+        }
+        Channel channel = getConnection().createChannel();
+        channelMap.put(channelName,channel);
+        return channelMap.get(channelName);
     }
 
     public synchronized static void init(BootstrapConfig.Rabbitmq rabbitmq){

@@ -69,10 +69,6 @@ public class MessageProducer {
                 //如果找不到用户连接的管道地址 则不发消息
                 continue;
             }
-//            if (!Objects.equals(ImConnectStatusEnum.ONLINE_STATUS.getCode(), session.getConnectState())) {    //加枚举
-//                //会话如果是保存长连接状态，才会发消息。
-//                continue;
-//            }
             sessionList.add(session);
         }
         return sessionList;
@@ -124,6 +120,24 @@ public class MessageProducer {
         String msg = JSON.toJSONString(msgPack);
         sendMessage(session, msg);
         return true;
+    }
+
+    /**
+     * @return 返回发送成功的session
+     */
+    public List<ClientInfo> sendToUser(String toId, Command command, Object data,Integer appId) {
+
+        List<UserSession> sessionList = pipeLineConnectedSessions(toId,appId);
+        logger.info("ready to send pack to {},sessionList: {},data: {} ", toId, sessionList, JSON.toJSONString(data));
+
+        List<ClientInfo> successResults = new ArrayList<>();
+        for (UserSession session : sessionList) {
+            boolean sendOk = sendPack(toId, command, data, session);
+            if (sendOk) {
+                successResults.add(new ClientInfo(session.getAppId(),session.getClientType(),session.getImei()));
+            }
+        }
+        return successResults;
     }
 
     private List<UserSession> getSessionsExceptClient(List<UserSession> sessionList, ClientInfo clientInfo) {

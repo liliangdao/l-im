@@ -10,7 +10,7 @@ import lombok.Data;
  * @create: 2022-07-22 15:52
  **/
 @Data
-public class MessageContent extends ClientInfo {
+public class P2PMessageContent {
 
     //客户端传的messageId
     private String messageId;
@@ -34,9 +34,5 @@ public class MessageContent extends ClientInfo {
     private int badgeMode;
 
     private Long messageLifeTime;
-
-    private int syncFromId = SyncFromEnum.BOTH.getCode();
-
-    private Integer appId;
 
 }
