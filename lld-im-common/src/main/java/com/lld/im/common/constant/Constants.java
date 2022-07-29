@@ -52,6 +52,8 @@ public class Constants {
 
         public static final String Message = "messageSeq";
 
+        public static final String Conversation = "conversationSeq";
+
     }
 
     public static class RabbitConstants{

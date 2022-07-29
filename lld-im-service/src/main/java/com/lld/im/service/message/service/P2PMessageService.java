@@ -84,8 +84,13 @@ public class P2PMessageService {
                 chatMessageData.setMessageKey(messageKey);
                 //回包
                 ack(chatMessageData,ResponseVO.successResponse());
+
+                P2PMessageContent p2PMessageContent = extractP2PMessage(chatMessageData);
+                //插入离线库
+                messageStoreService.storeOffLineMessage(p2PMessageContent);
+
                 //消息分发 给同步端和接收方
-                dispatchMessage(chatMessageData,chatMessageData.getOfflinePushInfo());
+                dispatchMessage(p2PMessageContent,chatMessageData.getOfflinePushInfo());
             });
         } else {
             ack(chatMessageData, responseVO);
@@ -131,7 +136,7 @@ public class P2PMessageService {
         return ResponseVO.successResponse();
     }
 
-    public void dispatchMessage(MessageContent messageContent, OfflinePushInfo offlinePushInfo) {
+    public void dispatchMessage(P2PMessageContent messageContent, OfflinePushInfo offlinePushInfo) {
 
         logger.debug("dispatchMessage : {}", messageContent);
         String toId = messageContent.getToId();
@@ -160,5 +165,12 @@ public class P2PMessageService {
 //            syncMessageService.syncPeerToPeerReceiveMsg(messageContent, terminalsNotInSessions);
 //        }
     }
+
+    public P2PMessageContent extractP2PMessage(MessageContent messageContent){
+        P2PMessageContent p2PMessagePack = new P2PMessageContent();
+        BeanUtils.copyProperties(messageContent, p2PMessagePack);
+        return p2PMessagePack;
+    }
+
 
 }

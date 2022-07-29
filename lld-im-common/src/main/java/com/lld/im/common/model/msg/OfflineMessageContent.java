@@ -1,27 +1,24 @@
 package com.lld.im.common.model.msg;
 
-import com.lld.im.common.enums.SyncFromEnum;
-import com.lld.im.common.model.ClientInfo;
 import lombok.Data;
 
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-07-22 15:52
+ * @create: 2022-07-29 15:53
  **/
 @Data
-public class P2PMessageContent {
-
-    //客户端传的messageId
-    private String messageId;
+public class OfflineMessageContent {
 
     private String messageKey;
+
+    private String conversationType;
+
+    private String conversationId;
 
     private String fromId;
 
     private String toId;
-
-    private int messageRandom;
 
     private long messageTime;
 

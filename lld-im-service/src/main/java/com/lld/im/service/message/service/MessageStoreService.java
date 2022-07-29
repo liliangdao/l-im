@@ -5,6 +5,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.SyncFromEnum;
 import com.lld.im.common.model.msg.ChatMessageContent;
+import com.lld.im.common.model.msg.P2PMessageContent;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.ImMessageHistoryEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
@@ -54,6 +55,17 @@ public class MessageStoreService {
         List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToMessageHistory(chatMessageContent,imMessageBodyEntity);
         imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
         return imMessageBodyEntity.getMessageKey();
+    }
+
+    /**
+     * @param
+     * @return void
+     * @description: 消息持久化。插入messageHistory和messageBody库
+     * @author lld
+     * @since 2022/7/23
+     */
+    public void storeOffLineMessage(P2PMessageContent chatMessageContent) {
+
     }
 
     public List<ImMessageHistoryEntity> extractToMessageHistory(ChatMessageContent content,ImMessageBodyEntity imMessageBodyEntity) {
