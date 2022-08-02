@@ -27,6 +27,8 @@ public enum FriendShipErrorCode implements ApplicationExceptionEnum {
 
     REPEATSHIP_IS_NOT_EXIST(30008,"关系链记录不存在"),
 
+    UPDATE_FRIEND_SHIP_TO_LONG(30009,"更新好友数量过长"),
+
     ;
 
     private int code;

@@ -74,7 +74,7 @@ public class MessageStoreService {
         ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
         BeanUtils.copyProperties(content, fromHistory);
         fromHistory.setOwnerId(content.getFromId());
-        long seq = this.seq.getSeq(Constants.SeqConstants.Message);
+        long seq = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
         fromHistory.setMessageHistroyId(seq);
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
         fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
@@ -85,7 +85,7 @@ public class MessageStoreService {
             ImMessageHistoryEntity toHistory = new ImMessageHistoryEntity();
             BeanUtils.copyProperties(content, toHistory);
             toHistory.setOwnerId(content.getToId());
-            long seq2 = this.seq.getSeq(Constants.SeqConstants.Message);
+            long seq2 = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
             toHistory.setMessageHistroyId(seq2);
             toHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
             toHistory.setMessageSequence(content.getMessageSequence());

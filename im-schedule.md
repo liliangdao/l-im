@@ -7,7 +7,7 @@
 | /user/login                  | 登录             | 返回服务地址                             | 100%  |
 | /user/data/getUserInfo       | 获取用户         | 获取用户拓展信息，根据字段获取信息未完成 |  50%  |
 | /user/data/getSingleUserInfo | 获取单个用户     | 获取所有的服务列表                       | 100%  |
-| /user/data/modifyUserInfo    | 修改用户信息     | 发送tcp通知未完成                        |  90%  |
+| /user/data/modifyUserInfo    | 修改用户信息     | 发送tcp通知未完成                        |  100%  |
 | /user/data/syncUserData      | 增量获取用户信息 |                                          |  0%   |
 | /user/qeuryOnlineStatus      | 查询用户在线状态 |                                          |  0%   |
 
@@ -15,10 +15,10 @@
 
 | 接口                                    | 作用                 | 备注                | 进 度 |
 | --------------------------------------- | -------------------- | ------------------- | :---: |
-| /friendship/add                         | 添加好友             | 发送tcp通知未完成   |  90%  |
-| /friendship/delete                      | 删除好友             | 发送tcp通知未完成   |  90%  |
+| /friendship/add                         | 添加好友             | 发送tcp通知未完成   |  100%  |
+| /friendship/delete                      | 删除好友             | 发送tcp通知未完成   |  100%  |
 | /friendship/sync                        | 增量获取好友信息     |                     |  0%   |
-| /friendship/update                      | 更新好友资料         | 发送tcp通知未完成   |  90%  |
+| /friendship/update                      | 更新好友资料         | 发送tcp通知未完成   |  100%  |
 | /friendship/getRelation                 | 获取单个好友关系信息 |                     |  0%   |
 | /friendship/check                       | 校验是否为好友       |                     |  0%   |
 | /friendship/get                         | 拉取好友             | 分页拉取，按照seq拉 |  0%   |

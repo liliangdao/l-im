@@ -37,7 +37,7 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
     @Transactional
     public void msgMarkRead(MessageReadedPack messageReaded) {
         String conversationId = convertConversationId(messageReaded.getConversationType(), messageReaded.getFromId(), messageReaded.getToId());
-        long seq = this.seq.getSeq(Constants.SeqConstants.Conversation);
+        long seq = this.seq.getSeq(messageReaded.getAppId() + Constants.SeqConstants.Conversation);
         ImConversationSetEntity conversationSet = new ImConversationSetEntity();
         conversationSet.setConversationId(conversationId);
         BeanUtils.copyProperties(messageReaded,conversationSet);

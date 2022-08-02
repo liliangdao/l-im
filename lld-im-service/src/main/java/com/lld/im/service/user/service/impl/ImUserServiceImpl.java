@@ -1,10 +1,12 @@
 package com.lld.im.service.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.lld.im.codec.pack.UserModifyPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.DelFlagEnum;
-import com.lld.im.service.Application;
+import com.lld.im.common.enums.command.UserEventCommand;
+import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.dao.mapper.ImUserDataMapper;
@@ -45,6 +47,9 @@ public class ImUserServiceImpl implements ImUserService {
 
     @Autowired
     WriteUserSeq writeUserSeq;
+
+    @Autowired
+    MessageProducer messageProducer;
 
     @Autowired
     @Qualifier("snowflakeSeq")
@@ -222,8 +227,13 @@ public class ImUserServiceImpl implements ImUserService {
         update.setSequence(seq);
         imUserDataMapper.update(update,query);
         writeUserSeq.writeUserSeq(req.getAppId(),req.getUserId(),Constants.SeqConstants.User,seq);
-        //TODO 发送Tcp通知给用户
 
+        UserModifyPack pack = new UserModifyPack();
+        update.setAppId(req.getAppId());
+        update.setUserId(req.getUserId());
+        BeanUtils.copyProperties(update,pack);
+        messageProducer.sendToUser(req.getUserId(),req.getClientType(),req.getImel(), UserEventCommand.USER_MODIFY,
+                pack,req.getAppId());
         return ResponseVO.successResponse();
     }
 }

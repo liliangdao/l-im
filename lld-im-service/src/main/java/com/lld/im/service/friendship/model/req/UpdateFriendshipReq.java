@@ -19,8 +19,10 @@ public class UpdateFriendshipReq extends RequestBase {
     @NotBlank(message = "用户id不能为空")
     private String fromId;
 
+    public List<UpdateItem> updateItems;
+
     @Data
-    public static class updateItem{
+    public static class UpdateItem{
 
         private String toId;
 

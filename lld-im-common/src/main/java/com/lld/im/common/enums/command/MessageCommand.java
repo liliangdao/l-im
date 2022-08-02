@@ -1,21 +1,9 @@
-package com.lld.im.common.enums;
+package com.lld.im.common.enums.command;
 
 public enum MessageCommand implements Command {
 
     //测试  8888
     TEST(8888),
-
-    //心跳  9998
-    PING(0x270e),
-
-    //登陸  1000
-    LOGIN(0x3E8),
-
-    //下线通知 用于多端互斥  2000
-    MUTUALLOGIN(2000),
-
-    //登出  9999
-    LOGOUT(0x270f),
 
     //单聊消息收发  1103
     MSG_P2P(0x44F),
@@ -100,15 +88,14 @@ public enum MessageCommand implements Command {
     CONVERSATION_DEL(0x1393);
 
 
-    private int command;
+    private Integer command;
 
     MessageCommand(int command) {
         this.command = command;
     }
 
 
-
-    public int getCommand() {
+    public Integer getCommand() {
         return command;
     }
 }

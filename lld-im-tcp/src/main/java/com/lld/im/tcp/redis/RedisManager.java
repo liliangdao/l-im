@@ -1,25 +1,9 @@
 package com.lld.im.tcp.redis;
 
-import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.config.BootstrapConfig;
-import com.lld.im.codec.proto.Message;
-import com.lld.im.codec.proto.MessagePack;
-import com.lld.im.codec.proto.MessageHeader;
-import com.lld.im.common.ClientType;
-import com.lld.im.common.constant.Constants;
-import com.lld.im.common.enums.DeviceMultiLoginEnum;
-import com.lld.im.common.enums.MessageCommand;
-import com.lld.im.common.model.UserClientDto;
 import com.lld.im.tcp.reciver.UserLoginMessageListener;
-import com.lld.im.tcp.utils.SessionSocketHolder;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
-import org.redisson.api.listener.MessageListener;
-
-import java.util.List;
 
 /**
  * @author: Chackylee

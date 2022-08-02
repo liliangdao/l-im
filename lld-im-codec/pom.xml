@@ -34,11 +34,11 @@
         </dependency>
 
         <!-- common -->
-<!--        <dependency>-->
-<!--            <groupId>com.lld.im</groupId>-->
-<!--            <artifactId>lld-im-common</artifactId>-->
-<!--            <version>0.0.1-SNAPSHOT</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.lld.im</groupId>
+            <artifactId>lld-im-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
 
     </dependencies>

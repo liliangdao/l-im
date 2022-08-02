@@ -19,25 +19,34 @@ import java.util.List;
  * @description:
  * @create: 2022-05-07 08:51
  **/
-public class WebSocketMessageEncoder extends MessageToMessageEncoder<Message> {
+public class WebSocketMessageEncoder extends MessageToMessageEncoder<MessagePack> {
 
     private static Logger log = LoggerFactory.getLogger(WebSocketMessageEncoder.class);
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out)  {
+    protected void encode(ChannelHandlerContext ctx, MessagePack msg, List<Object> out)  {
 
         try {
-            Message msgBody = (Message) msg;
-            Integer command = msgBody.getMessageHeader().getCommand();
-            MessagePack body = msgBody.getMessagePack();
+//            Message msgBody = (Message) msg;
+//            Integer command = msgBody.getMessageHeader().getCommand();
+//            MessagePack body = msgBody.getMessagePack();
+//
+//            String s = JSONObject.toJSONString(body);
+//            ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());
+//
+//            byte[] bytes = s.getBytes();
+//            byteBuf.writeInt(bytes.length);
+//            byteBuf.writeInt(command);
+//            byteBuf.writeBytes(bytes);
+//            out.add(new BinaryWebSocketFrame(byteBuf));
 
-            String s = JSONObject.toJSONString(body);
+            String s = JSONObject.toJSONString(msg);
             ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());
-
             byte[] bytes = s.getBytes();
             byteBuf.writeInt(bytes.length);
-            byteBuf.writeInt(command);
+            byteBuf.writeInt(msg.getCommand());
             byteBuf.writeBytes(bytes);
+
             out.add(new BinaryWebSocketFrame(byteBuf));
         }catch (Exception e){
             e.printStackTrace();

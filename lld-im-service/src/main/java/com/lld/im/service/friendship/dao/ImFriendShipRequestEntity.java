@@ -37,6 +37,11 @@ public class ImFriendShipRequestEntity {
 //    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long createTime;
 
+    private Long updateTime;
+
+    /** 序列号*/
+    private Long sequence;
+
 
 
 

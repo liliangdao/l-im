@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.proto.MessagePack;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,15 +28,22 @@ public class MessageEncoder extends MessageToByteEncoder {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
-        if(msg instanceof Message){
-            Message msgBody = (Message) msg;
-            Integer command = msgBody.getMessageHeader().getCommand();
-            MessagePack body = msgBody.getMessagePack();
-
-            String s = JSONObject.toJSONString(body);
+        if(msg instanceof MessagePack){
+//            Message msgBody = (Message) msg;
+//            Integer command = msgBody.getMessageHeader().getCommand();
+//            MessagePack body = msgBody.getMessagePack();
+//
+//            String s = JSONObject.toJSONString(body);
+//            byte[] bytes = s.getBytes();
+//            out.writeInt(bytes.length);
+//            out.writeInt(command);
+//            out.writeBytes(bytes);
+            MessagePack msgBody = (MessagePack) msg;
+            String s = JSONObject.toJSONString(msgBody);
+            ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());
             byte[] bytes = s.getBytes();
             out.writeInt(bytes.length);
-            out.writeInt(command);
+            out.writeInt(msgBody.getCommand());
             out.writeBytes(bytes);
         }
     }

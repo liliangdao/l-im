@@ -2,13 +2,21 @@ package com.lld.im.service.friendship.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.lld.im.codec.pack.AddFriendPack;
+import com.lld.im.codec.pack.UpdateFriendPack;
 import com.lld.im.common.BaseErrorCode;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.AllowFriendTypeEnum;
 import com.lld.im.common.enums.FriendShipStatusEnum;
+import com.lld.im.common.enums.command.FriendshipEventCommand;
+import com.lld.im.common.model.RequestBase;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.*;
+import com.lld.im.service.friendship.model.resp.UpdateFriendshipResp;
+import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.friendship.dao.mapper.ImFriendShipMapper;
 import com.lld.im.common.enums.FriendShipErrorCode;
@@ -21,6 +29,7 @@ import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.utils.CallbackService;
 import com.lld.im.service.utils.WriteUserSeq;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -60,6 +69,8 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
     @Autowired
     CallbackService callbackService;
 
+    @Autowired
+    MessageProducer messageProducer;
 
     /**
      * @description 添加好友方法，需要判断用户是否开启好友验证，如果开启则插入好友申请记录，没有开启直接添加
@@ -113,7 +124,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                     }
                 } else{
                     try {
-                        ResponseVO doAddFriend = imFriendShipService.doAddFriend(req.getAppId(),req.getFromId(),dto);
+                        ResponseVO doAddFriend = imFriendShipService.doAddFriend(req,req.getFromId(),dto);
                         resp.setCode(doAddFriend.getCode());
                         resp.setMsg(doAddFriend.getMsg());
                         resp.setToId(toId);
@@ -142,11 +153,11 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
      * @return com.lld.im.common.ResponseVO
     */
     @Transactional
-    public ResponseVO doAddFriend(Integer appId,String fromId,FriendDto dto){
+    public ResponseVO doAddFriend(RequestBase requestBase, String fromId, FriendDto dto){
 
         QueryWrapper queryFrom = new QueryWrapper<>()
                 .eq("from_id", fromId)
-                .eq("app_id",appId)
+                .eq("app_id",requestBase.getAppId())
                 .eq("to_id",dto.getToId());
         ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(queryFrom);
 
@@ -166,49 +177,48 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 }
 
                 update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
-                long seq = this.seq.getSeq(appId + Constants.SeqConstants.Friendship);
+                long seq = this.seq.getSeq(requestBase.getAppId() + Constants.SeqConstants.Friendship);
                 update.setSequence(seq);
 
                 imFriendShipMapper.update(update,queryFrom);
-                writeUserSeq.writeUserSeq(appId,fromId,Constants.SeqConstants.Friendship, seq);
+                writeUserSeq.writeUserSeq(requestBase.getAppId(),fromId,Constants.SeqConstants.Friendship, seq);
             }
         }else {
             fromItem = new ImFriendShipEntity();
             fromItem.setAddSource(dto.getAddSource());
-            fromItem.setAppId(appId);
+            fromItem.setAppId(requestBase.getAppId());
             fromItem.setBlack(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode());
             fromItem.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
             fromItem.setCreateTime(System.currentTimeMillis());
             fromItem.setRemark(dto.getRemark());
             fromItem.setToId(dto.getToId());
             fromItem.setFromId(fromId);
-            long seq = this.seq.getSeq(appId + Constants.SeqConstants.Friendship);
+            long seq = this.seq.getSeq(requestBase.getAppId() + Constants.SeqConstants.Friendship);
             fromItem.setSequence(seq);
             int insert = imFriendShipMapper.insert(fromItem);
             if(insert < 1){
                 throw new ApplicationException(FriendShipErrorCode.FRIEND_ADD_ERROR);
             }
-            writeUserSeq.writeUserSeq(appId,fromId,Constants.SeqConstants.Friendship, seq);
-
+            writeUserSeq.writeUserSeq(requestBase.getAppId(),fromId,Constants.SeqConstants.Friendship, seq);
         }
 
         //判断to是否有添加from，如果没有，则插入数据
         QueryWrapper queryTo = new QueryWrapper<>()
                 .eq("from_id", dto.getToId())
-                .eq("app_id",appId)
+                .eq("app_id",requestBase.getAppId())
                 .eq("to_id",fromId);
         ImFriendShipEntity toItem = imFriendShipMapper.selectOne(queryTo);
         
         if(toItem == null){
             toItem = new ImFriendShipEntity();
-            toItem.setAppId(appId);
+            toItem.setAppId(requestBase.getAppId());
             toItem.setBlack(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode());
             toItem.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NO_FRIEND.getCode());
             toItem.setCreateTime(System.currentTimeMillis());
             toItem.setToId(dto.getToId());
             toItem.setFromId(dto.getToId());
             toItem.setToId(fromId);
-            long seq = this.seq.getSeq(appId + Constants.SeqConstants.Friendship);
+            long seq = this.seq.getSeq(requestBase.getAppId() + Constants.SeqConstants.Friendship);
             toItem.setSequence(seq);
             int insert = imFriendShipMapper.insert(toItem);
             if(insert < 1){
@@ -217,9 +227,13 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_ADD_ERROR.getCode()
                         ,FriendShipErrorCode.FRIEND_ADD_ERROR.getError());
             }
-            writeUserSeq.writeUserSeq(appId,dto.getToId(),Constants.SeqConstants.Friendship,seq);
+            writeUserSeq.writeUserSeq(requestBase.getAppId(),dto.getToId(),Constants.SeqConstants.Friendship,seq);
         }
 
+        AddFriendPack addFriendPack = new AddFriendPack();
+        BeanUtils.copyProperties(fromItem,addFriendPack);
+        messageProducer.sendToUser(fromId,requestBase.getClientType(),requestBase.getImel(),
+                FriendshipEventCommand.FRIEND_ADD,addFriendPack,addFriendPack.getAppId());
         return ResponseVO.successResponse();
     }
 
@@ -260,6 +274,51 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
     }
 
     @Override
+    public ResponseVO<List<UpdateFriendshipResp>> updateFriendShip(UpdateFriendshipReq req) {
+
+        List<UpdateFriendshipReq.UpdateItem> updateItems = req.getUpdateItems();
+
+        if(updateItems.size() > 100){
+            return ResponseVO.errorResponse(FriendShipErrorCode.UPDATE_FRIEND_SHIP_TO_LONG);
+        }
+
+        List<UpdateFriendshipResp> resp = new ArrayList<>();
+        List<UpdateFriendPack.UpdateItem> successItem = new ArrayList<>();
+
+        updateItems.forEach(e -> {
+            ResponseVO responseVO = doUpdateFriendship(e,req.getAppId());
+            UpdateFriendshipResp updateFriendshipResp = new UpdateFriendshipResp();
+            updateFriendshipResp.setCode(responseVO.getCode());
+            updateFriendshipResp.setToId(e.getToId());
+            resp.add(updateFriendshipResp);
+            if(responseVO.isOk()){
+                UpdateFriendPack.UpdateItem updateItem = new UpdateFriendPack.UpdateItem();
+                updateItem.setCustomerItem(e.getCustomerItem());
+                updateItem.setRemark(e.getRemark());
+                updateItem.setToId(e.getToId());
+                successItem.add(updateItem);
+            }
+        });
+
+
+
+        return ResponseVO.successResponse(resp);
+    }
+
+    public ResponseVO doUpdateFriendship(UpdateFriendshipReq.UpdateItem req,Integer appId) {
+
+        UpdateWrapper<ImFriendShipEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().set(ImFriendShipEntity::getRemark, req.getRemark())
+                .eq(ImFriendShipEntity::getAppId,appId).eq(ImFriendShipEntity::getToId,req.getToId());
+        int update = imFriendShipMapper.update(null, updateWrapper);
+        if(update == 1){
+            return ResponseVO.successResponse();
+        }
+
+        return ResponseVO.errorResponse();
+    }
+
+    @Override
     public ResponseVO deleteFriend(DeleteFriendReq req) {
 
         QueryWrapper queryFrom = new QueryWrapper<>()
@@ -274,7 +333,10 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         ImFriendShipEntity update = new ImFriendShipEntity();
         update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_DELETED.getCode());
         imFriendShipMapper.update(update, queryFrom);
+
         //TODO 发送消息给同步端
+//        messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(),FriendshipEventCommand.FRIEND_DELETE,
+//                "",req.getAppId());
 
         //回调
         callbackService.callback(req.getAppId(), Constants.CallbackCommand.DeleteFriend, JSONObject.toJSONString(req));

@@ -3,7 +3,9 @@ package com.lld.im.service.friendship.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.UserErrorCode;
+import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.common.exception.ApplicationException;
 import com.lld.im.service.friendship.dao.ImFriendShipRequestEntity;
 import com.lld.im.service.friendship.dao.mapper.ImFriendShipRequestMapper;
@@ -11,12 +13,15 @@ import com.lld.im.common.enums.FriendShipErrorCode;
 import com.lld.im.service.friendship.model.req.FriendDto;
 import com.lld.im.service.friendship.model.resp.GetFriendRequestResp;
 import com.lld.im.service.friendship.service.ImFriendShipRequestService;
+import com.lld.im.service.message.service.MessageProducer;
+import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.model.req.GetUserInfoReq;
 import com.lld.im.service.user.model.resp.GetUserInfoResp;
 import com.lld.im.service.user.service.ImUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,19 +45,29 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
     @Autowired
     ImUserService imUserService;
 
+    @Autowired
+    @Qualifier("redisSeq")
+    Seq seq;
+
+    @Autowired
+    MessageProducer messageProducer;
+
     @Override
     @Transactional
     public ResponseVO addFriendRequest(String fromId, Integer appId, FriendDto dto) {
 
         QueryWrapper query = new QueryWrapper();
-        query.eq("from_id",fromId);
-        query.eq("to_id",dto.getToId());
-        query.eq("app_id",appId);
+        query.eq("from_id", fromId);
+        query.eq("to_id", dto.getToId());
+        query.eq("app_id", appId);
         ImFriendShipRequestEntity request = imFriendShipRequestMapper.selectOne(query);
 
-        if(request == null){
+        long seq = this.seq.getSeq(appId + Constants.SeqConstants.FriendshipRequest);
+
+        if (request == null) {
             request = new ImFriendShipRequestEntity();
             request.setAddWording(dto.getAddWording());
+            request.setSequence(seq);
             request.setAddSource(dto.getAddSource());
             request.setAppId(appId);
             request.setCreateTime(System.currentTimeMillis());
@@ -61,18 +76,25 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             request.setRemark(dto.getRemark());
             request.setToId(dto.getToId());
             int insert = imFriendShipRequestMapper.insert(request);
-            if(insert < 0){
+            if (insert < 0) {
                 return ResponseVO.errorResponse(FriendShipErrorCode.ADD_FRIEND_REQUEST_ERROR.getCode(),
                         FriendShipErrorCode.ADD_FRIEND_REQUEST_ERROR.getError());
             }
-        }else{
+        } else {
+            request.setSequence(seq);
+            request.setReadStatus(0);
+            request.setUpdateTime(System.currentTimeMillis());
             request.setAddWording(dto.getAddWording());
             int i = imFriendShipRequestMapper.updateById(request);
-//            if(i < 0){
-//                return ResponseVO.errorResponse(FriendShipErrorCode.ADD_FRIEND_REQUEST_ERROR.getCode(),
-//                        FriendShipErrorCode.ADD_FRIEND_REQUEST_ERROR.getError());
-//            }
+            if (i != 1) {
+                return ResponseVO.errorResponse(FriendShipErrorCode.ADD_FRIEND_REQUEST_ERROR.getCode(),
+                        FriendShipErrorCode.ADD_FRIEND_REQUEST_ERROR.getError());
+            }
         }
+
+        //发送好友申请的tcp给接收方
+        messageProducer.sendToUser(dto.getToId(), null, "", FriendshipEventCommand.FRIEND_REQUEST,
+                request, appId);
         return ResponseVO.successResponse();
     }
 
@@ -80,12 +102,12 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
     public ResponseVO getFriendRequest(String fromId, Integer appId) {
 
         QueryWrapper<ImFriendShipRequestEntity> query = new QueryWrapper();
-        query.eq("app_id",appId);
-        query.eq("from_id",fromId);
+        query.eq("app_id", appId);
+        query.eq("from_id", fromId);
         List<String> userId = new ArrayList<>();
 
         List<ImFriendShipRequestEntity> requestList = imFriendShipRequestMapper.selectList(query);
-        requestList.forEach(entity ->{
+        requestList.forEach(entity -> {
             userId.add(entity.getToId());
         });
 
@@ -93,21 +115,21 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         getUserInfoReq.setAppId(getUserInfoReq.getAppId());
         getUserInfoReq.setUserIds(userId);
         ResponseVO<GetUserInfoResp> userInfo = imUserService.getUserInfo(getUserInfoReq);
-        if(userInfo.getCode() != 200){
+        if (userInfo.getCode() != 200) {
             throw new ApplicationException(UserErrorCode.SERVER_GET_USER_ERROR);
         }
 
         HashMap<String, ImUserDataEntity> userMap = new HashMap<>();
         List resp = new ArrayList();
-        for (ImUserDataEntity user:
-        userInfo.getData().getUserDataItem()) {
-            userMap.put(user.getUserId(),user);
+        for (ImUserDataEntity user :
+                userInfo.getData().getUserDataItem()) {
+            userMap.put(user.getUserId(), user);
         }
 
         for (ImFriendShipRequestEntity entity : requestList) {
             GetFriendRequestResp respInfo = new GetFriendRequestResp();
-            BeanUtils.copyProperties(entity,respInfo);
-            if(userMap.containsKey(entity.getToId())){
+            BeanUtils.copyProperties(entity, respInfo);
+            if (userMap.containsKey(entity.getToId())) {
                 ImUserDataEntity imUserDataEntity = userMap.get(entity.getToId());
                 respInfo.setPhoto(imUserDataEntity.getPhoto());
                 respInfo.setNickName(imUserDataEntity.getNickName());
@@ -123,12 +145,12 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
     public ResponseVO readAllFriendRequest(String fromId, Integer appId) {
 
         QueryWrapper<ImFriendShipRequestEntity> query = new QueryWrapper<>();
-        query.eq("app_id",appId);
-        query.eq("from_id",fromId);
+        query.eq("app_id", appId);
+        query.eq("from_id", fromId);
 
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
         update.setReadStatus(1);
-        imFriendShipRequestMapper.update(update,query);
+        imFriendShipRequestMapper.update(update, query);
         return ResponseVO.successResponse();
     }
 

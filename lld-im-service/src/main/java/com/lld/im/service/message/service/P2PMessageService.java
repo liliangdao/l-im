@@ -2,7 +2,7 @@ package com.lld.im.service.message.service;
 
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.common.enums.MessageCommand;
+import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.*;
 import com.lld.im.service.service.seq.Seq;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;

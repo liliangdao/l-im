@@ -2,20 +2,17 @@ package com.lld.im.codec.pack;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-07-29 16:24
+ * @create: 2022-08-02 13:46
  **/
 @Data
-public class MessageReadedPack extends BasePack{
+public class DeleteFriendPack {
 
     private String fromId;
 
     private String toId;
-
-    private Integer conversationType;
-
-    private long messageSequence;
-
 }

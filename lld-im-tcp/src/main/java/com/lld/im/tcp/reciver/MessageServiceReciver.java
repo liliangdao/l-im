@@ -2,16 +2,12 @@ package com.lld.im.tcp.reciver;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.WebSocketMessageEncoder;
-import com.lld.im.codec.proto.Message;
-import com.lld.im.codec.proto.MessageHeader;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.common.enums.MessageCommand;
+import com.lld.im.tcp.reciver.process.MessageProcess;
+import com.lld.im.tcp.reciver.process.ProcessFactory;
 import com.lld.im.tcp.utils.MqFactoryUtils;
-import com.lld.im.tcp.utils.SessionSocketHolder;
 import com.rabbitmq.client.*;
-import com.sun.org.apache.bcel.internal.ExceptionConst;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,34 +38,9 @@ public class MessageServiceReciver {
                     String msgStr = new String(body);
                     System.out.println("收到消息：" + msgStr);
                     MessagePack messagePack = JSONObject.parseObject(msgStr, MessagePack.class);
-
                     try {
-                        if(messagePack.getCommand() == MessageCommand.MSG_ACK.getCommand()){
-                            NioSocketChannel nioSocketChannel = SessionSocketHolder.get(messagePack.getAppId(), messagePack.getToId(), messagePack.getClientType(), messagePack.getImei());
-                            if(nioSocketChannel != null){
-                                Message sendPack = new Message();
-                                MessageHeader header = new MessageHeader();
-                                header.setCommand(messagePack.getCommand());
-                                sendPack.setMessageHeader(header);
-                                sendPack.setMessagePack(messagePack);
-                                nioSocketChannel.writeAndFlush(sendPack);
-                            }
-                        }
-                        if(messagePack.getCommand() == MessageCommand.MSG_P2P.getCommand()){
-                            NioSocketChannel nioSocketChannel = SessionSocketHolder.get(messagePack.getAppId(), messagePack.getToId(), messagePack.getClientType(), messagePack.getImei());
-                            if(nioSocketChannel != null){
-                                Message sendPack = new Message();
-                                MessageHeader header = new MessageHeader();
-                                header.setCommand(messagePack.getCommand());
-                                sendPack.setMessageHeader(header);
-                                sendPack.setMessagePack(messagePack);
-                                nioSocketChannel.writeAndFlush(sendPack);
-                            }else {
-                                channel.basicPublish(Constants.RabbitConstants.Im2MessageService,
-                                        "",MessageProperties.PERSISTENT_TEXT_PLAIN,
-                                        JSONObject.toJSONString(messagePack).getBytes());
-                            }
-                        }
+                        MessageProcess messageProcess = ProcessFactory.getMessageProcess(messagePack.getCommand());
+                        messageProcess.process(messagePack,channel);
                         channel.basicAck(envelope.getDeliveryTag() , false);
                     } catch (Exception e){
                         channel.basicNack(envelope.getDeliveryTag(),false,false);

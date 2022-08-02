@@ -2,19 +2,16 @@ package com.lld.im.service.message.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.ClientType;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.common.enums.Command;
-import com.lld.im.common.enums.ImConnectStatusEnum;
-import com.lld.im.common.enums.MessageCommand;
+import com.lld.im.common.enums.command.Command;
+import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.UserSession;
 import com.lld.im.common.model.msg.MessageAck;
 import com.lld.im.service.utils.UserSessionUtils;
-import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,15 +100,15 @@ public class MessageProducer {
         if(command == MessageCommand.MSG_ACK || command == MessageCommand.GROUP_MSG_ACK) {
             ResponseVO<MessageAck> ackData = (ResponseVO<MessageAck>) bizData;
             String ackMsgId = ackData.getData().getMessageId();
-            msgPack.setMsgId(ackMsgId);
+            msgPack.setMessageId(ackMsgId);
         }else{
             String bizMsgId = jsonObject.getString("msgId");
             if(StringUtils.isEmpty(bizMsgId)){
                 String genUid = UUID.randomUUID().toString().replace("-","");
                 jsonObject.put("msgId",genUid);
-                msgPack.setMsgId(genUid);
+                msgPack.setMessageId(genUid);
             }else{
-                msgPack.setMsgId(bizMsgId);
+                msgPack.setMessageId(bizMsgId);
             }
         }
 //
@@ -120,6 +117,20 @@ public class MessageProducer {
         String msg = JSON.toJSONString(msgPack);
         sendMessage(session, msg);
         return true;
+    }
+
+    /**
+     * @return 返回发送成功的session
+     */
+    public void sendToUser(String toId,Integer clientType,String imel, Command command, Object data,Integer appId) {
+        if(clientType != null && StringUtils.isBlank(imel)){
+            ClientInfo clientInfo = new ClientInfo(appId,clientType,imel);
+            this.sendToUserExceptClient(toId,command,data,clientInfo);
+            //发给除了这个端的人
+        }else {
+            //发给所有人
+            this.sendToUser(toId, command, data, appId);
+        }
     }
 
     /**

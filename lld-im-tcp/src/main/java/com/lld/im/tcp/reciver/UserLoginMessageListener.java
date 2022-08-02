@@ -7,7 +7,8 @@ import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.ClientType;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.DeviceMultiLoginEnum;
-import com.lld.im.common.enums.MessageCommand;
+import com.lld.im.common.enums.command.MessageCommand;
+import com.lld.im.common.enums.command.SystemCommand;
 import com.lld.im.tcp.handler.NettyServerHandler;
 import com.lld.im.common.model.UserClientDto;
 import com.lld.im.tcp.redis.RedisManager;
@@ -71,10 +72,10 @@ public class UserLoginMessageListener {
                             MessagePack pack = new MessagePack();
                             pack.setToId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                             pack.setUserId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
-                            pack.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
+                            pack.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
                             sendMsg.setMessagePack(pack);
                             sendMsg.setMessageHeader(header);
-                            header.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
+                            header.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
                             nioSocketChannel.writeAndFlush(sendMsg);
                         }
                     } else if (loginModel == DeviceMultiLoginEnum.TWO.getLoginMode()) {
@@ -91,9 +92,9 @@ public class UserLoginMessageListener {
                                 MessagePack msgBody = new MessagePack();
                                 msgBody.setToId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setUserId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
-                                msgBody.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
+                                msgBody.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
                                 sendMsg.setMessagePack(msgBody);
-                                header.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
+                                header.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
                                 nioSocketChannel.writeAndFlush(sendMsg);
                             }
                         }
@@ -123,9 +124,9 @@ public class UserLoginMessageListener {
                                 MessagePack msgBody = new MessagePack();
                                 msgBody.setToId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setUserId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
-                                msgBody.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
+                                msgBody.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
                                 sendMsg.setMessagePack(msgBody);
-                                header.setCommand(MessageCommand.MUTUALLOGIN.getCommand());
+                                header.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
                                 nioSocketChannel.writeAndFlush(sendMsg);
                             }
                         }

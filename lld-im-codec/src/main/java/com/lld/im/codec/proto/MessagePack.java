@@ -32,7 +32,7 @@ public class MessagePack<T> implements Serializable {
     /**
      * 消息ID
      */
-    private String msgId;
+    private String messageId;
 
     /**
      * 客户端设备唯一标识
@@ -42,7 +42,7 @@ public class MessagePack<T> implements Serializable {
     /**
      * 数据解析类型 和具体业务无关，后续根据解析类型解析data数据 0x0:Json,0x1:ProtoBuf,0x2:Xml,默认:0x0
      */
-    private int msgType = 0x0;
+    private int messageType = 0x0;
 
     /**
      * 业务数据对象，如果是聊天消息则不需要解析直接透传
