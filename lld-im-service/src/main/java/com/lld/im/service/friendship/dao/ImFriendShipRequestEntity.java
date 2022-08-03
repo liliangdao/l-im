@@ -34,6 +34,9 @@ public class ImFriendShipRequestEntity {
 //    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String addWording;
 
+    //审批状态 1同意 2拒绝
+    private Integer approveStatus;
+
 //    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long createTime;
 

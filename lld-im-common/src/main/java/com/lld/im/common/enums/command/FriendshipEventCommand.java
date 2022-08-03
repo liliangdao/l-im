@@ -15,8 +15,11 @@ public enum FriendshipEventCommand implements Command {
     //好友申请
     FRIEND_REQUEST(3003),
 
-    //好友申请
+    //好友申请已读
     FRIEND_REQUEST_READ(3004),
+
+    //好友申请审批
+    FRIEND_REQUEST_APPROVER(3005),
     ;
 
     private Integer command;

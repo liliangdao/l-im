@@ -4,15 +4,18 @@ import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.ApproverFriendRequestStatusEnum;
 import com.lld.im.common.enums.UserErrorCode;
 import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.common.exception.ApplicationException;
 import com.lld.im.service.friendship.dao.ImFriendShipRequestEntity;
 import com.lld.im.service.friendship.dao.mapper.ImFriendShipRequestMapper;
 import com.lld.im.common.enums.FriendShipErrorCode;
+import com.lld.im.service.friendship.model.req.ApproveFriendRequestReq;
 import com.lld.im.service.friendship.model.req.FriendDto;
 import com.lld.im.service.friendship.model.resp.GetFriendRequestResp;
 import com.lld.im.service.friendship.service.ImFriendShipRequestService;
+import com.lld.im.service.friendship.service.ImFriendShipService;
 import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.dao.ImUserDataEntity;
@@ -24,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +55,9 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
 
     @Autowired
     MessageProducer messageProducer;
+
+    @Autowired
+    ImFriendShipService imFriendShipService;
 
     @Override
     @Transactional
@@ -151,6 +158,54 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
         update.setReadStatus(1);
         imFriendShipRequestMapper.update(update, query);
+        return ResponseVO.successResponse();
+    }
+
+    /**
+     * @description 审批好友请求 1同意 2拒绝
+     * @author chackylee
+     * @date 2022/8/3 14:09
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+    */
+    @Override
+    @Transactional
+    public ResponseVO approverFriendRequest(ApproveFriendRequestReq req) {
+
+        ImFriendShipRequestEntity imFriendShipRequestEntity = imFriendShipRequestMapper.selectById(req.getId());
+        if(imFriendShipRequestEntity == null){
+            throw new ApplicationException(FriendShipErrorCode.FRIEND_REQUEST_IS_NOT_EXIST);
+        }
+
+        ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
+        long seq = this.seq.getSeq(req.getAppId() + Constants.SeqConstants.FriendshipRequest);
+        update.setSequence(seq);
+        update.setApproveStatus(req.getStatus());
+        update.setUpdateTime(System.currentTimeMillis());
+
+        if(!req.getOperater().equals(imFriendShipRequestEntity.getToId())){
+            //只能审批发给自己的好友请求
+            throw new ApplicationException(FriendShipErrorCode.NOT_APPROVER_OTHER_MAN_REQUEST);
+        }
+
+        if(ApproverFriendRequestStatusEnum.AGREE.getCode() == req.getStatus()){
+            //同意 ===> 去执行添加好友逻辑
+            FriendDto dto = new FriendDto();
+            dto.setAddSource(imFriendShipRequestEntity.getAddSource());
+            dto.setAddWording(imFriendShipRequestEntity.getAddWording());
+            dto.setRemark(imFriendShipRequestEntity.getRemark());
+            dto.setToId(imFriendShipRequestEntity.getToId());
+            ResponseVO responseVO = imFriendShipService.doAddFriend(null, imFriendShipRequestEntity.getFromId(), dto);
+            if(!responseVO.isOk()){
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return responseVO;
+            }
+        }
+
+        //TCP通知
+        messageProducer.sendToUser(imFriendShipRequestEntity.getToId(),req.getClientType(),req.getImel(),FriendshipEventCommand
+        .FRIEND_REQUEST_APPROVER,"",req.getAppId());
+
         return ResponseVO.successResponse();
     }
 

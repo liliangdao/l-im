@@ -214,7 +214,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 .eq("app_id",requestBase.getAppId())
                 .eq("to_id",fromId);
         ImFriendShipEntity toItem = imFriendShipMapper.selectOne(queryTo);
-        
+
         if(toItem == null){
             toItem = new ImFriendShipEntity();
             toItem.setAppId(requestBase.getAppId());
@@ -238,9 +238,15 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
 
         AddFriendPack addFriendPack = new AddFriendPack();
         BeanUtils.copyProperties(fromItem,addFriendPack);
-        //TCP通知给from
-        messageProducer.sendToUser(fromId,requestBase.getClientType(),requestBase.getImel(),
-                FriendshipEventCommand.FRIEND_ADD,addFriendPack,addFriendPack.getAppId());
+        if(requestBase != null){
+            //TCP通知给from
+            messageProducer.sendToUser(fromId,requestBase.getClientType(),requestBase.getImel(),
+                    FriendshipEventCommand.FRIEND_ADD,addFriendPack,addFriendPack.getAppId());
+        }else{
+            messageProducer.sendToUser(fromId,null,null,
+                    FriendshipEventCommand.FRIEND_ADD,addFriendPack,addFriendPack.getAppId());
+        }
+
         //tcp通知给to
         AddFriendPack addToFriendPack = new AddFriendPack();
         BeanUtils.copyProperties(toItem,addToFriendPack);

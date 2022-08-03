@@ -29,6 +29,10 @@ public enum FriendShipErrorCode implements ApplicationExceptionEnum {
 
     UPDATE_FRIEND_SHIP_TO_LONG(30009,"更新好友数量过长"),
 
+    NOT_APPROVER_OTHER_MAN_REQUEST(30010,"无法审批其他人的好友请求"),
+
+    FRIEND_REQUEST_IS_NOT_EXIST(30011,"好友申请不存在"),
+
     ;
 
     private int code;

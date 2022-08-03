@@ -32,4 +32,11 @@ public class ImFriendShipRequestController {
         return imFriendShipRequestService.readAllFriendRequest(req.getFromId(),appId);
     }
 
+    @RequestMapping("/approverFriendRequest")
+    public ResponseVO approverFriendRequest(@RequestBody @Validated ApproveFriendRequestReq req,Integer appId)  {//@Validated
+        return imFriendShipRequestService.approverFriendRequest(req);
+    }
+
+
+
 }
