@@ -102,7 +102,9 @@ public class GroupServiceImpl implements GroupService {
         //TODO 发送tcp通知
 
         //回调
-        callbackService.callback(req.getAppId(), Constants.CallbackCommand.CreateGroup, JSONObject.toJSONString(imGroupEntity));
+        if(appConfig.isCreateGroupCallback()){
+            callbackService.callback(req.getAppId(), Constants.CallbackCommand.CreateGroup, JSONObject.toJSONString(imGroupEntity));
+        }
         return ResponseVO.successResponse();
     }
 

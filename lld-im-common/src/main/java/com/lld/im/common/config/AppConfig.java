@@ -49,6 +49,10 @@ public class AppConfig {
 
     private boolean addFriendCallback; //添加好友之后回调开关
 
+    private boolean modifyFriendCallback; //修改好友之后回调开关
+
+    private boolean deleteFriendCallback; //删除好友之后回调开关
+
     private boolean createGroupCallback; //创建群聊之后回调开关
 
 }

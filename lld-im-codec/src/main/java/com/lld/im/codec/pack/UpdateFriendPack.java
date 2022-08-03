@@ -10,19 +10,30 @@ import java.util.List;
  * @description:
  * @create: 2022-08-02 13:50
  **/
+@Data
 public class UpdateFriendPack {
 
     public String fromId;
 
-    @Data
-    public static class UpdateItem{
+    private String toId;
 
-        private String toId;
+    private String remark;
 
-        private String remark;
+    private List<KeyValuesBase> customerItem;
 
-        private List<KeyValuesBase> customerItem;
+    private Long sequence;
 
-    }
+
+
+//    @Data
+//    public static class UpdateItem{
+//
+//        private String toId;
+//
+//        private String remark;
+//
+//        private List<KeyValuesBase> customerItem;
+//
+//    }
 
 }

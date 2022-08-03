@@ -27,4 +27,5 @@ public class AddFriendPack extends BasePack {
      */
     private String addWording;
 
+    private Long sequence;
 }
