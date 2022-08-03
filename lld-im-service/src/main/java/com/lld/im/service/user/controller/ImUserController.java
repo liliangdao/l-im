@@ -38,7 +38,8 @@ public class ImUserController {
     RouteHandle routeHandle;
 
     @RequestMapping("/importUser")
-    public ResponseVO importUser(@RequestBody ImportUserReq req){//@Validated
+    public ResponseVO importUser(@RequestBody ImportUserReq req,Integer appId){//@Validated
+        req.setAppId(appId);
         return imUserService.importUser(req);
     }
 

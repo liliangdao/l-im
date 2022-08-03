@@ -77,6 +77,7 @@ public class ImUserServiceImpl implements ImUserService {
         for (ImUserDataEntity data : req.getUserData()) {
             data.setAppId(req.getAppId());
             try {
+                data.setAppId(req.getAppId());
                 imUserDataMapper.insert(data);
                 successId.add(data.getUserId());
             }catch (Exception e){

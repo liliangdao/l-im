@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@SpringBootApplication(scanBasePackages = {"com.lld.im.service","com.lld.im.common"})
+@SpringBootApplication(scanBasePackages = {"com.lld.im.service", "com.lld.im.common"})
 @MapperScan("com.lld.im.service.*.dao.mapper")
 public class Application {
 
@@ -20,9 +20,9 @@ public class Application {
 
 
 @RestController
-class callback{
+class callback {
     @RequestMapping("/callback")
-    public void callback(@RequestBody Object o,String command){
+    public void callback(@RequestBody Object o, String command) {
         System.out.println(command);
         System.out.println(o.toString());
     }
