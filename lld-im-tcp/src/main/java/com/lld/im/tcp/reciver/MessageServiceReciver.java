@@ -28,7 +28,7 @@ public class MessageServiceReciver {
     public static void startReciverMessage() {
         try {
             final Channel channel = MqFactoryUtils.getChannel(Constants.RabbitConstants.MessageService2Im);
-            channel.queueDeclare(Constants.RabbitConstants.MessageService2Im + brokerId, false, false, false, null);
+            channel.queueDeclare(Constants.RabbitConstants.MessageService2Im + brokerId, true, false, false, null);
             channel.queueBind(Constants.RabbitConstants.MessageService2Im + brokerId, Constants.RabbitConstants.MessageService2Im
                     , brokerId);
 //            channel.basicQos(1);
