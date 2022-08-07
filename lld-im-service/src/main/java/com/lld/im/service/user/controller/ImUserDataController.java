@@ -31,7 +31,8 @@ public class ImUserDataController {
     ImUserService imUserService;
 
     @RequestMapping("/getUserInfo")
-    public ResponseVO getUserInfo(@RequestBody GetUserInfoReq req){//@Validated
+    public ResponseVO getUserInfo(@RequestBody GetUserInfoReq req,Integer appId){//@Validated
+        req.setAppId(appId);
         return imUserService.getUserInfo(req);
     }
 
