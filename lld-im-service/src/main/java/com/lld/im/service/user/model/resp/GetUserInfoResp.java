@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class GetUserInfoResp {
 
-    private List<ImUserDataEntity> UserDataItem;
+    private List<ImUserDataEntity> userDataItem;
 
     private List<String> failUser;
 
