@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn
 import java.util.List;
 
 /**
- * @description:
+ * @description: mybatisplus 插件类
  * @author: lld
  * @createDate: 2022/7/23
  * @version: 1.0
