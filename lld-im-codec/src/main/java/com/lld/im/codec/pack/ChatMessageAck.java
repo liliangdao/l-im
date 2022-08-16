@@ -1,26 +1,24 @@
-package com.lld.im.common.model.msg;
+package com.lld.im.codec.pack;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @description:
- * @author: lld
- * @createDate: 2022/7/23
- * @version: 1.0
- */
+ * @author: Chackylee
+ * @description: 单聊消息ack
+ * @create: 2022-08-16 14:24
+ **/
 @Data
 @NoArgsConstructor
-public class MessageAck {
-
+public class ChatMessageAck extends BasePack{
     private String messageId;
 
     private long messageSequence;
 //    private String conversationId;
 
-
-    public MessageAck(String messageId, long messageSequence) {
+    public ChatMessageAck(String messageId, long messageSequence,int appId) {
         this.messageId = messageId;
         this.messageSequence = messageSequence;
+        super.setAppId(appId);
     }
 }

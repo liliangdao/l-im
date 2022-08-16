@@ -60,7 +60,7 @@ public class CheckSendMessageService {
             }
         }
 
-        ImUserDataEntity toer = toId.getData();
+//        ImUserDataEntity toer = toId.getData();
         // 禁用标识(0 未禁用 1 已禁用) silentFlag 1禁言
 //        if(toer.getForbiddenFlag() == UserForbiddenFlagEnum.FORBIBBEN.getCode()){
 //            return ResponseVO.errorResponse(MessageErrorCode.FROMER_IS_FORBIBBEN);

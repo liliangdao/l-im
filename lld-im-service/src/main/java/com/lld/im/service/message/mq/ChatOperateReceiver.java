@@ -3,9 +3,11 @@ package com.lld.im.service.message.mq;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.msg.ChatMessageContent;
+import com.lld.im.service.message.service.MessageSyncService;
 import com.lld.im.service.message.service.P2PMessageService;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
@@ -33,6 +35,9 @@ public class ChatOperateReceiver {
 
     @Autowired
     P2PMessageService p2PMessageService;
+
+    @Autowired
+    MessageSyncService messageSyncService;
 
     /**
      * 订阅MQ单聊消息队列--处理 liutong 2020-11-02 注
@@ -64,6 +69,10 @@ public class ChatOperateReceiver {
                 ChatMessageContent messageContent = JSON.parseObject(msg, new TypeReference<ChatMessageContent>() {
                 }.getType());
                 p2PMessageService.process(messageContent);
+            }else if(Objects.equals(command, MessageCommand.MSG_READED.getCommand())){
+                MessageReadedPack messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedPack>() {
+                }.getType());
+                messageSyncService.readMark(messageContent);
             }
 
             channel.basicAck(deliveryTag,false);

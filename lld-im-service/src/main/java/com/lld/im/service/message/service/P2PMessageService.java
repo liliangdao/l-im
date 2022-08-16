@@ -1,5 +1,6 @@
 package com.lld.im.service.message.service;
 
+import com.lld.im.codec.pack.ChatMessageAck;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.MessageCommand;
@@ -107,7 +108,7 @@ public class P2PMessageService {
     private void ack(MessageContent content, ResponseVO result) {
         logger.debug("result = {}",result);
         logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
-        MessageAck ackData = new MessageAck(content.getMessageId(), content.getMessageSequence());
+        ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence(),content.getAppId());
         result.setData(ackData);
         messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.MSG_ACK, result, content);
     }
