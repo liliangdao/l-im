@@ -40,7 +40,7 @@ public class ChatOperateReceiver {
     MessageSyncService messageSyncService;
 
     /**
-     * 订阅MQ单聊消息队列--处理 liutong 2020-11-02 注
+     * 订阅MQ单聊消息队列--处理
      *
      * @throws Exception
      */
