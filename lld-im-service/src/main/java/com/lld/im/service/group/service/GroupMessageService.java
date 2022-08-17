@@ -11,6 +11,7 @@ import com.lld.im.service.group.model.req.GroupMemberDto;
 import com.lld.im.service.message.service.*;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
+import com.lld.im.service.utils.UserSessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -164,6 +165,12 @@ public class GroupMessageService {
                 }
                 List<ClientInfo> successResults = messageProducer.sendToUser(d.getMemberId()
                         , MessageCommand.MSG_GROUP, groupMessageContent,messageContent.getAppId());
+
+                // 如果成功的session列表中不包括手机，则需要推送离线消息。
+                if (!UserSessionUtils.containMobile(successResults)) {
+                    //如果接收端没有手机，则推送离线消息 TODO
+//            pushService.pushOfflineInfo(offlinePushInfo, messageContent);
+                }
             }
         }
 

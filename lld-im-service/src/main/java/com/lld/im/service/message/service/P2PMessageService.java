@@ -8,6 +8,7 @@ import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.*;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
+import com.lld.im.service.utils.UserSessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -159,10 +160,10 @@ public class P2PMessageService {
         logger.debug("messageProducer.sendToUser msgId:{}, success sent Result ： {}", messageContent.getMessageId(), successResults);
 
         // 如果成功的session列表中不包括手机，则需要推送离线消息。
-//        if (!SessionUtil.containMobile(successResults)) {
-//            //如果发送失败，则推送离线消息，并入同步库
+        if (!UserSessionUtils.containMobile(successResults)) {
+            //如果接收端没有手机，则推送离线消息 TODO
 //            pushService.pushOfflineInfo(offlinePushInfo, messageContent);
-//        }
+        }
 
 //        if (!Objects.equals(0L, messageContent.getmess())) {
 //            //根据多端登陆模式的配置。决定未发送成功的消息存到哪几张离线消息表

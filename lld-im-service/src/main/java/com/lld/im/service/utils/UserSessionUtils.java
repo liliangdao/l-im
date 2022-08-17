@@ -3,7 +3,10 @@ package com.lld.im.service.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.lld.im.common.ClientType;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.ImConnectStatusEnum;
+import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.UserSession;
 import com.lld.im.common.model.msg.ChatMessageContent;
 import org.apache.commons.lang3.StringUtils;
@@ -11,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @description:
@@ -47,7 +47,9 @@ public class UserSessionUtils {
             String str = (String) o;
             UserSession session = JSON.parseObject(str, new TypeReference<UserSession>() {
             }.getType());
-            list.add(session);
+            if(session.getConnectState() == ImConnectStatusEnum.ONLINE_STATUS.getCode()){
+                list.add(session);
+            }
         }
         return list;
     }
@@ -70,6 +72,16 @@ public class UserSessionUtils {
             return session;
         }
         return null;
+    }
+
+    public static boolean containMobile(List<ClientInfo> clientInfos) {
+        for (ClientInfo clientInfo : clientInfos) {
+            int clientType = clientInfo.getClientType();
+            if (Objects.equals(ClientType.ANDROID.getCode(), clientType) || Objects.equals(ClientType.IOS.getCode(), clientType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isValid(UserSession userSessionDto) {
