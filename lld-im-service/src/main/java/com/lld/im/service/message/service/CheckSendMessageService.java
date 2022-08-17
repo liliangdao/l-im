@@ -6,6 +6,10 @@ import com.lld.im.common.enums.*;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.GetRelationReq;
 import com.lld.im.service.friendship.service.ImFriendShipService;
+import com.lld.im.service.group.dao.ImGroupEntity;
+import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
+import com.lld.im.service.group.service.GroupMemberService;
+import com.lld.im.service.group.service.GroupService;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.service.ImUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +32,14 @@ public class CheckSendMessageService {
     @Autowired
     ImFriendShipService imFriendShipService;
 
-    /**
-     * @description 校验用户是否被禁用/发送方是否被禁言
-     * @author chackylee
-     * @date 2022/7/22 16:23
-     * @param [from, to, appId]
-     * @return com.lld.im.common.ResponseVO
-    */
-    public ResponseVO checkUserForbidAndMute(String from,String to,Integer appId){
+    @Autowired
+    GroupService groupService;
 
+    @Autowired
+    GroupMemberService groupMemberService;
+
+
+    public ResponseVO checkSenderForbidAndMute(String from,Integer appId){
         ResponseVO<ImUserDataEntity> fromId = imUserService.getSingleUserInfo(from, appId);
 
         if(!fromId.isOk()){
@@ -51,6 +54,23 @@ public class CheckSendMessageService {
             return ResponseVO.errorResponse(MessageErrorCode.FROMER_IS_FORBIBBEN);
         }else if(fromer.getSilentFlag() == UserSilentFlagEnum.MUTE.getCode()){
             return ResponseVO.errorResponse(MessageErrorCode.FROMER_IS_MUTE);
+        }
+        return ResponseVO.successResponse();
+    }
+
+
+    /**
+     * @description 校验用户是否被禁用/发送方是否被禁言
+     * @author chackylee
+     * @date 2022/7/22 16:23
+     * @param [from, to, appId]
+     * @return com.lld.im.common.ResponseVO
+    */
+    public ResponseVO checkUserForbidAndMute(String from,String to,Integer appId){
+
+        ResponseVO responseVO = checkSenderForbidAndMute(from, appId);
+        if(!responseVO.isOk()){
+            return responseVO;
         }
 
         ResponseVO<ImUserDataEntity> toId = imUserService.getSingleUserInfo(to, appId);
@@ -116,6 +136,48 @@ public class CheckSendMessageService {
                     return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_DELETED);
                 }
             }
+        }
+
+        return ResponseVO.successResponse();
+    }
+
+    /**
+     * @description 个人是否被禁言 , 是否在群内, 群是否被禁言, 如果群被禁言是否是管理员or群主
+     * @author chackylee
+     * @date 2022/8/17 14:35
+     * @param [from, to, appId]
+     * @return com.lld.im.common.ResponseVO
+    */
+    public ResponseVO checkGroup(String from,String groupId,Integer appId){
+
+        //校验发送方
+        ResponseVO responseVO = checkSenderForbidAndMute(from, appId);
+        if(!responseVO.isOk()){
+            return responseVO;
+        }
+
+        ResponseVO<ImGroupEntity> group = groupService.getGroup(groupId, appId);
+        if(!group.isOk()){
+            return group;
+        }
+
+        //校验是否在群内
+        ResponseVO<GetRoleInGroupResp> roleInGroupOne = groupMemberService.getRoleInGroupOne(groupId, from, appId);
+        if(!roleInGroupOne.isOk()){
+            return roleInGroupOne;
+        }
+
+        GetRoleInGroupResp data = roleInGroupOne.getData();
+        if(data.getRole() == GroupMemberRoleEnum.LEAVE.getCode()){
+            return ResponseVO.errorResponse(GroupErrorCode.MEMBER_IS_NOT_JOINED_GROUP);
+        }
+
+        ImGroupEntity groupData = group.getData();
+        //校验群是否被禁言
+        if (groupData.getMute() == GroupMuteTypeEnum.MUTE.getCode()
+                && (data.getRole() == GroupMemberRoleEnum.MAMAGER.getCode()
+                || data.getRole() == GroupMemberRoleEnum.OWNER.getCode())){
+            return ResponseVO.errorResponse(GroupErrorCode.THIS_GROUP_IS_MUTE);
         }
 
         return ResponseVO.successResponse();

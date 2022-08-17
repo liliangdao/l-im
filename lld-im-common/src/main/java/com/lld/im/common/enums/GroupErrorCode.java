@@ -29,6 +29,8 @@ public enum GroupErrorCode implements ApplicationExceptionEnum {
 
     UPDATE_GROUP_BASE_INFO_ERROR(40009,"更新群信息失败"),
 
+    THIS_GROUP_IS_MUTE(40010,"该群禁止发言"),
+
 //    ADD_FRIEND_REQUEST_ERROR(30003,"好友验证添加失败"),
 
     ;

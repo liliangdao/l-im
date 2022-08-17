@@ -223,7 +223,4 @@ public class MessageProducer {
                 && Objects.equals(sessionDto.getClientType(), clientInfo.getClientType());
     }
 
-
-    public void sendToUserExceptClientInfo(String fromId, MessageCommand msgReadedNotify, ClientType messageReaded, Integer clientType, Integer appId) {
-    }
 }

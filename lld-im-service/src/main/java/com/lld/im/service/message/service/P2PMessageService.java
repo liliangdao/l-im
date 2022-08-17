@@ -80,7 +80,7 @@ public class P2PMessageService {
             //落库+回包+分发（发送给同步端和接收方的所有端）
             threadPoolExecutor.execute(() -> {
                 //插入历史库和msgBody
-                String messageKey = messageStoreService.storeMessage(chatMessageData);
+                String messageKey = messageStoreService.storeP2PMessage(chatMessageData);
                 chatMessageData.setMessageKey(messageKey);
                 //回包
                 ack(chatMessageData,ResponseVO.successResponse());
@@ -89,7 +89,9 @@ public class P2PMessageService {
                 //插入离线库
                 messageStoreService.storeOffLineMessage(p2PMessageContent);
 
-                //消息分发 给同步端和接收方
+                syncToSender(p2PMessageContent,chatMessageData,chatMessageData.getOfflinePushInfo());
+
+                //消息分发
                 dispatchMessage(p2PMessageContent,chatMessageData.getOfflinePushInfo());
             });
         } else {
@@ -121,7 +123,7 @@ public class P2PMessageService {
      * @author chackylee
      * @date 2022/7/22 16:01
      */
-    public ResponseVO imServerpermissionCheck(String fromId, String toId, Integer appId) {
+    private ResponseVO imServerpermissionCheck(String fromId, String toId, Integer appId) {
 
         ResponseVO checkForbidden = checkSendMessageService.checkUserForbidAndMute(fromId, toId, appId);
         if (!checkForbidden.isOk()) {
@@ -136,7 +138,11 @@ public class P2PMessageService {
         return ResponseVO.successResponse();
     }
 
-    public void dispatchMessage(P2PMessageContent messageContent, OfflinePushInfo offlinePushInfo) {
+    private void syncToSender(P2PMessageContent content,ClientInfo clientInfo, OfflinePushInfo offlinePushInfo) {
+        messageProducer.sendToUserExceptClient(content.getFromId(),MessageCommand.MSG_P2P,content,clientInfo);
+    }
+
+    private void dispatchMessage(P2PMessageContent messageContent, OfflinePushInfo offlinePushInfo) {
 
         logger.debug("dispatchMessage : {}", messageContent);
         String toId = messageContent.getToId();
@@ -166,7 +172,7 @@ public class P2PMessageService {
 //        }
     }
 
-    public P2PMessageContent extractP2PMessage(MessageContent messageContent){
+    private P2PMessageContent extractP2PMessage(MessageContent messageContent){
         P2PMessageContent p2PMessagePack = new P2PMessageContent();
         BeanUtils.copyProperties(messageContent, p2PMessagePack);
         return p2PMessagePack;

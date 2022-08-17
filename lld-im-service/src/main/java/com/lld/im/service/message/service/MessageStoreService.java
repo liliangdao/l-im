@@ -4,8 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.SyncFromEnum;
-import com.lld.im.common.model.msg.ChatMessageContent;
-import com.lld.im.common.model.msg.P2PMessageContent;
+import com.lld.im.common.model.msg.*;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.ImMessageHistoryEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
@@ -49,10 +48,25 @@ public class MessageStoreService {
      * @author lld
      * @since 2022/7/23
      */
-    public String storeMessage(ChatMessageContent chatMessageContent) {
+    public String storeGroupMessage(GroupChatMessageContent chatMessageContent) {
         ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
         imMessageBodyMapper.insert(imMessageBodyEntity);
-        List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToMessageHistory(chatMessageContent,imMessageBodyEntity);
+        ImMessageHistoryEntity imMessageHistoryEntity = extractToGroupMessageHistory(chatMessageContent, imMessageBodyEntity);
+        imMessageHistoryMapper.insert(imMessageHistoryEntity);
+        return imMessageBodyEntity.getMessageKey();
+    }
+
+    /**
+     * @param
+     * @return void
+     * @description: 消息持久化。插入messageHistory和messageBody库
+     * @author lld
+     * @since 2022/7/23
+     */
+    public String storeP2PMessage(ChatMessageContent chatMessageContent) {
+        ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
+        imMessageBodyMapper.insert(imMessageBodyEntity);
+        List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent,imMessageBodyEntity);
         imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
         return imMessageBodyEntity.getMessageKey();
     }
@@ -68,7 +82,7 @@ public class MessageStoreService {
 
     }
 
-    public List<ImMessageHistoryEntity> extractToMessageHistory(ChatMessageContent content,ImMessageBodyEntity imMessageBodyEntity) {
+    public List<ImMessageHistoryEntity> extractToP2PMessageHistory(ChatMessageContent content,ImMessageBodyEntity imMessageBodyEntity) {
         List<ImMessageHistoryEntity> list = new ArrayList<>();
         // 1 2 存2份
         ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
@@ -97,8 +111,22 @@ public class MessageStoreService {
         return list;
     }
 
+    public ImMessageHistoryEntity extractToGroupMessageHistory(GroupChatMessageContent content, ImMessageBodyEntity imMessageBodyEntity) {
+        ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
+        BeanUtils.copyProperties(content, fromHistory);
+        fromHistory.setOwnerId(content.getFromId());
+        long seq = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
+        fromHistory.setMessageHistroyId(seq);
+        fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
+        fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
+        fromHistory.setMessageSequence(content.getMessageSequence());
+        fromHistory.setCreateTime(System.currentTimeMillis());
 
-    public ImMessageBodyEntity extractMessageBody(ChatMessageContent content) {
+        return fromHistory;
+    }
+
+
+    public ImMessageBodyEntity extractMessageBody(MessageContent content) {
 
         ImMessageBodyEntity body = new ImMessageBodyEntity();
         body.setAppId(content.getAppId());

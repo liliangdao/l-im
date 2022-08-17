@@ -116,6 +116,13 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         return null;
     }
 
+    /**
+     * @description 查询用户在群内的角色
+     * @author chackylee
+     * @date 2022/8/17 14:40
+     * @param [groupId, memberId, appId]
+     * @return com.lld.im.common.ResponseVO<com.lld.im.service.group.model.resp.GetRoleInGroupResp>
+    */
     @Override
     public ResponseVO<GetRoleInGroupResp> getRoleInGroupOne(String groupId, String memberId, Integer appId) {
 

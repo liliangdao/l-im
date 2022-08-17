@@ -262,7 +262,7 @@ public class GroupServiceImpl implements GroupService {
         ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(query);
 
         if(imGroupEntity == null){
-            throw new ApplicationException(GroupErrorCode.GROUP_IS_NOT_EXIST);
+            return ResponseVO.errorResponse(GroupErrorCode.GROUP_IS_NOT_EXIST);
         }
         return ResponseVO.successResponse(imGroupEntity);
     }
