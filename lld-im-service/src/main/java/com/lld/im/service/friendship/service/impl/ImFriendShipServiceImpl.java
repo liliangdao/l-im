@@ -14,6 +14,7 @@ import com.lld.im.common.enums.AllowFriendTypeEnum;
 import com.lld.im.common.enums.FriendShipStatusEnum;
 import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.common.model.RequestBase;
+import com.lld.im.common.model.SyncReq;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.*;
 import com.lld.im.service.friendship.model.resp.UpdateFriendshipResp;
@@ -258,7 +259,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
     }
 
     @Override
-    public ResponseVO syncFriendShipList(SyncFriendShipReq req) {
+    public ResponseVO syncFriendShipList(SyncReq req) {
         return null;
     }
 

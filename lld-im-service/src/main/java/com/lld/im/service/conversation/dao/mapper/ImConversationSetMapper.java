@@ -3,7 +3,10 @@ package com.lld.im.service.conversation.dao.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
 
 @Repository
 public interface ImConversationSetMapper extends BaseMapper<ImConversationSetEntity> {
@@ -24,5 +27,13 @@ public interface ImConversationSetMapper extends BaseMapper<ImConversationSetEnt
             "  conversation_sequence = VALUES (conversation_sequence), " +
             "  readed_sequence = VALUES (readed_sequence), ")
     public int markConversation(ImConversationSetEntity entity);
+
+
+
+
+    @Select(
+            " select sequence from im_conversation_set where app_id = #{appId} and owner_id = #{userId} "
+            )
+    Long geConversationSerMaxSeq(Integer appId, String userId);
 
 }

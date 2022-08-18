@@ -2,6 +2,7 @@ package com.lld.im.service.friendship.service;
 
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.model.RequestBase;
+import com.lld.im.common.model.SyncReq;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.*;
 import com.lld.im.service.friendship.model.resp.UpdateFriendshipResp;
@@ -16,7 +17,7 @@ public interface ImFriendShipService {
 
     public ResponseVO doAddFriend(RequestBase requestBase, String fromId, FriendDto dto);
 
-    public ResponseVO syncFriendShipList(SyncFriendShipReq req);
+    public ResponseVO syncFriendShipList(SyncReq req);
 
     public ResponseVO getAllFriendShip(GetAllFriendShipReq req);
 

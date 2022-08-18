@@ -1,6 +1,7 @@
 package com.lld.im.service.friendship.controller;
 
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.model.SyncReq;
 import com.lld.im.service.friendship.model.req.*;
 import com.lld.im.service.friendship.service.ImFriendShipService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class ImFriendShipController {
     }
 
     @RequestMapping("/syncFriendShipList")
-    public ResponseVO syncFriendShipList(@RequestBody @Validated SyncFriendShipReq req,Integer appId)  {
+    public ResponseVO syncFriendShipList(@RequestBody @Validated SyncReq req, Integer appId)  {
         req.setAppId(appId);
         return imFriendShipService.syncFriendShipList(req);
     }

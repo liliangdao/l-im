@@ -1,6 +1,7 @@
 package com.lld.im.service.group.service;
 
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.model.SyncReq;
 import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.model.req.*;
 

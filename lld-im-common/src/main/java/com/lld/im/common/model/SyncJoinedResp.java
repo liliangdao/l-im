@@ -1,6 +1,5 @@
-package com.lld.im.service.group.model.resp;
+package com.lld.im.common.model;
 
-import com.lld.im.service.group.dao.ImGroupEntity;
 import lombok.Data;
 
 import java.util.List;
@@ -11,12 +10,12 @@ import java.util.List;
  * @create: 2022-08-18 11:41
  **/
 @Data
-public class SyncJoinedGroupResp {
+public class SyncJoinedResp<T> {
 
     private Long maxSequence;
 
     private boolean isCompleted;
 
-    private List<ImGroupEntity> dataList;
+    private List<T> dataList;
 
 }

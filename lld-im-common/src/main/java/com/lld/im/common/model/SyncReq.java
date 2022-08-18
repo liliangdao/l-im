@@ -1,6 +1,5 @@
-package com.lld.im.service.group.model.req;
+package com.lld.im.common.model;
 
-import com.lld.im.common.model.RequestBase;
 import lombok.Data;
 
 /**
