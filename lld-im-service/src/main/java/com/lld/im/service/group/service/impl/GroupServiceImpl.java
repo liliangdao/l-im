@@ -239,7 +239,7 @@ public class GroupServiceImpl implements GroupService {
             QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
             query.eq("app_id",req.getAppId());
             query.in("group_id",data);
-            query.le("sequence",req.getLastSequence());//TODO 改成大于
+            query.gt("sequence",req.getLastSequence());
             query.orderByAsc("sequence");
             query.last("limit " + req.getMaxLimit());
 
