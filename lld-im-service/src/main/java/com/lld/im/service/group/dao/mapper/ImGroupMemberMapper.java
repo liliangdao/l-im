@@ -1,6 +1,7 @@
 package com.lld.im.service.group.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.lld.im.common.enums.GroupMemberRoleEnum;
 import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.dao.ImGroupMemberEntity;
 import com.lld.im.service.group.model.req.GroupMemberDto;
@@ -16,6 +17,9 @@ public interface ImGroupMemberMapper extends BaseMapper<ImGroupMemberEntity> {
 
     @Select("select group_id from im_group_member where app_id = #{appId} AND member_id = #{memberId} ")
     public List<String> getJoinedGroupId(Integer appId, String memberId);
+
+    @Select("select group_id from im_group_member where app_id = #{appId} AND member_id = #{memberId} and role != {role}" )
+    public List<String> syncJoinedGroupId(Integer appId, String memberId,int role);
 
 
     @Results({

@@ -18,6 +18,8 @@ public interface GroupService {
 
     public ResponseVO getJoinedGroup(GetJoinedGroupReq req);
 
+    public ResponseVO syncJoinedGroupList(SyncReq req);
+
     public ResponseVO destroyGroup(DestroyGroupReq req);
 
     public ResponseVO<ImGroupEntity> getGroup(String groupId, Integer appId);

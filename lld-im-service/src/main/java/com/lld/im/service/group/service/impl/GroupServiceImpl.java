@@ -1,5 +1,6 @@
 package com.lld.im.service.group.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -15,6 +16,7 @@ import com.lld.im.service.group.model.req.*;
 import com.lld.im.service.group.model.resp.GetGroupResp;
 import com.lld.im.service.group.model.resp.GetJoinedGroupResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
+import com.lld.im.service.group.model.resp.SyncJoinedGroupResp;
 import com.lld.im.service.group.service.GroupMemberService;
 import com.lld.im.service.group.service.GroupService;
 import com.lld.im.service.service.seq.Seq;
@@ -212,6 +214,46 @@ public class GroupServiceImpl implements GroupService {
         } else {
             return memberJoinedGroup;
         }
+    }
+
+    /**
+     * @description 增量同步加入的群聊列表，传0拉所有
+     * @author chackylee
+     * @date 2022/8/18 10:01
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+    */
+    @Override
+    public ResponseVO syncJoinedGroupList(SyncReq req) {
+
+        if(req.getMaxLimit() > 100){
+            req.setMaxLimit(100);
+        }
+
+        SyncJoinedGroupResp resp = new SyncJoinedGroupResp();
+
+        ResponseVO<Collection<String>> memberJoinedGroup = groupMemberService.syncMemberJoinedGroup(req);
+        if(memberJoinedGroup.isOk()){
+
+            Collection<String> data = memberJoinedGroup.getData();
+            QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
+            query.eq("app_id",req.getAppId());
+            query.in("group_id",data);
+            query.le("sequence",req.getLastSequence());//TODO 改成大于
+            query.orderByAsc("sequence");
+            query.last("limit " + req.getMaxLimit());
+
+            List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
+            if(!CollectionUtil.isEmpty(imGroupEntities)){
+                ImGroupEntity imGroupEntity = imGroupEntities.get(imGroupEntities.size()-1);
+                Long memberJoinedGroupMaxSeq = imGroupDataMapper.getMemberJoinedGroupMaxSeq(req.getAppId(), data);
+                resp.setCompleted(imGroupEntity.getSequence() >= memberJoinedGroupMaxSeq);
+                resp.setDataList(imGroupEntities);
+                return ResponseVO.successResponse(resp);
+            }
+        }
+
+        return memberJoinedGroup;
     }
 
     /**

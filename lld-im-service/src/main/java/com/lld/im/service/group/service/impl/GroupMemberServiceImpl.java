@@ -14,10 +14,7 @@ import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.dao.ImGroupMemberEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMemberMapper;
 import com.lld.im.service.group.model.callback.AddMemberCallback;
-import com.lld.im.service.group.model.req.AddMemberReq;
-import com.lld.im.service.group.model.req.GetJoinedGroupReq;
-import com.lld.im.service.group.model.req.GetRoleInGroupReq;
-import com.lld.im.service.group.model.req.GroupMemberDto;
+import com.lld.im.service.group.model.req.*;
 import com.lld.im.service.group.model.resp.AddMemberResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
 import com.lld.im.service.group.service.GroupMemberService;
@@ -168,6 +165,18 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         } else {
             return ResponseVO.successResponse(imGroupMemberMapper.getJoinedGroupId(req.getAppId(),req.getMemberId()));
         }
+    }
+
+    /**
+     * @description
+     * @author chackylee
+     * @date 2022/8/18 10:13
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO<java.util.Collection<java.lang.String>>
+    */
+    @Override
+    public ResponseVO<Collection<String>> syncMemberJoinedGroup(SyncReq req) {
+        return ResponseVO.successResponse(imGroupMemberMapper.syncJoinedGroupId(req.getAppId(),req.getOperater(),GroupMemberRoleEnum.LEAVE.getCode()));
     }
 
     /**
