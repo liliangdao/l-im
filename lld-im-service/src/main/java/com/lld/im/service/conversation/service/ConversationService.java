@@ -62,7 +62,7 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
 //        List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
         if(!CollectionUtil.isEmpty(imConversationSetEntities)){
             ImConversationSetEntity imGroupEntity = imConversationSetEntities.get(imConversationSetEntities.size()-1);
-            Long seq = imConversationSetMapper.geConversationSerMaxSeq(req.getAppId(),req.getOperater());
+            Long seq = imConversationSetMapper.geConversationSetMaxSeq(req.getAppId(),req.getOperater());
             resp.setCompleted(imGroupEntity.getConversationSequence() >= seq);
             resp.setDataList(imConversationSetEntities);
             return ResponseVO.successResponse(resp);

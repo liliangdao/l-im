@@ -28,9 +28,12 @@ public class ImFriendShipEntity {
     private Integer black;
 //    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long createTime;
-    /** 序列号*/
+    /** 好友关系序列号*/
 //    @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Long sequence;
+    private Long friendSequence;
+
+    /** 黑名单关系序列号*/
+    private Long blackSequence;
     /** 好友来源*/
 //    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String addSource;

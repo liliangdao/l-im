@@ -1,5 +1,6 @@
 package com.lld.im.service.friendship.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -14,7 +15,9 @@ import com.lld.im.common.enums.AllowFriendTypeEnum;
 import com.lld.im.common.enums.FriendShipStatusEnum;
 import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.common.model.RequestBase;
+import com.lld.im.common.model.SyncJoinedResp;
 import com.lld.im.common.model.SyncReq;
+import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.*;
 import com.lld.im.service.friendship.model.resp.UpdateFriendshipResp;
@@ -185,7 +188,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
 
                 update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
                 long seq = this.seq.getSeq(requestBase.getAppId() + Constants.SeqConstants.Friendship);
-                update.setSequence(seq);
+                update.setFriendSequence(seq);
 
                 imFriendShipMapper.update(update,queryFrom);
                 writeUserSeq.writeUserSeq(requestBase.getAppId(),fromId,Constants.SeqConstants.Friendship, seq);
@@ -201,7 +204,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
             fromItem.setToId(dto.getToId());
             fromItem.setFromId(fromId);
             long seq = this.seq.getSeq(requestBase.getAppId() + Constants.SeqConstants.Friendship);
-            fromItem.setSequence(seq);
+            fromItem.setFriendSequence(seq);
             int insert = imFriendShipMapper.insert(fromItem);
             if(insert < 1){
                 throw new ApplicationException(FriendShipErrorCode.FRIEND_ADD_ERROR);
@@ -226,7 +229,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
             toItem.setFromId(dto.getToId());
             toItem.setToId(fromId);
             long seq = this.seq.getSeq(requestBase.getAppId() + Constants.SeqConstants.Friendship);
-            toItem.setSequence(seq);
+            toItem.setFriendSequence(seq);
             int insert = imFriendShipMapper.insert(toItem);
             if(insert < 1){
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -260,7 +263,29 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
 
     @Override
     public ResponseVO syncFriendShipList(SyncReq req) {
-        return null;
+
+        if(req.getMaxLimit() > 100){
+            req.setMaxLimit(100);
+        }
+
+        SyncJoinedResp resp = new SyncJoinedResp();
+
+        QueryWrapper<ImFriendShipEntity> query = new QueryWrapper<>();
+        query.eq("owner_id",req.getOperater());
+        query.gt("sequence",req.getLastSequence());
+        query.last(" limit " + req.getMaxLimit());
+        List<ImFriendShipEntity> imConversationSetEntities = imFriendShipMapper.selectList(query);
+//        List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
+        if(!CollectionUtil.isEmpty(imConversationSetEntities)){
+            ImFriendShipEntity friend = imConversationSetEntities.get(imConversationSetEntities.size()-1);
+            Long seq = imFriendShipMapper.getFriendShipMaxSeq(req.getAppId(),req.getOperater());
+            resp.setCompleted(friend.getFriendSequence() >= seq);
+            resp.setDataList(imConversationSetEntities);
+            return ResponseVO.successResponse(resp);
+        }
+
+        return ResponseVO.successResponse();
+
     }
 
     /**
@@ -313,7 +338,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
             updateFriendshipResp.setToId(e.getToId());
             resp.add(updateFriendshipResp);
             if(responseVO.isOk()){
-                Long sequence = responseVO.getData().getSequence();
+                Long sequence = responseVO.getData().getFriendSequence();
                 UpdateFriendPack updateItem = new UpdateFriendPack();
                 updateItem.setCustomerItem(e.getCustomerItem());
                 updateItem.setRemark(e.getRemark());
@@ -336,12 +361,12 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         long seq = this.seq.getSeq(appId + Constants.SeqConstants.Friendship);
 
         UpdateWrapper<ImFriendShipEntity> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.lambda().set(ImFriendShipEntity::getRemark, req.getRemark()).set(ImFriendShipEntity::getSequence,seq)
+        updateWrapper.lambda().set(ImFriendShipEntity::getRemark, req.getRemark()).set(ImFriendShipEntity::getFriendSequence,seq)
                 .eq(ImFriendShipEntity::getAppId,appId).eq(ImFriendShipEntity::getToId,req.getToId());
         int update = imFriendShipMapper.update(null, updateWrapper);
         if(update == 1){
             ImFriendShipEntity resp = new ImFriendShipEntity();
-            resp.setSequence(seq);
+            resp.setFriendSequence(seq);
             resp.setRemark(req.getRemark());
             resp.setToId(req.getToId());
             return ResponseVO.successResponse(resp);
