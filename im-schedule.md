@@ -8,7 +8,6 @@
 | /user/data/getUserInfo       | 获取用户         | 获取用户拓展信息，根据字段获取信息未完成 |  50%  |
 | /user/data/getSingleUserInfo | 获取单个用户     | 获取所有的服务列表                       | 100%  |
 | /user/data/modifyUserInfo    | 修改用户信息     | 发送tcp通知未完成                        |  100%  |
-| /user/data/syncUserData      | 增量获取用户信息 |                                          |  0%   |
 | /user/qeuryOnlineStatus      | 查询用户在线状态 |                                          |  0%   |
 
 ## 好友
@@ -54,7 +53,6 @@
 | 接口                 | 作用             | 备注                                       | 进 度 |
 | -------------------- | ---------------- | ------------------------------------------ | :---: |
 | /conversation/get    | 获取会话列表     |                                            |  0%   |
-| /conversation/sync   | 增量同步会话列表 |                                            |  0%   |
 | /conversation/update | 修改会话设置     | 置顶/静音                                  |  0%   |
 | /conversation/delete | 删除会话         | 支持服务端删除/客户端删除（仅发送tcp通知） |  0%   |
 
@@ -91,6 +89,17 @@
 | 消息持久化 |                                         |  90%   |
 | 工具类封装 | session工具类，messageProdecer工具...                                        |  90%   |
 | 消息服务和tcp服务通信 | mq                                        |  95%   |
+
+## 增量同步
+
+| 功能                      | 备注                                    | 进 度 |
+| ------------------------- | --------------------------------------- | :---: |
+| friendship/syncFriendShipList      | 增量同步好友 |  100%  |
+| friendship/syncFriendShipRequestList               | 增量同步好友申请                             |  0%  |
+| friendship/syncBlackList |    增量同步黑名单                                     |  0%   |
+| conversation/syncConversationList |        增量同步会话列表                                 |  100%   |
+| group/syncJoinedGroup | 增量同步加入的群聊                                        |  100%   |
+| message/syncOfflineMessage | 增量同步离线消息                                        |  100%   |
 
 
 
