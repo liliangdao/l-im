@@ -19,13 +19,13 @@ public interface ImConversationSetMapper extends BaseMapper<ImConversationSetEnt
      * @return int
     */
     @Insert(" insert into im_conversation_set " +
-            "(conversation_id , conversation_type , from_id , to_id ,is_mute,is_top,conversation_sequence,readed_sequence,app_id)" +
-            " values(#{entity.conversationId},#{entity.conversationType}" +
-            " ,#{entity.fromId},#{entity.toId},#{entity.isMute},#{entity.isTop},#{entity.conversationSequence} " +
-            " ,#{entity.readedSequence},#{entity.appId} ) " +
-            " ON DUPLICATE KEY UPDATE" +
-            "  conversation_sequence = VALUES (conversation_sequence), " +
-            "  readed_sequence = VALUES (readed_sequence), ")
+            "(conversation_id , conversation_type , from_id , to_id ,is_mute,is_top,sequence,readed_sequence,app_id)" +
+            " values(#{conversationId},#{conversationType}" +
+            " ,#{fromId},#{toId},#{isMute},#{isTop},#{sequence} " +
+            " ,#{readedSequence},#{appId} ) " +
+            " ON DUPLICATE KEY UPDATE " +
+            "  sequence = VALUES (sequence) , " +
+            "  readed_sequence = VALUES (readed_sequence) ")
     public int markConversation(ImConversationSetEntity entity);
 
 

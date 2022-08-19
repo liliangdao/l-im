@@ -4,21 +4,25 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.lld.im.codec.pack.BasePack;
+import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.codec.proto.MessageHeader;
 import com.lld.im.codec.pack.LoginPack;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.ImConnectStatusEnum;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.enums.command.SystemCommand;
 import com.lld.im.common.model.UserClientDto;
 import com.lld.im.common.model.UserSession;
+import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.tcp.publish.MqMessageProducer;
 import com.lld.im.tcp.redis.RedisManager;
 import com.lld.im.tcp.utils.SessionSocketHolder;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
+import jodd.bean.BeanUtil;
 import org.redisson.api.RMap;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
@@ -88,6 +92,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             session.setClientType(loginPack.getClientType());
             session.setImei(loginPack.getImei());
             session.setUserId(loginReq.getUserId());
+            session.setConnectState(ImConnectStatusEnum.ONLINE_STATUS.getCode());
             try {
                 InetAddress addr = InetAddress.getLocalHost();
                 session.setPipelineHost(addr.getHostAddress());
@@ -149,11 +154,27 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                 ctx.channel().writeAndFlush(sendPack);
             }
         } else if (command == SystemCommand.PING.getCommand()) {
-
+            //PING
 
         } else if (command == MessageCommand.MSG_P2P.getCommand()) {
             try {
                 MqMessageProducer.sendMessageToMessageService(msg.getMessagePack().getData());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if (command == MessageCommand.MSG_READED.getCommand()) {
+            try {
+                MessagePack<MessageReadedPack> pack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()), new TypeReference<MessagePack<MessageReadedPack>>() {
+                }.getType());
+                MessageReadedContent content = new MessageReadedContent();
+                content.setConversationType(pack.getData().getConversationType());
+                content.setFromId(pack.getData().getFromId());
+                content.setMessageSequence(pack.getData().getMessageSequence());
+                content.setToId(pack.getUserId());
+                content.setAppId(pack.getAppId());
+                content.setImei(pack.getImei());
+                content.setClientType(pack.getClientType());
+                MqMessageProducer.sendMessageToMessageService(content,command);
             } catch (Exception e) {
                 e.printStackTrace();
             }

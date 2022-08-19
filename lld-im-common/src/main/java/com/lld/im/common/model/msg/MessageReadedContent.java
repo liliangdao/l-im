@@ -18,4 +18,5 @@ public class MessageReadedContent extends ClientInfo {
     private Integer conversationType;
 
     private long messageSequence;
+
 }

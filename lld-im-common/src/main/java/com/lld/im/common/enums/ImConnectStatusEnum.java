@@ -10,13 +10,13 @@ public enum ImConnectStatusEnum {
     OFFLINE_STATUS(2),
     ;
 
-    private int code;
+    private Integer code;
 
-    ImConnectStatusEnum(int code){
+    ImConnectStatusEnum(Integer code){
         this.code=code;
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 }
