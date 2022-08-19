@@ -112,7 +112,6 @@ public class MessageSyncService {
 
         if(CollectionUtil.isNotEmpty(respList)){
             OfflineMessageContent offlineMessageContent = respList.get(respList.size() - 1);
-            System.out.println(offlineMessageContent.getMessageSequence());
             resp.setCompleted(maxSeq >= offlineMessageContent.getMessageSequence());
         }
 
