@@ -22,7 +22,6 @@ public class Constants {
 
     public static final String ImCoreZkRootWeb = "/web";
 
-
     public static class RedisConstants{
 
         /**
@@ -40,6 +39,11 @@ public class Constants {
          * seq前缀
          */
         public static final String SeqPrefix = "seq";
+
+        /**
+         * 离线消息，格式： appId + :offlineMessage: + userId
+         */
+        public static final String offlineMessage = ":offlineMessage:";
     }
 
     public static class SeqConstants{
@@ -50,7 +54,7 @@ public class Constants {
 
         public static final String FriendshipRequest = ":friendshipRequestSeq";
 
-        public static final String Group = ":groupSeq";
+        public static final String Group = "groupSeq";
 
         public static final String Message = ":messageSeq";
 

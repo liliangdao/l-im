@@ -91,7 +91,7 @@ public class GroupServiceImpl implements GroupService {
         }
 
         ImGroupEntity imGroupEntity = new ImGroupEntity();
-        long seq = this.seq.getSeq(req.getAppId() + Constants.SeqConstants.Group);
+        long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         imGroupEntity.setSequence(seq);
         BeanUtils.copyProperties(req, imGroupEntity);
         int insert = imGroupDataMapper.insert(imGroupEntity);
@@ -160,7 +160,7 @@ public class GroupServiceImpl implements GroupService {
         }
 
         ImGroupEntity update = new ImGroupEntity();
-        long seq = this.seq.getSeq(req.getAppId() + Constants.SeqConstants.Group);
+        long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         update.setSequence(seq);
         BeanUtils.copyProperties(req, update);
 
@@ -285,7 +285,7 @@ public class GroupServiceImpl implements GroupService {
 
         ImGroupEntity update = new ImGroupEntity();
         update.setStatus(GroupStatusEnum.DESTROY.getCode());
-        long seq = this.seq.getSeq(req.getAppId() + Constants.SeqConstants.Group);
+        long seq = this.seq.getSeq(req.getAppId()+ ":" + Constants.SeqConstants.Group);
         update.setSequence(seq);
         int update1 = imGroupDataMapper.update(update, objectQueryWrapper);
         if(update1 != 1){

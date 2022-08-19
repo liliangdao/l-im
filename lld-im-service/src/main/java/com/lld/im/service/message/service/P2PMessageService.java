@@ -76,7 +76,7 @@ public class P2PMessageService {
         ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
 
         if (responseVO.isOk()) {
-            long seq = this.seq.getSeq(Constants.SeqConstants.Message);
+            long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" + Constants.SeqConstants.Message);
             chatMessageData.setMessageSequence(seq);
             //落库+回包+分发（发送给同步端和接收方的所有端）
             threadPoolExecutor.execute(() -> {
@@ -87,8 +87,9 @@ public class P2PMessageService {
                 ack(chatMessageData,ResponseVO.successResponse());
 
                 P2PMessageContent p2PMessageContent = extractP2PMessage(chatMessageData);
-                //插入离线库
-                messageStoreService.storeOffLineMessage(p2PMessageContent);
+
+                //TODO 插入离线库redis
+//                messageStoreService.storeOffLineMessage(p2PMessageContent);
 
                 syncToSender(p2PMessageContent,chatMessageData,chatMessageData.getOfflinePushInfo());
 

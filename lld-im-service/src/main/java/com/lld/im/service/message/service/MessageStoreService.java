@@ -14,6 +14,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,9 @@ public class MessageStoreService {
     @Autowired
     @Qualifier("snowflakeSeq")
     Seq seq;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
 
     /**
@@ -72,13 +77,22 @@ public class MessageStoreService {
     }
 
     /**
-     * @param
+     * @description 存储离线消息到redis，发送方和接收方都要存一份
+     * @author chackylee
+     * @date 2022/8/19 15:30
+     * @param [chatMessageContent]
      * @return void
-     * @description: 消息持久化。插入messageHistory和messageBody库
-     * @author lld
-     * @since 2022/7/23
-     */
-    public void storeOffLineMessage(P2PMessageContent chatMessageContent) {
+    */
+    public void storeOffLineMessage(OfflineMessageContent chatMessageContent) {
+
+        ZSetOperations zSetOperations = redisTemplate.opsForZSet();
+
+        Long count = zSetOperations.count(chatMessageContent.getAppId() + Constants.RedisConstants.offlineMessage + chatMessageContent.getToId(),
+                0, chatMessageContent.getMessageSequence());
+        if(count > 10000){
+//            zSetOperations.re
+        }
+
 
     }
 
@@ -88,7 +102,7 @@ public class MessageStoreService {
         ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
         BeanUtils.copyProperties(content, fromHistory);
         fromHistory.setOwnerId(content.getFromId());
-        long seq = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
+        long seq = this.seq.getSeq("");
         fromHistory.setMessageHistroyId(seq);
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
         fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
@@ -115,7 +129,7 @@ public class MessageStoreService {
         ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
         BeanUtils.copyProperties(content, fromHistory);
         fromHistory.setOwnerId(content.getFromId());
-        long seq = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
+        long seq = this.seq.getSeq("");
         fromHistory.setMessageHistroyId(seq);
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
         fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
