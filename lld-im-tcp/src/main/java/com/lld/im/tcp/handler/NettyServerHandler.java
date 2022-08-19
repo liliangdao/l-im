@@ -158,7 +158,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
         } else if (command == MessageCommand.MSG_P2P.getCommand()) {
             try {
-                MqMessageProducer.sendMessageToMessageService(msg.getMessagePack().getData());
+                MqMessageProducer.sendMessageToMessageService(msg.getMessagePack().getData(),command);
             } catch (Exception e) {
                 e.printStackTrace();
             }
