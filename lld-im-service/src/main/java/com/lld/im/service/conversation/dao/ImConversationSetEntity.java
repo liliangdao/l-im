@@ -26,7 +26,7 @@ public class ImConversationSetEntity {
 
     private int isTop;
 
-    private Long conversationSequence;
+    private Long sequence;
 
     private Long readedSequence;
 

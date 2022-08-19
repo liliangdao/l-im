@@ -477,10 +477,11 @@
         if (socket.readyState == WebSocket.OPEN) {
             var userId = userId;
             var toUser = toUser;
-            var command = 1000;
+            var command = 9000;
             var data = {"userId": userId, "toId": toUser, "appId": 10000, "clientType": 1, "imei": "web"};
-            data['data'] = {"userId": userId, "toId": toUser, "appId": 10000, "clientType": 1, "imei": "web"};
+            data['data'] = {"userId": userId,"userSign":"123"};
             var jsonData = JSON.stringify(data);
+			console.log(jsonData);
 
             var bodyLen = jsonData.length;
 
@@ -496,14 +497,19 @@
     }
 
     //发消息
-    function sendMsg(userId, toId, msg) {
+    function sendMsg(userId, toId, command,msg) {
         if (!window.WebSocket) {
             return;
         }
         //当websocket状态打开
         if (socket.readyState == WebSocket.OPEN) {
             // debugger;
-            var command = 1103;
+            //var command = 1103;
+			
+			if(command == null || command == ''){
+				command = 1103;
+			}
+			
             var imei = "web"
             var data = {
                 "userId": userId,
@@ -515,16 +521,21 @@
             }
 
             var messageId = uuid();
-            var messageData = {
-                "messageId": messageId,
-                "fromId": userId,
-                "toId": toId,
-                "appId": 10000,
-                "clientType": 1,
-                "imei": imei,
-                "messageBody": msg,
-                "command": command
-            }
+			var messageData = {};
+            if(command == 1103 ){
+				messageData = {
+					"messageId": messageId,
+					"fromId": userId,
+					"toId": toId,
+					"appId": 10000,
+					"clientType": 1,
+					"imei": imei,
+					"messageBody": msg,
+					"command": command
+				}
+			}else{
+				messageData = JSON.parse(msg)
+			}
             data.data = messageData;
 
             var jsonData = JSON.stringify(data);
@@ -562,12 +573,15 @@
     <textarea placeholder="你要发消息给谁" name="toUser" style="width: 100px;height: 20px"></textarea>
     <input type="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value);">
 
+	<textarea placeholder="输入command" name="command" style="width: 200px;height: 20px"></textarea>
 
     <textarea placeholder="输入要发送的内容" name="message" style="width: 200px;height: 20px"></textarea>
+	
+	
 
 
     <input type="button" value="发送数据"
-           onclick="sendMsg(this.form.userId.value,this.form.toUser.value,this.form.message.value);">
+           onclick="sendMsg(this.form.userId.value,this.form.toUser.value,this.form.command.value,this.form.message.value);">
 
     <h3>服务器输出：</h3>
 

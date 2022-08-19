@@ -10,7 +10,7 @@ import java.util.List;
  * @create: 2022-08-02 13:46
  **/
 @Data
-public class AddFriendPack extends BasePack {
+public class AddFriendPack {
     private String fromId;
 
     /**

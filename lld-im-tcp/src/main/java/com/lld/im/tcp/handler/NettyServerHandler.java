@@ -2,6 +2,8 @@ package com.lld.im.tcp.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.lld.im.codec.pack.BasePack;
 import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.codec.proto.MessageHeader;
@@ -23,6 +25,7 @@ import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -65,22 +68,25 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
         if (command == SystemCommand.LOGIN.getCommand()) {
 
-            LoginPack loginReq = JSONObject.parseObject(msg.getMessagePack().getData().toString(), LoginPack.class);
+            MessagePack<LoginPack> loginPack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()), new TypeReference<MessagePack<LoginPack>>() {
+            }.getType());
+            LoginPack loginReq = loginPack.getData();
+
             /** 登陸事件 **/
             String userId = msg.getMessagePack().getUserId();
             /** 为channel设置用户id **/
             ctx.channel().attr(AttributeKey.valueOf(Constants.UserId)).set(userId);
-            String hashKey = loginReq.getClientType() + ":" + loginReq.getImei();
+            String hashKey = loginPack.getClientType() + ":" + loginPack.getImei();
             /** 为channel设置client和imel **/
             ctx.channel().attr(AttributeKey.valueOf(Constants.ClientImei)).set(hashKey);
             /** 为channel设置appId **/
-            ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).set(loginReq.getAppId());
+            ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).set(loginPack.getAppId());
 
             // 设置userSession到redis
             UserSession session = new UserSession();
-            session.setAppId(loginReq.getAppId());
-            session.setClientType(loginReq.getClientType());
-            session.setImei(loginReq.getImei());
+            session.setAppId(loginPack.getAppId());
+            session.setClientType(loginPack.getClientType());
+            session.setImei(loginPack.getImei());
             session.setUserId(loginReq.getUserId());
             try {
                 InetAddress addr = InetAddress.getLocalHost();
@@ -91,15 +97,15 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             }
 
             RedissonClient redissonClient = RedisManager.getRedissonClient();
-            RMap<Object, Object> map = redissonClient.getMap(loginReq.getAppId() + Constants.RedisConstants.UserSessionConstants + userId);
+            RMap<Object, Object> map = redissonClient.getMap(loginPack.getAppId() + Constants.RedisConstants.UserSessionConstants + userId);
             map.put(hashKey, JSONObject.toJSONString(session));
-            SessionSocketHolder.put(loginReq.getAppId(), userId, loginReq.getClientType(), loginReq.getImei(), (NioSocketChannel) ctx.channel());
+            SessionSocketHolder.put(loginPack.getAppId(), userId, loginPack.getClientType(), loginPack.getImei(), (NioSocketChannel) ctx.channel());
 
             // 通知其他端下线,例如：安卓与ios互斥，windows和mac互斥，是否允许多设备登录
             UserClientDto dto = new UserClientDto();
-            dto.setAppId(loginReq.getAppId());
-            dto.setClientType(loginReq.getClientType());
-            dto.setImei(loginReq.getImei());
+            dto.setAppId(loginPack.getAppId());
+            dto.setClientType(loginPack.getClientType());
+            dto.setImei(loginPack.getImei());
             dto.setUserId(loginReq.getUserId());
             RTopic topic = redissonClient.getTopic(Constants.RedisConstants.UserLoginChannel);
             topic.publish(JSON.toJSONString(dto));

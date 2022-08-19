@@ -92,17 +92,17 @@ public class MessageStoreService {
         fromHistory.setMessageHistroyId(seq);
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
         fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
-        fromHistory.setMessageSequence(content.getMessageSequence());
+        fromHistory.setSequence(content.getMessageSequence());
         fromHistory.setCreateTime(System.currentTimeMillis());
         list.add(fromHistory);
         if (content.getSyncFromId() == SyncFromEnum.BOTH.getCode()) {
             ImMessageHistoryEntity toHistory = new ImMessageHistoryEntity();
             BeanUtils.copyProperties(content, toHistory);
             toHistory.setOwnerId(content.getToId());
-            long seq2 = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
-            toHistory.setMessageHistroyId(seq2);
+//            long seq2 = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
+            toHistory.setMessageHistroyId(seq);
             toHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
-            toHistory.setMessageSequence(content.getMessageSequence());
+            toHistory.setSequence(content.getMessageSequence());
             toHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
             toHistory.setCreateTime(System.currentTimeMillis());
             list.add(toHistory);
@@ -119,7 +119,7 @@ public class MessageStoreService {
         fromHistory.setMessageHistroyId(seq);
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
         fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
-        fromHistory.setMessageSequence(content.getMessageSequence());
+        fromHistory.setSequence(content.getMessageSequence());
         fromHistory.setCreateTime(System.currentTimeMillis());
 
         return fromHistory;

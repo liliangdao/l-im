@@ -25,7 +25,7 @@ public class ImMessageHistoryEntity {
     /** messageBodyId*/
     private String messageKey;
     /** 序列号*/
-    private Long messageSequence;
+    private Long sequence;
 
     private String messageRandom;
 

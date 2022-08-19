@@ -8,7 +8,7 @@ import lombok.Data;
  * @create: 2022-08-02 10:26
  **/
 @Data
-public class UserModifyPack extends BasePack {
+public class UserModifyPack  {
 
     // 用户id
     private String userId;

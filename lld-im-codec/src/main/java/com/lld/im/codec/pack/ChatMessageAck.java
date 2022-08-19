@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  **/
 @Data
 @NoArgsConstructor
-public class ChatMessageAck extends BasePack{
+public class ChatMessageAck {
     private String messageId;
 
     private long messageSequence;
@@ -19,6 +19,5 @@ public class ChatMessageAck extends BasePack{
     public ChatMessageAck(String messageId, long messageSequence,int appId) {
         this.messageId = messageId;
         this.messageSequence = messageSequence;
-        super.setAppId(appId);
     }
 }

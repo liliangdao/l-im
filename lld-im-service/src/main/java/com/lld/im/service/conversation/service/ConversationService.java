@@ -10,6 +10,7 @@ import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.model.SyncJoinedResp;
 import com.lld.im.common.model.SyncReq;
+import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import com.lld.im.service.conversation.dao.mapper.ImConversationSetMapper;
 import com.lld.im.service.group.dao.ImGroupEntity;
@@ -63,7 +64,7 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
         if(!CollectionUtil.isEmpty(imConversationSetEntities)){
             ImConversationSetEntity imGroupEntity = imConversationSetEntities.get(imConversationSetEntities.size()-1);
             Long seq = imConversationSetMapper.geConversationSetMaxSeq(req.getAppId(),req.getOperater());
-            resp.setCompleted(imGroupEntity.getConversationSequence() >= seq);
+            resp.setCompleted(imGroupEntity.getSequence() >= seq);
             resp.setDataList(imConversationSetEntities);
             return ResponseVO.successResponse(resp);
         }
@@ -73,13 +74,13 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
 
 
     @Transactional
-    public void msgMarkRead(MessageReadedPack messageReaded) {
+    public void msgMarkRead(MessageReadedContent messageReaded) {
         String conversationId = convertConversationId(messageReaded.getConversationType(), messageReaded.getFromId(), messageReaded.getToId());
         long seq = this.seq.getSeq(messageReaded.getAppId() + Constants.SeqConstants.Conversation);
         ImConversationSetEntity conversationSet = new ImConversationSetEntity();
         conversationSet.setConversationId(conversationId);
         BeanUtils.copyProperties(messageReaded,conversationSet);
-        conversationSet.setConversationSequence(seq);
+        conversationSet.setSequence(seq);
         imConversationSetMapper.markConversation(conversationSet);
 //        cacheManager.refreshUserSyncSeqCache(messageReaded.getFromId(), SyncKeyEnum.syncConversationSetSequence.name(), String.valueOf(conversationSequence),messageReaded.getAppId());
         writeUserSeq.writeUserSeq(messageReaded.getAppId(),messageReaded.getFromId(),Constants.SeqConstants.Conversation,seq);

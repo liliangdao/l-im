@@ -45,8 +45,8 @@ public class GroupChatOperateReceiver {
      * @throws Exception
      */
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(value = Constants.RabbitConstants.Im2MessageService, durable = "true"),
-            exchange = @Exchange(value = Constants.RabbitConstants.Im2MessageService, durable = "true")
+            value = @Queue(value = Constants.RabbitConstants.Im2GroupService, durable = "true"),
+            exchange = @Exchange(value = Constants.RabbitConstants.Im2GroupService, durable = "true")
     ), concurrency = "1")
     @RabbitHandler
     public void onChatMessage(@Payload Message message,

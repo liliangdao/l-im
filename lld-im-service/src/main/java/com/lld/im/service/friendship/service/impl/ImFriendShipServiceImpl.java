@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.lld.im.codec.pack.AddFriendPack;
+import com.lld.im.codec.pack.BasePack;
 import com.lld.im.codec.pack.UpdateFriendPack;
 import com.lld.im.common.BaseErrorCode;
 import com.lld.im.common.ResponseVO;
@@ -240,15 +241,16 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
             writeUserSeq.writeUserSeq(requestBase.getAppId(),dto.getToId(),Constants.SeqConstants.Friendship,seq);
         }
 
+
         AddFriendPack addFriendPack = new AddFriendPack();
         BeanUtils.copyProperties(fromItem,addFriendPack);
         if(requestBase != null){
             //TCP通知给from
             messageProducer.sendToUser(fromId,requestBase.getClientType(),requestBase.getImel(),
-                    FriendshipEventCommand.FRIEND_ADD,addFriendPack,addFriendPack.getAppId());
+                    FriendshipEventCommand.FRIEND_ADD,addFriendPack, requestBase.getAppId());
         }else{
             messageProducer.sendToUser(fromId,null,null,
-                    FriendshipEventCommand.FRIEND_ADD,addFriendPack,addFriendPack.getAppId());
+                    FriendshipEventCommand.FRIEND_ADD,addFriendPack,requestBase.getAppId());
         }
 
         //tcp通知给to
@@ -256,7 +258,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         BeanUtils.copyProperties(toItem,addToFriendPack);
         //TCP通知给from
         messageProducer.sendToUser(toItem.getToId(),null,null,
-                FriendshipEventCommand.FRIEND_ADD,addToFriendPack,addToFriendPack.getAppId());
+                FriendshipEventCommand.FRIEND_ADD,addToFriendPack,requestBase.getAppId());
 
         return ResponseVO.successResponse();
     }

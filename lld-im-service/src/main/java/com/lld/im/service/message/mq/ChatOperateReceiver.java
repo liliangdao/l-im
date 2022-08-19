@@ -7,6 +7,7 @@ import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.msg.ChatMessageContent;
+import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.service.message.service.MessageSyncService;
 import com.lld.im.service.message.service.P2PMessageService;
 import com.rabbitmq.client.Channel;
@@ -70,7 +71,7 @@ public class ChatOperateReceiver {
                 }.getType());
                 p2PMessageService.process(messageContent);
             }else if(Objects.equals(command, MessageCommand.MSG_READED.getCommand())){
-                MessageReadedPack messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedPack>() {
+                MessageReadedContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedContent>() {
                 }.getType());
                 messageSyncService.readMark(messageContent);
             }

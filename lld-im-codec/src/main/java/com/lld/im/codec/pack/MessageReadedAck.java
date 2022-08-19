@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  **/
 @Data
 @NoArgsConstructor
-public class MessageReadedAck extends BasePack{
+public class MessageReadedAck {
 
     private String fromId;
 

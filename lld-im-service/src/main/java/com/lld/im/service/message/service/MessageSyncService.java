@@ -1,11 +1,13 @@
 package com.lld.im.service.message.service;
 
+import ch.qos.logback.core.net.server.Client;
 import com.lld.im.codec.pack.BasePack;
 import com.lld.im.codec.pack.MessageReadedAck;
 import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
+import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.utils.ShareThreadPool;
 import org.slf4j.Logger;
@@ -40,24 +42,27 @@ public class MessageSyncService {
      * @param [messageReaded]
      * @return void
     */
-    public void readMark(MessageReadedPack messageReaded) {
+    public void readMark(MessageReadedContent messageReaded) {
         shareThreadPool.submit(() -> {
             conversationService.msgMarkRead(messageReaded);
             MessageReadedAck ack = new MessageReadedAck();
             BeanUtils.copyProperties(messageReaded, ack);
             ack(messageReaded, ack, messageReaded.getFromId());
 //            //同步给其他端
+
             syncToSender(messageReaded);
         });
     }
 
-    private void ack(BasePack clientInfo, MessageReadedAck readAck, String fromId) {
+    private void ack(ClientInfo clientInfo, MessageReadedAck readAck, String fromId) {
         ResponseVO<Object> wrappedResp = ResponseVO.successResponse(readAck);
         messageProducer.sendToUserAppointedClient(fromId, MessageCommand.MSG_READED_ACK, wrappedResp,
                 new ClientInfo(clientInfo.getAppId(),clientInfo.getClientType(),clientInfo.getImei()));
     }
 
-    private void syncToSender(MessageReadedPack messageReaded) {
+    private void syncToSender(MessageReadedContent messageReaded) {
+        MessageReadedPack pack = new MessageReadedPack();
+        BeanUtils.copyProperties(messageReaded,pack);
         ClientInfo clinetInfo = new ClientInfo(messageReaded.getAppId(), messageReaded.getClientType(), messageReaded.getImei());
         messageProducer.sendToUserExceptClient(messageReaded.getFromId(), MessageCommand.MSG_READED_NOTIFY, messageReaded
                 , clinetInfo);

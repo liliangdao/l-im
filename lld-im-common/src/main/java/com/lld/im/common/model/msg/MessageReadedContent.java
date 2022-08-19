@@ -1,14 +1,15 @@
-package com.lld.im.codec.pack;
+package com.lld.im.common.model.msg;
 
+import com.lld.im.common.model.ClientInfo;
 import lombok.Data;
 
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-07-29 16:24
+ * @create: 2022-08-19 10:35
  **/
 @Data
-public class MessageReadedPack {
+public class MessageReadedContent extends ClientInfo {
 
     private String fromId;
 
@@ -17,5 +18,4 @@ public class MessageReadedPack {
     private Integer conversationType;
 
     private long messageSequence;
-
 }
