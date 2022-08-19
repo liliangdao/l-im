@@ -3,9 +3,11 @@ package com.lld.im.service.message.service;
 import com.lld.im.codec.pack.ChatMessageAck;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.ConversationTypeEnum;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.*;
+import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
 import com.lld.im.service.utils.UserSessionUtils;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,6 +51,9 @@ public class P2PMessageService {
 
     @Autowired
     MessageProducer messageProducer;
+
+    @Autowired
+    ConversationService conversationService;
 
     private final ThreadPoolExecutor threadPoolExecutor;
 
@@ -88,13 +94,13 @@ public class P2PMessageService {
 
                 P2PMessageContent p2PMessageContent = extractP2PMessage(chatMessageData);
 
-                //TODO 插入离线库redis
-//                messageStoreService.storeOffLineMessage(p2PMessageContent);
-
                 syncToSender(p2PMessageContent,chatMessageData,chatMessageData.getOfflinePushInfo());
 
                 //消息分发
                 dispatchMessage(p2PMessageContent,chatMessageData.getOfflinePushInfo());
+
+                //插入离线库redis
+                messageStoreService.storeOffLineMessage(chatMessageData);
             });
         } else {
             ack(chatMessageData, responseVO);

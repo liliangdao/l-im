@@ -1,10 +1,14 @@
 package com.lld.im.service.message.service;
 
 import cn.hutool.core.util.RandomUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.ConversationTypeEnum;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.SyncFromEnum;
 import com.lld.im.common.model.msg.*;
+import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.ImMessageHistoryEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
@@ -45,6 +49,12 @@ public class MessageStoreService {
     @Autowired
     RedisTemplate redisTemplate;
 
+    @Autowired
+    ConversationService conversationService;
+
+    @Autowired
+    AppConfig appConfig;
+
 
     /**
      * @param
@@ -83,16 +93,35 @@ public class MessageStoreService {
      * @param [chatMessageContent]
      * @return void
     */
-    public void storeOffLineMessage(OfflineMessageContent chatMessageContent) {
+    public void storeOffLineMessage(ChatMessageContent chatMessageData) {
+
+        OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+        BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
+        offlineMessageContent.setConversationId(conversationService.convertConversationId(ConversationTypeEnum.P2P.getCode(),
+                chatMessageData.getFromId(),chatMessageData.getToId()));
+        offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
+        offlineMessageContent.setMessageKey(chatMessageData.getMessageKey());
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
 
-        Long count = zSetOperations.count(chatMessageContent.getAppId() + Constants.RedisConstants.offlineMessage + chatMessageContent.getToId(),
-                0, chatMessageContent.getMessageSequence());
-        if(count > 10000){
-//            zSetOperations.re
+        String fromKey = chatMessageData.getAppId() + Constants.RedisConstants.offlineMessage + chatMessageData.getFromId();
+        String toKey = chatMessageData.getAppId() + Constants.RedisConstants.offlineMessage + chatMessageData.getToId();
+
+        //给发送方插入离线消息
+        Long fromCount = zSetOperations.zCard(fromKey);
+
+        if(fromCount > appConfig.getOfflineMessageCount()){
+            zSetOperations.removeRange(fromKey,0,0);
         }
 
+        zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent),chatMessageData.getMessageSequence());
+        //给接收方插入离线消息
+        Long toCount = zSetOperations.zCard(toKey);
+
+        if(toCount > appConfig.getOfflineMessageCount()){
+            zSetOperations.removeRange(toKey,0,0);
+        }
+        zSetOperations.add(toKey,JSONObject.toJSONString(offlineMessageContent),chatMessageData.getMessageSequence());
 
     }
 
@@ -102,8 +131,8 @@ public class MessageStoreService {
         ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
         BeanUtils.copyProperties(content, fromHistory);
         fromHistory.setOwnerId(content.getFromId());
-        long seq = this.seq.getSeq("");
-        fromHistory.setMessageHistroyId(seq);
+        long fromMessageHistoryId = this.seq.getSeq("");
+        fromHistory.setMessageHistroyId(fromMessageHistoryId);
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
         fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
         fromHistory.setSequence(content.getMessageSequence());
@@ -113,8 +142,9 @@ public class MessageStoreService {
             ImMessageHistoryEntity toHistory = new ImMessageHistoryEntity();
             BeanUtils.copyProperties(content, toHistory);
             toHistory.setOwnerId(content.getToId());
+            long toMessageHistoryId = this.seq.getSeq("");
 //            long seq2 = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
-            toHistory.setMessageHistroyId(seq);
+            toHistory.setMessageHistroyId(toMessageHistoryId);
             toHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
             toHistory.setSequence(content.getMessageSequence());
             toHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());

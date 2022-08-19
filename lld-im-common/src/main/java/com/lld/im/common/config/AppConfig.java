@@ -55,4 +55,6 @@ public class AppConfig {
 
     private boolean createGroupCallback; //创建群聊之后回调开关
 
+    private Integer offlineMessageCount;//离线消息存储条数
+
 }

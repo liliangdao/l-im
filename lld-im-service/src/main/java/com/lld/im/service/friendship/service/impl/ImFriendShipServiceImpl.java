@@ -188,7 +188,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 }
 
                 update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
-                long seq = this.seq.getSeq(requestBase.getAppId() + Constants.SeqConstants.Friendship);
+                long seq = this.seq.getSeq(requestBase.getAppId() + ":" +  Constants.SeqConstants.Friendship);
                 update.setFriendSequence(seq);
 
                 imFriendShipMapper.update(update,queryFrom);
@@ -204,7 +204,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
             fromItem.setRemark(dto.getRemark());
             fromItem.setToId(dto.getToId());
             fromItem.setFromId(fromId);
-            long seq = this.seq.getSeq(requestBase.getAppId() + Constants.SeqConstants.Friendship);
+            long seq = this.seq.getSeq(requestBase.getAppId() + ":" + Constants.SeqConstants.Friendship);
             fromItem.setFriendSequence(seq);
             int insert = imFriendShipMapper.insert(fromItem);
             if(insert < 1){
@@ -229,7 +229,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
             toItem.setToId(dto.getToId());
             toItem.setFromId(dto.getToId());
             toItem.setToId(fromId);
-            long seq = this.seq.getSeq(requestBase.getAppId() + Constants.SeqConstants.Friendship);
+            long seq = this.seq.getSeq(requestBase.getAppId() + ":" + Constants.SeqConstants.Friendship);
             toItem.setFriendSequence(seq);
             int insert = imFriendShipMapper.insert(toItem);
             if(insert < 1){
@@ -363,7 +363,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
 
     public ResponseVO<ImFriendShipEntity> doUpdateFriendship(UpdateFriendshipReq.UpdateItem req,Integer appId) {
 
-        long seq = this.seq.getSeq(appId + Constants.SeqConstants.Friendship);
+        long seq = this.seq.getSeq(appId + ":" + Constants.SeqConstants.Friendship);
 
         UpdateWrapper<ImFriendShipEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().set(ImFriendShipEntity::getRemark, req.getRemark()).set(ImFriendShipEntity::getFriendSequence,seq)

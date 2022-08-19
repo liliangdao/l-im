@@ -224,7 +224,7 @@ public class ImUserServiceImpl implements ImUserService {
 
         update.setAppId(null);
         update.setUserId(null);
-        long seq = this.seq.getSeq(req.getAppId() + Constants.SeqConstants.User);
+        long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.User);
         update.setSequence(seq);
         imUserDataMapper.update(update,query);
         writeUserSeq.writeUserSeq(req.getAppId(),req.getUserId(),Constants.SeqConstants.User,seq);

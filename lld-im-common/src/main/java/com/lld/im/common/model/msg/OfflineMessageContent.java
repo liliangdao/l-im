@@ -12,7 +12,7 @@ public class OfflineMessageContent {
 
     private String messageKey;
 
-    private String conversationType;
+    private Integer conversationType;
 
     private String conversationId;
 
