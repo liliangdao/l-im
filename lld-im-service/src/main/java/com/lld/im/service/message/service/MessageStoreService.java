@@ -104,8 +104,8 @@ public class MessageStoreService {
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
 
-        String fromKey = chatMessageData.getAppId() + Constants.RedisConstants.offlineMessage + chatMessageData.getFromId();
-        String toKey = chatMessageData.getAppId() + Constants.RedisConstants.offlineMessage + chatMessageData.getToId();
+        String fromKey = chatMessageData.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + chatMessageData.getFromId();
+        String toKey = chatMessageData.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + chatMessageData.getToId();
 
         //给发送方插入离线消息
         Long fromCount = zSetOperations.zCard(fromKey);

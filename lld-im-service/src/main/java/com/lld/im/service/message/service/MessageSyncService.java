@@ -1,20 +1,34 @@
 package com.lld.im.service.message.service;
 
 import ch.qos.logback.core.net.server.Client;
+import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.pack.BasePack;
 import com.lld.im.codec.pack.MessageReadedAck;
 import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
+import com.lld.im.common.model.SyncReq;
+import com.lld.im.common.model.SyncResp;
 import com.lld.im.common.model.msg.MessageReadedContent;
+import com.lld.im.common.model.msg.OfflineMessageContent;
+import com.lld.im.common.model.msg.OfflinePushInfo;
+import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.utils.ShareThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author: Chackylee
@@ -32,6 +46,9 @@ public class MessageSyncService {
 
     @Autowired
     MessageProducer messageProducer;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     private static Logger logger = LoggerFactory.getLogger(MessageSyncService.class);
 
@@ -66,6 +83,40 @@ public class MessageSyncService {
         ClientInfo clinetInfo = new ClientInfo(messageReaded.getAppId(), messageReaded.getClientType(), messageReaded.getImei());
         messageProducer.sendToUserExceptClient(messageReaded.getFromId(), MessageCommand.MSG_READED_NOTIFY, messageReaded
                 , clinetInfo);
+    }
+
+    public ResponseVO syncOfflineMessage(SyncReq req){
+
+        SyncResp<OfflineMessageContent> resp = new SyncResp<>();
+
+        ZSetOperations zSetOperations = redisTemplate.opsForZSet();
+        String key = req.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + req.getOperater();
+        Set set = zSetOperations.reverseRange(key, 0, 0);
+        Long maxSeq = 0L;
+        if(!CollectionUtil.isEmpty(set)){
+            List list=new ArrayList(set);
+            Object o = list.get(0);
+            OfflineMessageContent max = JSONObject.parseObject(o.toString(), OfflineMessageContent.class);
+            maxSeq = max.getMessageSequence();
+        }
+
+        List<OfflineMessageContent> respList = new ArrayList<>();
+
+        resp.setMaxSequence(maxSeq);
+        Set<ZSetOperations.TypedTuple> set1 = zSetOperations.rangeByScoreWithScores(key, req.getLastSequence(), maxSeq, 0, req.getMaxLimit());
+        for (ZSetOperations.TypedTuple typedTuple : set1) {
+            Object value = typedTuple.getValue();
+            respList.add(JSONObject.parseObject(value.toString(), OfflineMessageContent.class));
+        }
+        resp.setDataList(respList);
+
+        if(CollectionUtil.isNotEmpty(respList)){
+            OfflineMessageContent offlineMessageContent = respList.get(respList.size() - 1);
+            System.out.println(offlineMessageContent.getMessageSequence());
+            resp.setCompleted(maxSeq >= offlineMessageContent.getMessageSequence());
+        }
+
+        return ResponseVO.successResponse(resp);
     }
 
 }

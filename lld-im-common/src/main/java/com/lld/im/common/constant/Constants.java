@@ -43,7 +43,7 @@ public class Constants {
         /**
          * 离线消息，格式： appId + :offlineMessage: + userId
          */
-        public static final String offlineMessage = ":offlineMessage:";
+        public static final String offlineMessage = "offlineMessage";
     }
 
     public static class SeqConstants{
