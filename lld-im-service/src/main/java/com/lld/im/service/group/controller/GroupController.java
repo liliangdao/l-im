@@ -1,6 +1,7 @@
 package com.lld.im.service.group.controller;
 
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.model.SyncReq;
 import com.lld.im.service.group.model.req.*;
 import com.lld.im.service.group.service.GroupMemberService;
 import com.lld.im.service.group.service.GroupService;
@@ -53,6 +54,13 @@ public class GroupController {
         req.setOperater(identifier);
         return groupService.getJoinedGroup(req);
     }
+
+    @RequestMapping("/syncJoinedGroup")
+    public ResponseVO syncJoinedGroup(@RequestBody @Validated SyncReq req, Integer appId, String identifier)  {
+        req.setAppId(appId);
+        return groupService.syncJoinedGroupList(req);
+    }
+
 
     @RequestMapping("/destroyGroup")
     public ResponseVO destroyGroup(@RequestBody @Validated DestroyGroupReq req, Integer appId, String identifier)  {

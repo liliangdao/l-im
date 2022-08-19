@@ -21,7 +21,7 @@ public class ConversationController {
     @Autowired
     ConversationService conversationService;
 
-    @RequestMapping("/syncFriendShipList")
+    @RequestMapping("/syncConversationList")
     public ResponseVO syncFriendShipList(@RequestBody @Validated SyncReq req, Integer appId)  {
         req.setAppId(appId);
         return conversationService.syncConversationSet(req);

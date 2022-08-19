@@ -16,8 +16,8 @@ import com.lld.im.common.enums.AllowFriendTypeEnum;
 import com.lld.im.common.enums.FriendShipStatusEnum;
 import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.common.model.RequestBase;
-import com.lld.im.common.model.SyncJoinedResp;
 import com.lld.im.common.model.SyncReq;
+import com.lld.im.common.model.SyncResp;
 import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.*;
@@ -270,23 +270,26 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
             req.setMaxLimit(100);
         }
 
-        SyncJoinedResp resp = new SyncJoinedResp();
+        SyncResp resp = new SyncResp();
 
         QueryWrapper<ImFriendShipEntity> query = new QueryWrapper<>();
-        query.eq("owner_id",req.getOperater());
-        query.gt("sequence",req.getLastSequence());
+        query.eq("from_id",req.getOperater());
+        query.gt("friend_sequence",req.getLastSequence());
         query.last(" limit " + req.getMaxLimit());
+        query.orderByAsc("friend_sequence");
         List<ImFriendShipEntity> imConversationSetEntities = imFriendShipMapper.selectList(query);
 //        List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
         if(!CollectionUtil.isEmpty(imConversationSetEntities)){
-            ImFriendShipEntity friend = imConversationSetEntities.get(imConversationSetEntities.size()-1);
+            ImFriendShipEntity friend = imConversationSetEntities.get(imConversationSetEntities.size() - 1);
             Long seq = imFriendShipMapper.getFriendShipMaxSeq(req.getAppId(),req.getOperater());
             resp.setCompleted(friend.getFriendSequence() >= seq);
             resp.setDataList(imConversationSetEntities);
+            resp.setMaxSequence(seq);
             return ResponseVO.successResponse(resp);
         }
 
-        return ResponseVO.successResponse();
+        resp.setCompleted(true);
+        return ResponseVO.successResponse(resp);
 
     }
 

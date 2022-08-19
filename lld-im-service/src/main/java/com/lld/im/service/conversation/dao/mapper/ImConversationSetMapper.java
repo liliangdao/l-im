@@ -32,7 +32,7 @@ public interface ImConversationSetMapper extends BaseMapper<ImConversationSetEnt
 
 
     @Select(
-            " select sequence from im_conversation_set where app_id = #{appId} and owner_id = #{userId} "
+            " select max(sequence) from im_conversation_set where app_id = #{appId} and from_id = #{userId} "
             )
     Long geConversationSetMaxSeq(Integer appId, String userId);
 

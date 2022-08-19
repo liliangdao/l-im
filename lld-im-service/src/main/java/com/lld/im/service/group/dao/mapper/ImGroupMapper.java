@@ -20,9 +20,9 @@ public interface ImGroupMapper extends BaseMapper<ImGroupEntity> {
      * @return java.lang.Long
     */
     @Select(" <script> " +
-            " select sequence from im_group where app_id = #{appId} and group_id in " +
-            "<foreach collection=\"groupId\" index=\"index\" item=\"id\" separator=\",\" close=\")\" open=\"(\">" +
-            " {id} " +
+            " select max(sequence) from im_group where app_id = #{appId} and group_id in " +
+            "<foreach collection='groupId' index='index' item='id' separator=',' close=')' open='('>" +
+            " #{id} " +
             "</foreach>" +
             " </script> ")
     Long getMemberJoinedGroupMaxSeq(Integer appId, Collection<String> groupId);

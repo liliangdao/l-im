@@ -10,7 +10,7 @@ import java.util.List;
  * @create: 2022-08-18 11:41
  **/
 @Data
-public class SyncJoinedResp<T> {
+public class SyncResp<T> {
 
     private Long maxSequence;
 

@@ -9,8 +9,8 @@ import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.*;
 import com.lld.im.common.exception.ApplicationException;
-import com.lld.im.common.model.SyncJoinedResp;
 import com.lld.im.common.model.SyncReq;
+import com.lld.im.common.model.SyncResp;
 import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMapper;
 import com.lld.im.service.group.model.req.*;
@@ -230,7 +230,7 @@ public class GroupServiceImpl implements GroupService {
             req.setMaxLimit(100);
         }
 
-        SyncJoinedResp resp = new SyncJoinedResp();
+        SyncResp resp = new SyncResp();
 
         ResponseVO<Collection<String>> memberJoinedGroup = groupMemberService.syncMemberJoinedGroup(req);
         if(memberJoinedGroup.isOk()){
@@ -249,6 +249,7 @@ public class GroupServiceImpl implements GroupService {
                 Long memberJoinedGroupMaxSeq = imGroupDataMapper.getMemberJoinedGroupMaxSeq(req.getAppId(), data);
                 resp.setCompleted(imGroupEntity.getSequence() >= memberJoinedGroupMaxSeq);
                 resp.setDataList(imGroupEntities);
+                resp.setMaxSequence(memberJoinedGroupMaxSeq);
                 return ResponseVO.successResponse(resp);
             }
         }

@@ -170,7 +170,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                 content.setConversationType(pack.getData().getConversationType());
                 content.setFromId(pack.getData().getFromId());
                 content.setMessageSequence(pack.getData().getMessageSequence());
-                content.setToId(pack.getUserId());
+                content.setToId(pack.getToId());
                 content.setAppId(pack.getAppId());
                 content.setImei(pack.getImei());
                 content.setClientType(pack.getClientType());

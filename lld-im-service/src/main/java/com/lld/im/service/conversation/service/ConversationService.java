@@ -8,8 +8,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.common.model.SyncJoinedResp;
 import com.lld.im.common.model.SyncReq;
+import com.lld.im.common.model.SyncResp;
 import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import com.lld.im.service.conversation.dao.mapper.ImConversationSetMapper;
@@ -53,12 +53,13 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
             req.setMaxLimit(100);
         }
 
-        SyncJoinedResp resp = new SyncJoinedResp();
+        SyncResp resp = new SyncResp();
 
         QueryWrapper<ImConversationSetEntity> query = new QueryWrapper<>();
-        query.eq("owner_id",req.getOperater());
-        query.gt("conversation_sequence",req.getLastSequence());
+        query.eq("from_id",req.getOperater());
+        query.gt("sequence",req.getLastSequence());
         query.last(" limit " + req.getMaxLimit());
+        query.orderByAsc("sequence");
         List<ImConversationSetEntity> imConversationSetEntities = imConversationSetMapper.selectList(query);
 //        List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
         if(!CollectionUtil.isEmpty(imConversationSetEntities)){
@@ -66,6 +67,7 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
             Long seq = imConversationSetMapper.geConversationSetMaxSeq(req.getAppId(),req.getOperater());
             resp.setCompleted(imGroupEntity.getSequence() >= seq);
             resp.setDataList(imConversationSetEntities);
+            resp.setMaxSequence(seq);
             return ResponseVO.successResponse(resp);
         }
 
@@ -81,6 +83,7 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
         conversationSet.setConversationId(conversationId);
         BeanUtils.copyProperties(messageReaded,conversationSet);
         conversationSet.setSequence(seq);
+        conversationSet.setReadedSequence(messageReaded.getMessageSequence());
         imConversationSetMapper.markConversation(conversationSet);
 //        cacheManager.refreshUserSyncSeqCache(messageReaded.getFromId(), SyncKeyEnum.syncConversationSetSequence.name(), String.valueOf(conversationSequence),messageReaded.getAppId());
         writeUserSeq.writeUserSeq(messageReaded.getAppId(),messageReaded.getFromId(),Constants.SeqConstants.Conversation,seq);
