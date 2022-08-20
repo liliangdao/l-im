@@ -37,8 +37,8 @@ public class ImUserDataController {
     }
 
     @RequestMapping("/getSingleUserInfo")
-    public ResponseVO getSingleUserInfo(@RequestBody @Validated UserId req){
-        return imUserService.getSingleUserInfo(req.getUserId(),req.getAppId());
+    public ResponseVO getSingleUserInfo(@RequestBody @Validated UserId req,Integer appId){
+            return imUserService.getSingleUserInfo(req.getUserId(),req.getAppId());
     }
 
     @RequestMapping("/modifyUserInfo")
