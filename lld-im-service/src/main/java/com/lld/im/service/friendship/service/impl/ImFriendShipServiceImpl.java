@@ -13,6 +13,7 @@ import com.lld.im.common.ResponseVO;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.AllowFriendTypeEnum;
+import com.lld.im.common.enums.CheckFriendTypeEnum;
 import com.lld.im.common.enums.FriendShipStatusEnum;
 import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.common.model.RequestBase;
@@ -21,6 +22,7 @@ import com.lld.im.common.model.SyncResp;
 import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.*;
+import com.lld.im.service.friendship.model.resp.CheckFriendShipResp;
 import com.lld.im.service.friendship.model.resp.UpdateFriendshipResp;
 import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.user.dao.ImUserDataEntity;
@@ -43,7 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Chackylee
@@ -173,7 +177,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(queryFrom);
 
         if(fromItem != null){
-            if(fromItem.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode()){
+            if(fromItem.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
                 //重复添加
                 return ResponseVO.errorResponse(FriendShipErrorCode.REPEAT_TO_ADD.getCode()
                         ,FriendShipErrorCode.REPEAT_TO_ADD.getError());
@@ -187,7 +191,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                     update.setAddSource(dto.getAddSource());
                 }
 
-                update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
+                update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus());
                 long seq = this.seq.getSeq(requestBase.getAppId() + ":" +  Constants.SeqConstants.Friendship);
                 update.setFriendSequence(seq);
 
@@ -198,8 +202,8 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
             fromItem = new ImFriendShipEntity();
             fromItem.setAddSource(dto.getAddSource());
             fromItem.setAppId(requestBase.getAppId());
-            fromItem.setBlack(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode());
-            fromItem.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
+            fromItem.setBlack(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getStatus());
+            fromItem.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus());
             fromItem.setCreateTime(System.currentTimeMillis());
             fromItem.setRemark(dto.getRemark());
             fromItem.setToId(dto.getToId());
@@ -223,8 +227,8 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         if(toItem == null){
             toItem = new ImFriendShipEntity();
             toItem.setAppId(requestBase.getAppId());
-            toItem.setBlack(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode());
-            toItem.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode());
+            toItem.setBlack(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getStatus());
+            toItem.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus());
             toItem.setCreateTime(System.currentTimeMillis());
             toItem.setToId(dto.getToId());
             toItem.setFromId(dto.getToId());
@@ -361,6 +365,51 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         return ResponseVO.successResponse(resp);
     }
 
+    @Override
+    public ResponseVO checkFriend(CheckFriendShipReq req) {
+
+        List<CheckFriendShipResp> sigleCheck = imFriendShipMapper.checkFriendShip(req);
+        if(req.getCheckType() == CheckFriendTypeEnum.SINGLE.getType()){
+            return ResponseVO.successResponse(sigleCheck);
+        }
+        List<CheckFriendShipResp> checkFriendShipResps = imFriendShipMapper.checkFriendShipBoth(req);
+
+        Map<String,Integer> statusMap = new HashMap<>();
+
+        for (CheckFriendShipResp r:
+                checkFriendShipResps) {
+            statusMap.put(r.getFromId(),r.getStatus());
+        }
+
+        List<CheckFriendShipResp> resp = new ArrayList<>();
+        for (CheckFriendShipResp r : sigleCheck) {
+            CheckFriendShipResp respInfo = new CheckFriendShipResp();
+            respInfo.setFromId(r.getFromId());
+            respInfo.setToId(r.getToId());
+            Integer toStatus = statusMap.get(r.getToId());
+            //双向校验 1 from添加了to，to也添加了from
+            //        2 from添加了t0，to没有添加from
+            //        3 to添加了from，from没有添加to
+            //        4 双方都没有添加
+            if(r.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
+            && toStatus == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
+                respInfo.setStatus(respInfo.CheckResult_Type_BothWay);
+            } else if(r.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
+                    && toStatus != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
+                respInfo.setStatus(respInfo.CheckResult_Both_Type_AWithB);
+            }else if(r.getStatus() != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
+                    && toStatus == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
+                respInfo.setStatus(respInfo.CheckResult_Both_Type_BWithA);
+            }else if(r.getStatus() != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
+                    && toStatus != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
+                respInfo.setStatus(respInfo.CheckResult_Both_Type_NoRelation);
+            }
+            resp.add(respInfo);
+        }
+
+        return ResponseVO.successResponse(resp);
+    }
+
     public ResponseVO<ImFriendShipEntity> doUpdateFriendship(UpdateFriendshipReq.UpdateItem req,Integer appId) {
 
         long seq = this.seq.getSeq(appId + ":" + Constants.SeqConstants.Friendship);
@@ -387,12 +436,12 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 .eq("app_id", req.getAppId())
                 .eq("to_id", req.getToId());
         ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(queryFrom);
-        if (fromItem.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_DELETED.getCode()) {
+        if (fromItem.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_DELETED.getStatus()) {
             throw new ApplicationException(FriendShipErrorCode.FRIEND_IS_DELETED);
         }
 //        queryFrom
         ImFriendShipEntity update = new ImFriendShipEntity();
-        update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_DELETED.getCode());
+        update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_DELETED.getStatus());
         imFriendShipMapper.update(update, queryFrom);
 
         //TODO 发送消息给同步端

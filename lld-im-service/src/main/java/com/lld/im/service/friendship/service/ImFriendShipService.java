@@ -24,4 +24,6 @@ public interface ImFriendShipService {
     public ResponseVO<ImFriendShipEntity> getRelation(GetRelationReq req);
 
     public ResponseVO<List<UpdateFriendshipResp>> updateFriendShip(UpdateFriendshipReq req);
+
+    public ResponseVO checkFriend(CheckFriendShipReq req);
 }

@@ -119,20 +119,20 @@ public class CheckSendMessageService {
                 return toResp;
             }
 
-            if(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode() != fromResp.getData().getStatus()){
+            if(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus() != fromResp.getData().getStatus()){
                 return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_DELETED);
             }
 
             ImFriendShipEntity toData = toResp.getData();
-            if(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getCode() != toData.getStatus()){
+            if(FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus() != toData.getStatus()){
                 return ResponseVO.errorResponse(FriendShipErrorCode.TARGET_IS_DELETE_YOU);
             }
 
             if(appConfig.isSendMessageCheckFriend()){
-                if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode() != fromResp.getData().getBlack()){
+                if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getStatus() != fromResp.getData().getBlack()){
                     return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_DELETED);
                 }
-                if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getCode() != toData.getBlack()){
+                if(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getStatus() != toData.getBlack()){
                     return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_IS_DELETED);
                 }
             }
