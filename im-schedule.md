@@ -18,7 +18,7 @@
 | /friendship/delete                      | 删除好友             | 发送tcp通知未完成   |  100%  |
 | /friendship/update                      | 更新好友资料         | 发送tcp通知未完成   |  100%  |
 | /friendship/getRelation                 | 获取单个好友关系信息 |                     |  0%   |
-| /friendship/check                       | 校验是否为好友       |                     |  0%   |
+| /friendship/checkFriend                       | 校验是否为好友,支持单向和双向校验       |                     |  100%   |
 | /friendship/get                         | 拉取好友             | 分页拉取，按照seq拉 |  0%   |
 | /blackList/add                          | 添加黑名单           |                     |  0%   |
 | /blackList/delete                       | 删除黑名单           |                     |  0%   |
