@@ -59,9 +59,9 @@ public class ImFriendShipController {
     }
 
     @RequestMapping("/checkFriendShip")
-    public ResponseVO checkFriendShip(@RequestBody @Validated GetRelationReq req,Integer appId)  {//@Validated
+    public ResponseVO checkFriendShip(@RequestBody @Validated CheckFriendShipReq req,Integer appId)  {//@Validated
         req.setAppId(appId);
-        return imFriendShipService.getRelation(req);
+        return imFriendShipService.checkFriend(req);
     }
 
 

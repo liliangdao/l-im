@@ -368,46 +368,48 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
     @Override
     public ResponseVO checkFriend(CheckFriendShipReq req) {
 
-        List<CheckFriendShipResp> sigleCheck = imFriendShipMapper.checkFriendShip(req);
         if(req.getCheckType() == CheckFriendTypeEnum.SINGLE.getType()){
+            List<CheckFriendShipResp> sigleCheck = imFriendShipMapper.checkFriendShip(req);
             return ResponseVO.successResponse(sigleCheck);
+        }else{
+            return ResponseVO.successResponse(imFriendShipMapper.checkFriendShipBoth(req));
         }
-        List<CheckFriendShipResp> checkFriendShipResps = imFriendShipMapper.checkFriendShipBoth(req);
-
-        Map<String,Integer> statusMap = new HashMap<>();
-
-        for (CheckFriendShipResp r:
-                checkFriendShipResps) {
-            statusMap.put(r.getFromId(),r.getStatus());
-        }
-
-        List<CheckFriendShipResp> resp = new ArrayList<>();
-        for (CheckFriendShipResp r : sigleCheck) {
-            CheckFriendShipResp respInfo = new CheckFriendShipResp();
-            respInfo.setFromId(r.getFromId());
-            respInfo.setToId(r.getToId());
-            Integer toStatus = statusMap.get(r.getToId());
-            //双向校验 1 from添加了to，to也添加了from
-            //        2 from添加了t0，to没有添加from
-            //        3 to添加了from，from没有添加to
-            //        4 双方都没有添加
-            if(r.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
-            && toStatus == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
-                respInfo.setStatus(respInfo.CheckResult_Type_BothWay);
-            } else if(r.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
-                    && toStatus != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
-                respInfo.setStatus(respInfo.CheckResult_Both_Type_AWithB);
-            }else if(r.getStatus() != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
-                    && toStatus == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
-                respInfo.setStatus(respInfo.CheckResult_Both_Type_BWithA);
-            }else if(r.getStatus() != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
-                    && toStatus != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
-                respInfo.setStatus(respInfo.CheckResult_Both_Type_NoRelation);
-            }
-            resp.add(respInfo);
-        }
-
-        return ResponseVO.successResponse(resp);
+//        List<CheckFriendShipResp> checkFriendShipResps = imFriendShipMapper.checkFriendShipBoth(req);
+//
+//        Map<String,Integer> statusMap = new HashMap<>();
+//
+//        for (CheckFriendShipResp r:
+//                checkFriendShipResps) {
+//            statusMap.put(r.getFromId(),r.getStatus());
+//        }
+//
+//        List<CheckFriendShipResp> resp = new ArrayList<>();
+//        for (CheckFriendShipResp r : sigleCheck) {
+//            CheckFriendShipResp respInfo = new CheckFriendShipResp();
+//            respInfo.setFromId(r.getFromId());
+//            respInfo.setToId(r.getToId());
+//            Integer toStatus = statusMap.get(r.getToId());
+//            //双向校验 1 from添加了to，to也添加了from
+//            //        2 from添加了t0，to没有添加from
+//            //        3 to添加了from，from没有添加to
+//            //        4 双方都没有添加
+//            if(r.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
+//            && toStatus == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
+//                respInfo.setStatus(respInfo.CheckResult_Type_BothWay);
+//            } else if(r.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
+//                    && toStatus != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
+//                respInfo.setStatus(respInfo.CheckResult_Both_Type_AWithB);
+//            }else if(r.getStatus() != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
+//                    && toStatus == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
+//                respInfo.setStatus(respInfo.CheckResult_Both_Type_BWithA);
+//            }else if(r.getStatus() != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()
+//                    && toStatus != FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()){
+//                respInfo.setStatus(respInfo.CheckResult_Both_Type_NoRelation);
+//            }
+//            resp.add(respInfo);
+//        }
+//
+//        return ResponseVO.successResponse(resp);
     }
 
     public ResponseVO<ImFriendShipEntity> doUpdateFriendship(UpdateFriendshipReq.UpdateItem req,Integer appId) {
