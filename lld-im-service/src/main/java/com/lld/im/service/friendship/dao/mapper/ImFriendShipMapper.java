@@ -1,6 +1,7 @@
 package com.lld.im.service.friendship.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.jeffreyning.mybatisplus.base.MppBaseMapper;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.CheckFriendShipReq;
 import com.lld.im.service.friendship.model.resp.CheckFriendShipResp;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ImFriendShipMapper extends BaseMapper<ImFriendShipEntity> {
+public interface ImFriendShipMapper extends MppBaseMapper<ImFriendShipEntity> {
 
     @Select(
             " select Max(friend_sequence) from im_friendship where app_id = #{appId} and from_id = #{userId} "
@@ -77,6 +78,7 @@ public interface ImFriendShipMapper extends BaseMapper<ImFriendShipEntity> {
 //    INNER join
 //            (select from_id AS fromId, to_id AS toId , if(status = 1,1,0) as status from im_friendship where app_id = 10000 and to_id = 'lld'  and  from_id in ('lld2','lld4','lld5')) as b
 //    on a.fromId = b.toId AND b.fromId = a.toId
+
 
 
 }

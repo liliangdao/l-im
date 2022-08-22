@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface ImFriendShipService {
 
-    public ResponseVO addFriend(AddFriendReq req) ;
+    public ResponseVO addFriend(AddFriendShipReq req) ;
 
     public ResponseVO deleteFriend(DeleteFriendReq req);
 
@@ -26,4 +26,7 @@ public interface ImFriendShipService {
     public ResponseVO<List<UpdateFriendshipResp>> updateFriendShip(UpdateFriendshipReq req);
 
     public ResponseVO checkFriend(CheckFriendShipReq req);
+
+    public ResponseVO addBlack(AddFriendShipReq req);
+
 }

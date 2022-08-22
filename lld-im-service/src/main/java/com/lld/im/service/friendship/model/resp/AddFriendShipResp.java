@@ -8,7 +8,7 @@ import lombok.Data;
  * @create: 2022-05-19 09:32
  **/
 @Data
-public class AddFriendResp {
+public class AddFriendShipResp {
 
     private String toId;
 

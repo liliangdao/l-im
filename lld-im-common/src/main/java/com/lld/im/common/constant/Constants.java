@@ -52,6 +52,8 @@ public class Constants {
 
         public static final String Friendship = "friendshipSeq";
 
+        public static final String FriendshipBlack = "friendshipBlackSeq";
+
         public static final String FriendshipRequest = "friendshipRequestSeq";
 
         public static final String Group = "groupSeq";
@@ -89,6 +91,8 @@ public class Constants {
         public static final String UpdateFriend = "friend.update";
 
         public static final String DeleteFriend = "friend.delete";
+
+        public static final String AddBlack = "black.add";
     }
 
 

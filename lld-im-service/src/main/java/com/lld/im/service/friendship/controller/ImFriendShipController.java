@@ -23,7 +23,7 @@ public class ImFriendShipController {
     ImFriendShipService imFriendShipService;
 
     @RequestMapping("/addFriend")
-    public ResponseVO addFriend(@RequestBody @Validated AddFriendReq req,Integer appId)  {
+    public ResponseVO addFriend(@RequestBody @Validated AddFriendShipReq req,Integer appId)  {
         req.setAppId(appId);
         return imFriendShipService.addFriend(req);
     }
@@ -64,5 +64,10 @@ public class ImFriendShipController {
         return imFriendShipService.checkFriend(req);
     }
 
+    @RequestMapping("/addBlack")
+    public ResponseVO addBlack(@RequestBody @Validated AddFriendShipReq req,Integer appId)  {
+        req.setAppId(appId);
+        return imFriendShipService.addBlack(req);
+    }
 
 }
