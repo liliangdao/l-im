@@ -24,21 +24,9 @@ public class MppSqlInjectorProcess implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if (bean instanceof DefaultSqlInjector){
-            System.out.println(bean.getClass().getName());
-            bean = (DefaultSqlInjector) bean;
-            ((MppSqlInjector) bean).getMethodList(ImMessageHistoryMapper.class).add(new InsertBatchSomeColumn());
+            bean = new EasySqlInjector();
         }
         return bean;
     }
 
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-
-        if (bean instanceof DefaultSqlInjector){
-            System.out.println(bean.getClass().getName());
-            bean = (DefaultSqlInjector) bean;
-            ((MppSqlInjector) bean).getMethodList(ImMessageHistoryMapper.class).add(new InsertBatchSomeColumn());
-        }
-        return bean;
-    }
 }

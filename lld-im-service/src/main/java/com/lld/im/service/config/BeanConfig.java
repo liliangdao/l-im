@@ -1,6 +1,9 @@
 package com.lld.im.service.config;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.github.jeffreyning.mybatisplus.base.MppSqlInjector;
@@ -33,7 +36,7 @@ import java.util.List;
  * @create: 2022-05-16 11:00
  **/
 @Configuration
-public class BeanConfig implements CommandLineRunner {
+public class BeanConfig  {
 
     private static Logger logger = LoggerFactory.getLogger(BeanConfig.class);
 
@@ -113,14 +116,5 @@ public class BeanConfig implements CommandLineRunner {
     public PaginationInterceptor paginationInterceptor() {
         return new PaginationInterceptor();
     }
-
-    @Override
-    public void run(String... args) throws Exception {
-//        List<AbstractMethod> methodList = mppSqlInjector.getMethodList(ImMessageHistoryMapper.class);
-//        methodList.add(new InsertBatchSomeColumn());
-//        System.out.println("");
-    }
-
-
 
 }
