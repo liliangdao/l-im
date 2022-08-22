@@ -1,6 +1,7 @@
 package com.lld.im.service.friendship.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.jeffreyning.mybatisplus.anno.AutoMap;
 import com.github.jeffreyning.mybatisplus.base.MppBaseMapper;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.CheckFriendShipReq;
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+//@Repository
+//@AutoMap
 public interface ImFriendShipMapper extends MppBaseMapper<ImFriendShipEntity> {
 
     @Select(

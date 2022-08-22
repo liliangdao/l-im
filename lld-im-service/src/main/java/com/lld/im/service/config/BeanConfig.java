@@ -1,12 +1,16 @@
 package com.lld.im.service.config;
 
+import com.baomidou.mybatisplus.core.injector.AbstractMethod;
+import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import com.github.jeffreyning.mybatisplus.base.MppSqlInjector;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.enums.ImUrlRouteWayEnum;
 import com.lld.im.common.enums.RouteHashMethodEnum;
 import com.lld.im.common.enums.SeqMethodEnum;
 import com.lld.im.common.route.RouteHandle;
 import com.lld.im.common.route.algorithm.consistenthash.AbstractConsistentHash;
+import com.lld.im.service.message.dao.mapper.ImMessageHistoryMapper;
 import com.lld.im.service.service.seq.AbstractSeq;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.service.seq.SnowflakeIdWorker;
@@ -14,12 +18,13 @@ import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.lang.reflect.Method;
-
+import java.util.List;
 
 
 /**
@@ -28,7 +33,7 @@ import java.lang.reflect.Method;
  * @create: 2022-05-16 11:00
  **/
 @Configuration
-public class BeanConfig {
+public class BeanConfig implements CommandLineRunner {
 
     private static Logger logger = LoggerFactory.getLogger(BeanConfig.class);
 
@@ -37,6 +42,9 @@ public class BeanConfig {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    MppSqlInjector mppSqlInjector;
 
     @Bean
     public ZkClient buildZKClient() {
@@ -106,8 +114,13 @@ public class BeanConfig {
         return new PaginationInterceptor();
     }
 
-//    @Bean
-//    public EasySqlInjector easySqlInjector () {
-//        return new EasySqlInjector();
-//    }
+    @Override
+    public void run(String... args) throws Exception {
+//        List<AbstractMethod> methodList = mppSqlInjector.getMethodList(ImMessageHistoryMapper.class);
+//        methodList.add(new InsertBatchSomeColumn());
+//        System.out.println("");
+    }
+
+
+
 }

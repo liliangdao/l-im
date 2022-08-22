@@ -79,6 +79,7 @@ appConfig:
 mqQueueName: 123
 
 mybatis-plus:
+
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   mapper-locations: classpath*:mapper/*.xml
@@ -97,3 +98,6 @@ httpclient:
   connectionRequestTimeout: 2000
   socketTimeout: 5000
   staleConnectionCheckEnabled: true
+
+mpp:
+  entityBasePath: com.lld.im.service.friendship.dao
