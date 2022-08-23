@@ -48,7 +48,7 @@ public class Constants {
 
     public static class SeqConstants{
 
-        public static final String User = ":userSeq";
+        public static final String User = "userSeq";
 
         public static final String Friendship = "friendshipSeq";
 
