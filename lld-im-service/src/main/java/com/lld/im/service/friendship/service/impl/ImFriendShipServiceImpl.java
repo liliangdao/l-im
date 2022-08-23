@@ -442,6 +442,7 @@ public class ImFriendShipServiceImpl extends MppServiceImpl<ImFriendShipMapper, 
                     addFriendBlackPack.setFromId(req.getFromId());
                     addFriendBlackPack.setToId(toId);
                     addFriendBlackPack.setSequence(seq);
+                    writeUserSeq.writeUserSeq(req.getAppId(),req.getFromId(),Constants.SeqConstants.FriendshipBlack, seq);
                     //发送tcp通知
                     messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(),
                             FriendshipEventCommand.FRIEND_BLACK_ADD,addFriendBlackPack, req.getAppId());
@@ -455,7 +456,7 @@ public class ImFriendShipServiceImpl extends MppServiceImpl<ImFriendShipMapper, 
         }
 
         //回调
-        if(appConfig.isAddFriendCallback()){
+        if(appConfig.isAddFriendShipBlackCallback()){
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.AddBlack, JSONObject.toJSONString(result));
         }
         return ResponseVO.successResponse(result);
@@ -481,6 +482,8 @@ public class ImFriendShipServiceImpl extends MppServiceImpl<ImFriendShipMapper, 
         }
 
         ImFriendShipEntity update = new ImFriendShipEntity();
+        long seq = this.seq.getSeq(req.getFromId() + ":" + Constants.SeqConstants.Friendship);
+        update.setBlackSequence(seq);
         update.setBlack(FriendShipStatusEnum.BLACK_STATUS_BLACKED.getStatus());
         imFriendShipMapper.update(update, queryFrom);
 
@@ -488,11 +491,13 @@ public class ImFriendShipServiceImpl extends MppServiceImpl<ImFriendShipMapper, 
         deleteFriendPack.setFromId(req.getFromId());
         deleteFriendPack.setToId(req.getToId());
 
+        writeUserSeq.writeUserSeq(req.getAppId(),req.getFromId(),Constants.SeqConstants.FriendshipBlack, seq);
+
         messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(),FriendshipEventCommand.FRIEND_BLACK_DELETE,
                 deleteFriendPack,req.getAppId());
 
         //回调
-        if(appConfig.isDeleteFriendCallback()){
+        if(appConfig.isDeleteFriendShipBlackCallback()){
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.DeleteBlack, JSONObject.toJSONString(req));
         }
         return ResponseVO.successResponse();
@@ -536,12 +541,16 @@ public class ImFriendShipServiceImpl extends MppServiceImpl<ImFriendShipMapper, 
         }
 //        queryFrom
         ImFriendShipEntity update = new ImFriendShipEntity();
+        long seq = this.seq.getSeq(req.getFromId() + ":" + Constants.SeqConstants.Friendship);
+        update.setFriendSequence(seq);
         update.setStatus(FriendShipStatusEnum.FRIEND_STATUS_DELETED.getStatus());
         imFriendShipMapper.update(update, queryFrom);
 
         DeleteFriendPack deleteFriendPack = new DeleteFriendPack();
         deleteFriendPack.setFromId(req.getFromId());
         deleteFriendPack.setToId(req.getToId());
+
+        writeUserSeq.writeUserSeq(req.getAppId(),req.getFromId(),Constants.SeqConstants.FriendshipBlack, seq);
 
         messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(),FriendshipEventCommand.FRIEND_DELETE,
                 deleteFriendPack,req.getAppId());
