@@ -17,12 +17,11 @@
 | /friendship/add                         | 添加好友             | 发送tcp通知未完成   |  100%  |
 | /friendship/delete                      | 删除好友             | 发送tcp通知未完成   |  100%  |
 | /friendship/update                      | 更新好友资料         | 发送tcp通知未完成   |  100%  |
-| /friendship/getRelation                 | 获取单个好友关系信息 |                     |  0%   |
+| /friendship/getRelation                 | 获取单个好友关系信息 |                     |  100%   |
 | /friendship/checkFriend                       | 校验是否为好友,支持单向和双向校验       |                     |  100%   |
 | /friendship/get                         | 拉取好友             | 分页拉取，按照seq拉 |  0%   |
-| /blackList/add                          | 添加黑名单           |                     |  0%   |
-| /blackList/delete                       | 删除黑名单           |                     |  0%   |
-| /blackList/sync                         | 增量获取黑名单信息   |                     |  0%   |
+| /friendship/addBlack                          | 添加黑名单           |                     |  100%   |
+| /friendship/deleteBlack                       | 删除黑名单           |                     |  100%   |
 | /friendshipRequest/getFriendRequest     | 获取好友请求列表     |                     | 100%  |
 | /friendshipRequest/readAllFriendRequest |                      | 发送tcp通知未完成   |  90%  |
 
@@ -30,14 +29,14 @@
 
 | 接口                      | 作用                   | 备注                                             | 进 度 |
 | ------------------------- | ---------------------- | ------------------------------------------------ | :---: |
-| /group/createGroup        | 创建群                 | 发送tcp通知未完成                                |  90%  |
+| /group/createGroup        | 创建群                 | 发送tcp通知未完成，群的tcp通知要发给所有群成员                                |  90%  |
 | /group/get                | 获取群组资料           | 群资料+群成员信息                                |  0%   |
 | /group/getAll             | 获取所有群组           | 只支持根据群类型过滤                             |  0%   |
 | /group/getGroupMember     | 获取群成员详细资料     | 分页返回                                         |  0%   |
 | /group/update             | 修改群基础资料         | tcp通知未完成                                    |  90%  |
-| /group/addMember          | 增加群成员             | 发送tcp通知未完成，添加静默加人                  |  80%  |
-| /group/deleteMember       | 删除群成员             |                                                  |  0%   |
-| /group/updateMember       | 修改群成员资料         | 修改单个                                         |  0%   |
+| /group/addMember          | 增加群成员             | 发送tcp通知未完成，群的tcp通知要发给所有群成员，添加静默加人                  |  80%  |
+| /group/deleteMember       | 删除群成员             |  群的tcp通知要发给所有群成员                                                |  0%   |
+| /group/updateMember       | 修改群成员资料         | 修改单个，群的tcp通知要发给所有群成员                                         |  0%   |
 | /group/destroyGroup       | 解散群                 | 需要发送tcp通知未完成                            |  90%  |
 | /group/getJoinedGroup     | 获取用户所加入的群组   | 支持群类型过滤，分页拉取，分页返回小问题日后修复 |  95%  |
 | /group/getRoleInGroup     | 查询用户在群组中的身份 | 支持批量拉取                                     |  0%   |

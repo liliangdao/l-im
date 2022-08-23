@@ -53,6 +53,10 @@ public class AppConfig {
 
     private boolean deleteFriendCallback; //删除好友之后回调开关
 
+    private boolean addFriendShipBlackCallback; //添加黑名单之后回调开关
+
+    private boolean deleteFriendShipBlackCallback; //添加黑名单之后回调开关
+
     private boolean createGroupCallback; //创建群聊之后回调开关
 
     private Integer offlineMessageCount;//离线消息存储条数

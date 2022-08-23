@@ -65,9 +65,15 @@ public class ImFriendShipController {
     }
 
     @RequestMapping("/addBlack")
-    public ResponseVO addBlack(@RequestBody @Validated AddFriendShipReq req,Integer appId)  {
+    public ResponseVO addBlack(@RequestBody @Validated AddFriendShipBlackReq req,Integer appId)  {
         req.setAppId(appId);
         return imFriendShipService.addBlack(req);
+    }
+
+    @RequestMapping("/deleteBlack")
+    public ResponseVO addBlack(@RequestBody @Validated DeleteBlackReq req,Integer appId)  {
+        req.setAppId(appId);
+        return imFriendShipService.deleteBlack(req);
     }
 
 }

@@ -20,6 +20,12 @@ public enum FriendshipEventCommand implements Command {
 
     //好友申请审批
     FRIEND_REQUEST_APPROVER(3005),
+
+    //添加黑名单
+    FRIEND_BLACK_ADD(3010),
+
+    //移除黑名单
+    FRIEND_BLACK_DELETE(3011),
     ;
 
     private Integer command;

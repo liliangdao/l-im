@@ -93,6 +93,8 @@ public class Constants {
         public static final String DeleteFriend = "friend.delete";
 
         public static final String AddBlack = "black.add";
+
+        public static final String DeleteBlack = "black.delete";
     }
 
 
