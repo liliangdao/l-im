@@ -1,19 +1,12 @@
 package com.lld.im.service.config;
 
-import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
-import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
-import com.github.jeffreyning.mybatisplus.base.MppSqlInjector;
-import com.lld.im.service.message.dao.mapper.ImMessageHistoryMapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
- * @description:
+ * @description: spring 后置处理器，兼容mybatisplus联合主键插件和批量插入插件
  * @author: lld
  * @createDate: 2022/8/22
  * @version: 1.0

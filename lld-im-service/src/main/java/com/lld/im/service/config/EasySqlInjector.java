@@ -28,8 +28,4 @@ public class EasySqlInjector extends MppSqlInjector {
 
         return super.getMethodList(mapperClass);
     }
-//
-    public EasySqlInjector() {
-        System.out.println("EasySqlInjector");
-    }
 }
