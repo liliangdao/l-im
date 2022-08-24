@@ -16,7 +16,7 @@ import com.lld.im.common.ResponseVO;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.AllowFriendTypeEnum;
-import com.lld.im.common.enums.CheckFriendTypeEnum;
+import com.lld.im.common.enums.CheckFriendShipTypeEnum;
 import com.lld.im.common.enums.FriendShipStatusEnum;
 import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.common.model.RequestBase;
@@ -391,7 +391,7 @@ public class ImFriendShipServiceImpl extends MppServiceImpl<ImFriendShipMapper, 
     @Override
     public ResponseVO checkFriend(CheckFriendShipReq req) {
 
-        if(req.getCheckType() == CheckFriendTypeEnum.SINGLE.getType()){
+        if(req.getCheckType() == CheckFriendShipTypeEnum.SINGLE.getType()){
             List<CheckFriendShipResp> sigleCheck = imFriendShipMapper.checkFriendShip(req);
             return ResponseVO.successResponse(sigleCheck);
         }else{
@@ -501,6 +501,18 @@ public class ImFriendShipServiceImpl extends MppServiceImpl<ImFriendShipMapper, 
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.DeleteBlack, JSONObject.toJSONString(req));
         }
         return ResponseVO.successResponse();
+
+    }
+
+    @Override
+    public ResponseVO checkBlck(CheckFriendShipReq req) {
+
+        if(req.getCheckType() == CheckFriendShipTypeEnum.SINGLE.getType()){
+            List<CheckFriendShipResp> sigleCheck = imFriendShipMapper.checkFriendShipBlack(req);
+            return ResponseVO.successResponse(sigleCheck);
+        }else{
+            return ResponseVO.successResponse(imFriendShipMapper.checkFriendShipBlackBoth(req));
+        }
 
     }
 

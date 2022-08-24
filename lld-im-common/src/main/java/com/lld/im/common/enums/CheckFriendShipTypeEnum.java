@@ -1,6 +1,6 @@
 package com.lld.im.common.enums;
 
-public enum CheckFriendTypeEnum {
+public enum CheckFriendShipTypeEnum {
 
     /**
      * 1 单方校验；2双方校验。
@@ -12,7 +12,7 @@ public enum CheckFriendTypeEnum {
 
     private int type;
 
-    CheckFriendTypeEnum(int type){
+    CheckFriendShipTypeEnum(int type){
         this.type=type;
     }
 
