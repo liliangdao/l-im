@@ -2,7 +2,10 @@ package com.lld.im.service.friendship.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
+import com.lld.im.codec.pack.AddFriendGroupMemberPack;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.service.friendship.dao.ImFriendShipGroupEntity;
 import com.lld.im.service.friendship.dao.ImFriendShipGroupMemberEntity;
 import com.lld.im.service.friendship.dao.mapper.ImFriendShipGroupMapper;
@@ -11,11 +14,20 @@ import com.lld.im.service.friendship.model.req.AddFriendShipGroupMemberReq;
 import com.lld.im.service.friendship.service.ImFriendShipGroupMemberService;
 import com.lld.im.service.friendship.service.ImFriendShipGroupService;
 import com.lld.im.service.friendship.service.ImFriendShipService;
+import com.lld.im.service.message.service.MessageProducer;
+import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.service.ImUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author: Chackylee
@@ -38,6 +50,13 @@ public class ImFriendShipGroupMemberServiceImpl extends MppServiceImpl<ImFriendS
     @Autowired
     ImFriendShipGroupMemberService thisService;
 
+    @Autowired
+    MessageProducer messageProducer;
+
+    @Autowired
+    @Qualifier("redisSeq")
+    Seq redisSeq;
+
 
     @Override
     @Transactional
@@ -49,14 +68,26 @@ public class ImFriendShipGroupMemberServiceImpl extends MppServiceImpl<ImFriendS
             return group;
         }
 
+        List<String> successId = new ArrayList<>();
         for (String toId : req.getToIds()) {
             ResponseVO<ImUserDataEntity> singleUserInfo = imUserService.getSingleUserInfo(toId, req.getAppId());
             if(singleUserInfo.isOk()){
-                thisService.doAddGroupMember(group.getData().getGroupId(),toId);
+                int i = thisService.doAddGroupMember(group.getData().getGroupId(), toId);
+                if(i == 1){
+                    successId.add(toId);
+                }
             }
         }
 
-        //TDOO 发送tcp通知
+        Long seq = imFriendShipGroupService.updateSeq(req.getFromId(), req.getGroupName(), req.getAppId());
+
+        AddFriendGroupMemberPack pack = new AddFriendGroupMemberPack();
+        pack.setFromId(req.getFromId());
+        pack.setGroupName(req.getGroupName());
+        pack.setToIds(successId);
+        pack.setSequence(seq);
+        messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(), FriendshipEventCommand.FRIEND_GROUP_MEMBER_ADD,
+                pack,req.getAppId());
         return ResponseVO.successResponse();
     }
 
@@ -65,8 +96,13 @@ public class ImFriendShipGroupMemberServiceImpl extends MppServiceImpl<ImFriendS
         ImFriendShipGroupMemberEntity imFriendShipGroupMemberEntity = new ImFriendShipGroupMemberEntity();
         imFriendShipGroupMemberEntity.setGroupId(groupId);
         imFriendShipGroupMemberEntity.setToId(toId);
-        int insert = imFriendShipGroupMemberMapper.insert(imFriendShipGroupMemberEntity);
-        return insert;
+        try {
+            int insert = imFriendShipGroupMemberMapper.insert(imFriendShipGroupMemberEntity);
+            return insert;
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @Override

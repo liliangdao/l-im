@@ -26,6 +26,18 @@ public enum FriendshipEventCommand implements Command {
 
     //移除黑名单
     FRIEND_BLACK_DELETE(3011),
+
+    //新建好友分组
+    FRIEND_GROUP_ADD(3012),
+
+    //删除好友分组
+    FRIEND_GROUP_DELETE(3013),
+
+    //好友分组添加成员
+    FRIEND_GROUP_MEMBER_ADD(3014),
+
+    //好友分组移除成员
+    FRIEND_GROUP_MEMBER_DELETE(3015),
     ;
 
     private Integer command;
