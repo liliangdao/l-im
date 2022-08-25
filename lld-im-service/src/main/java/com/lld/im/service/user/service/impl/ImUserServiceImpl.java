@@ -147,7 +147,7 @@ public class ImUserServiceImpl implements ImUserService {
 
         ImUserDataEntity ImUserDataEntity = imUserDataMapper.selectOne(objectQueryWrapper);
         if(ImUserDataEntity == null){
-            throw new ApplicationException(UserErrorCode.USER_IS_NOT_EXIST);
+            return ResponseVO.errorResponse(UserErrorCode.USER_IS_NOT_EXIST);
         }
 
         return ResponseVO.successResponse(ImUserDataEntity);

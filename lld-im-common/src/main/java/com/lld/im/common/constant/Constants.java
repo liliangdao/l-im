@@ -56,6 +56,8 @@ public class Constants {
 
         public static final String FriendshipRequest = "friendshipRequestSeq";
 
+        public static final String FriendshipGroup = "friendshipGrouptSeq";
+
         public static final String Group = "groupSeq";
 
         public static final String Message = "messageSeq";
