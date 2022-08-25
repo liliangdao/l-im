@@ -13,6 +13,7 @@ import com.lld.im.service.user.service.ImUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,7 +57,7 @@ public class ImUserController {
      * @return com.lld.im.common.ResponseVO
     */
     @RequestMapping("/login")
-    public ResponseVO login(@RequestBody LoginReq req){//@Validated
+    public ResponseVO login(@RequestBody @Validated LoginReq req){//@Validated
         ResponseVO login = imUserService.login(req.getUserId());
         if(login.getCode() == BaseErrorCode.SUCCESS.getCode()){
             //返回im服务地址
