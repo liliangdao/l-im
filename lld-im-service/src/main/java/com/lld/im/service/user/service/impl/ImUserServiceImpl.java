@@ -55,6 +55,10 @@ public class ImUserServiceImpl implements ImUserService {
     @Qualifier("snowflakeSeq")
     Seq seq;
 
+    @Autowired
+    @Qualifier("redisSeq")
+    Seq redisSeq;
+
     /**
      * @description 導入用戶
      * @author chackylee
@@ -210,7 +214,6 @@ public class ImUserServiceImpl implements ImUserService {
     @Override
     public ResponseVO modifyUserInfo(ModifyUserInfoReq req) {
 
-
         QueryWrapper query = new QueryWrapper<>();
         query.eq("app_id",req.getAppId());
         query.eq("user_id",req.getUserId());
@@ -224,7 +227,7 @@ public class ImUserServiceImpl implements ImUserService {
 
         update.setAppId(null);
         update.setUserId(null);
-        long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.User);
+        long seq = this.redisSeq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.User);
         update.setSequence(seq);
         imUserDataMapper.update(update,query);
         writeUserSeq.writeUserSeq(req.getAppId(),req.getUserId(),Constants.SeqConstants.User,seq);

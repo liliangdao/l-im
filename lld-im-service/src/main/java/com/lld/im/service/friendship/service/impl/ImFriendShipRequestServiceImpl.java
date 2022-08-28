@@ -1,5 +1,6 @@
 package com.lld.im.service.friendship.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.common.ResponseVO;
@@ -8,6 +9,9 @@ import com.lld.im.common.enums.ApproverFriendRequestStatusEnum;
 import com.lld.im.common.enums.UserErrorCode;
 import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.common.exception.ApplicationException;
+import com.lld.im.common.model.SyncReq;
+import com.lld.im.common.model.SyncResp;
+import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.dao.ImFriendShipRequestEntity;
 import com.lld.im.service.friendship.dao.mapper.ImFriendShipRequestMapper;
 import com.lld.im.common.enums.FriendShipErrorCode;
@@ -207,6 +211,33 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         .FRIEND_REQUEST_APPROVER,"",req.getAppId());
 
         return ResponseVO.successResponse();
+    }
+
+    @Override
+    public ResponseVO syncFriendShipRequest(SyncReq req) {
+        if(req.getMaxLimit() > 100){
+            req.setMaxLimit(100);
+        }
+
+        SyncResp resp = new SyncResp();
+
+        QueryWrapper<ImFriendShipRequestEntity> query = new QueryWrapper<>();
+        query.eq("from_id",req.getOperater());
+        query.gt("sequence",req.getLastSequence());
+        query.last(" limit " + req.getMaxLimit());
+        query.orderByAsc("sequence");
+        List<ImFriendShipRequestEntity> list = imFriendShipRequestMapper.selectList(query);
+//        List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
+        if(!CollectionUtil.isEmpty(list)){
+            ImFriendShipRequestEntity friend = list.get(list.size() - 1);
+            Long seq = imFriendShipRequestMapper.getFriendShipRequestMaxSeq(req.getAppId(),req.getOperater());
+            resp.setCompleted(friend.getSequence() >= seq);
+            resp.setDataList(list);
+            resp.setMaxSequence(seq);
+            return ResponseVO.successResponse(resp);
+        }
+        resp.setCompleted(true);
+        return ResponseVO.successResponse(resp);
     }
 
 

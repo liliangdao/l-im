@@ -1,6 +1,7 @@
 package com.lld.im.service.friendship.controller;
 
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.model.SyncReq;
 import com.lld.im.service.friendship.model.req.*;
 import com.lld.im.service.friendship.service.ImFriendShipRequestService;
 import com.lld.im.service.friendship.service.ImFriendShipService;
@@ -37,6 +38,11 @@ public class ImFriendShipRequestController {
         return imFriendShipRequestService.approverFriendRequest(req);
     }
 
+    @RequestMapping("/syncFriendShipRequest")
+    public ResponseVO syncFriendShipRequest(@RequestBody @Validated SyncReq req, Integer appId)  {
+        req.setAppId(appId);
+        return imFriendShipRequestService.syncFriendShipRequest(req);
+    }
 
 
 }
