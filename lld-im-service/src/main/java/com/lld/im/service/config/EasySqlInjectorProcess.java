@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @version: 1.0
  */
 @Component
-public class MppSqlInjectorProcess implements BeanPostProcessor {
+public class EasySqlInjectorProcess implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
