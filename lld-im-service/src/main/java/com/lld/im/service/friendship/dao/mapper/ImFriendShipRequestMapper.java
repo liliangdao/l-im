@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ImFriendShipRequestMapper extends BaseMapper<ImFriendShipRequestEntity> {
     @Select(
-            " select Max(sequence) from im_friendship_request where app_id = #{appId} and from_id = #{userId} "
+            " select ifnull(Max(sequence),0) from im_friendship_request where app_id = #{appId} and to_id = #{userId} "
     )
     Long getFriendShipRequestMaxSeq(Integer appId, String userId);
 }

@@ -84,6 +84,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             request.setCreateTime(System.currentTimeMillis());
             request.setFromId(fromId);
             request.setReadStatus(0);
+            request.setApproveStatus(0);
             request.setRemark(dto.getRemark());
             request.setToId(dto.getToId());
             int insert = imFriendShipRequestMapper.insert(request);
@@ -187,6 +188,9 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         update.setApproveStatus(req.getStatus());
         update.setUpdateTime(System.currentTimeMillis());
 
+        update.setId(req.getId());
+        imFriendShipRequestMapper.updateById(update);
+
         if(!req.getOperater().equals(imFriendShipRequestEntity.getToId())){
             //只能审批发给自己的好友请求
             throw new ApplicationException(FriendShipErrorCode.NOT_APPROVER_OTHER_MAN_REQUEST);
@@ -199,9 +203,12 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             dto.setAddWording(imFriendShipRequestEntity.getAddWording());
             dto.setRemark(imFriendShipRequestEntity.getRemark());
             dto.setToId(imFriendShipRequestEntity.getToId());
-            ResponseVO responseVO = imFriendShipService.doAddFriend(null, imFriendShipRequestEntity.getFromId(), dto);
-            if(!responseVO.isOk()){
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            ResponseVO responseVO = imFriendShipService.doAddFriend(req, imFriendShipRequestEntity.getFromId(), dto);
+//            if(!responseVO.isOk()){
+////                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+//                return responseVO;
+//            }
+            if(!responseVO.isOk() && responseVO.getCode() != FriendShipErrorCode.REPEAT_TO_ADD.getCode()){
                 return responseVO;
             }
         }
@@ -222,7 +229,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         SyncResp resp = new SyncResp();
 
         QueryWrapper<ImFriendShipRequestEntity> query = new QueryWrapper<>();
-        query.eq("from_id",req.getOperater());
+        query.eq("to_id",req.getOperater());
         query.gt("sequence",req.getLastSequence());
         query.last(" limit " + req.getMaxLimit());
         query.orderByAsc("sequence");
