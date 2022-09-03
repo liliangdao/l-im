@@ -484,7 +484,7 @@ public class ImFriendShipServiceImpl extends MppServiceImpl<ImFriendShipMapper, 
         ImFriendShipEntity update = new ImFriendShipEntity();
         long seq = this.seq.getSeq(req.getFromId() + ":" + Constants.SeqConstants.Friendship);
         update.setBlackSequence(seq);
-        update.setBlack(FriendShipStatusEnum.BLACK_STATUS_BLACKED.getStatus());
+        update.setBlack(FriendShipStatusEnum.BLACK_STATUS_NORMAL.getStatus());
         imFriendShipMapper.update(update, queryFrom);
 
         DeleteFriendPack deleteFriendPack = new DeleteFriendPack();

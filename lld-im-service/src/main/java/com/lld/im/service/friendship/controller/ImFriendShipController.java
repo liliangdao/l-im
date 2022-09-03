@@ -71,7 +71,7 @@ public class ImFriendShipController {
     }
 
     @RequestMapping("/deleteBlack")
-    public ResponseVO addBlack(@RequestBody @Validated DeleteBlackReq req,Integer appId)  {
+    public ResponseVO deleteBlack(@RequestBody @Validated DeleteBlackReq req,Integer appId)  {
         req.setAppId(appId);
         return imFriendShipService.deleteBlack(req);
     }
