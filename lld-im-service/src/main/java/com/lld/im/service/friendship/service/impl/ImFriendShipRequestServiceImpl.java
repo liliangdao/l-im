@@ -158,7 +158,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
 
         QueryWrapper<ImFriendShipRequestEntity> query = new QueryWrapper<>();
         query.eq("app_id", appId);
-        query.eq("from_id", fromId);
+        query.eq("to_id", fromId);
 
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
         update.setReadStatus(1);
