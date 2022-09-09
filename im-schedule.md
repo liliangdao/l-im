@@ -23,8 +23,7 @@
 | /friendship/addBlack                          | 添加黑名单           |                     |  100%   |
 | /friendship/deleteBlack                       | 删除黑名单           |                     |  100%   |
 | /friendshipRequest/getFriendRequest     | 获取好友请求列表     |                     | 100%  |
-| /friendshipRequest/readAllFriendRequest |                      | 发送tcp通知未完成   |  90%  |
-| /friendshipRequest/readAllFriendRequest |                      | 发送tcp通知未完成   |  90%  |
+| /friendshipRequest/readAllFriendRequest |                      |    |  100%  |
 | /friendship/group/add |  添加好友分组                    |    |  100%  |
 | /friendship/group/del |  删除好友分组                    |    |  100%  |
 | /friendship/group/member/add |  好友分组添加用户                    |    |  100%  |

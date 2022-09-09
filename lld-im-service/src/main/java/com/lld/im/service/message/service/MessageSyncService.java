@@ -1,9 +1,7 @@
 package com.lld.im.service.message.service;
 
-import ch.qos.logback.core.net.server.Client;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.pack.BasePack;
 import com.lld.im.codec.pack.MessageReadedAck;
 import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.common.ResponseVO;
@@ -14,8 +12,6 @@ import com.lld.im.common.model.SyncReq;
 import com.lld.im.common.model.SyncResp;
 import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.common.model.msg.OfflineMessageContent;
-import com.lld.im.common.model.msg.OfflinePushInfo;
-import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.utils.ShareThreadPool;
 import org.slf4j.Logger;

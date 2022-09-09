@@ -3,7 +3,6 @@ package com.lld.im.tcp.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.lld.im.codec.pack.BasePack;
 import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.proto.MessagePack;

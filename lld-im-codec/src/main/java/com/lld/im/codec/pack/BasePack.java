@@ -8,7 +8,7 @@ import lombok.Data;
  * @create: 2022-08-02 10:26
  **/
 @Data
-public class BasePack<T> {
+public class BasePack {
 
     private Integer appId;
     /**
@@ -23,5 +23,4 @@ public class BasePack<T> {
     private String version;
 
 
-    private T data;
 }

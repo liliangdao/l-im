@@ -3,6 +3,8 @@ package com.lld.im.service.friendship.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.lld.im.codec.pack.ApproverFriendRequestPack;
+import com.lld.im.codec.pack.ReadAllFriendRequestPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ApproverFriendRequestStatusEnum;
@@ -17,6 +19,7 @@ import com.lld.im.service.friendship.dao.mapper.ImFriendShipRequestMapper;
 import com.lld.im.common.enums.FriendShipErrorCode;
 import com.lld.im.service.friendship.model.req.ApproveFriendRequestReq;
 import com.lld.im.service.friendship.model.req.FriendDto;
+import com.lld.im.service.friendship.model.req.ReadFriendShipRequestReq;
 import com.lld.im.service.friendship.model.resp.GetFriendRequestResp;
 import com.lld.im.service.friendship.service.ImFriendShipRequestService;
 import com.lld.im.service.friendship.service.ImFriendShipService;
@@ -154,15 +157,24 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
     }
 
     @Override
-    public ResponseVO readAllFriendRequest(String fromId, Integer appId) {
+    public ResponseVO readAllFriendRequest(ReadFriendShipRequestReq req) {
 
         QueryWrapper<ImFriendShipRequestEntity> query = new QueryWrapper<>();
-        query.eq("app_id", appId);
-        query.eq("to_id", fromId);
+        query.eq("app_id", req.getAppId());
+        query.eq("to_id", req.getFromId());
 
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
         update.setReadStatus(1);
         imFriendShipRequestMapper.update(update, query);
+
+
+        ReadAllFriendRequestPack readAllFriendRequestPack = new ReadAllFriendRequestPack();
+        readAllFriendRequestPack.setFromId(req.getFromId());
+        readAllFriendRequestPack.setAppId(req.getAppId());
+        //TCP通知
+        messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(),FriendshipEventCommand
+                .FRIEND_REQUEST_READ,readAllFriendRequestPack,req.getAppId());
+
         return ResponseVO.successResponse();
     }
 
@@ -213,9 +225,12 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             }
         }
 
-        //TCP通知
+        ApproverFriendRequestPack approverFriendRequestPack = new ApproverFriendRequestPack();
+        approverFriendRequestPack.setId(req.getId());
+        approverFriendRequestPack.setStatus(req.getStatus());
+        approverFriendRequestPack.setAppId(req.getAppId());
         messageProducer.sendToUser(imFriendShipRequestEntity.getToId(),req.getClientType(),req.getImel(),FriendshipEventCommand
-        .FRIEND_REQUEST_APPROVER,"",req.getAppId());
+        .FRIEND_REQUEST_APPROVER,approverFriendRequestPack,req.getAppId());
 
         return ResponseVO.successResponse();
     }
