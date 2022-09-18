@@ -78,9 +78,9 @@ public class MessageSyncService {
      * @author lld
      * @since 2022/9/18
      */
-    public void receiveMark(MessageReciveAckContent messageReaded) {
+    public void receiveMark(MessageReciveAckContent message) {
 
-//        shareThreadPool.submit(() -> {
+        shareThreadPool.submit(() -> {
 //            conversationService.messageMarkRead(messageReaded);
 //            MessageReadedAck ack = new MessageReadedAck();
 //            BeanUtils.copyProperties(messageReaded, ack);
@@ -88,8 +88,8 @@ public class MessageSyncService {
 ////            //同步给其他端
 //
 //            syncToSender(messageReaded);
-//
-//        });
+            messageProducer.sendToUser(message.getToId(),MessageCommand.MSG_READED_ACK,message,message.getAppId());
+        });
     }
 
     private void ack(ClientInfo clientInfo, MessageReadedAck readAck, String fromId) {

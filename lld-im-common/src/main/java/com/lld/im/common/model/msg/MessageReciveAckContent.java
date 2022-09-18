@@ -20,4 +20,6 @@ public class MessageReciveAckContent extends ClientInfo {
 
     private String messageId;
 
+    private String messageKey;
+
 }

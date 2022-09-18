@@ -103,7 +103,7 @@ public class MessageProducer {
             String ackMsgId = ackData.getData().getMessageId();
             msgPack.setMessageId(ackMsgId);
         }else{
-            String bizMsgId = jsonObject.getString("msgId");
+            String bizMsgId = jsonObject.getString("messageId");
             if(StringUtils.isEmpty(bizMsgId)){
                 String genUid = UUID.randomUUID().toString().replace("-","");
                 jsonObject.put("msgId",genUid);
