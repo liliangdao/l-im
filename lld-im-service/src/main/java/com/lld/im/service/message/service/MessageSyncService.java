@@ -11,6 +11,7 @@ import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.SyncReq;
 import com.lld.im.common.model.SyncResp;
 import com.lld.im.common.model.msg.MessageReadedContent;
+import com.lld.im.common.model.msg.MessageReciveAckContent;
 import com.lld.im.common.model.msg.OfflineMessageContent;
 import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.utils.ShareThreadPool;
@@ -57,14 +58,38 @@ public class MessageSyncService {
     */
     public void readMark(MessageReadedContent messageReaded) {
         shareThreadPool.submit(() -> {
-            conversationService.msgMarkRead(messageReaded);
+            conversationService.messageMarkRead(messageReaded);
             MessageReadedAck ack = new MessageReadedAck();
             BeanUtils.copyProperties(messageReaded, ack);
             ack(messageReaded, ack, messageReaded.getFromId());
 //            //同步给其他端
 
             syncToSender(messageReaded);
+
+            //TODO 告诉对方已读
+
         });
+    }
+
+    /**
+     * @description: 消息接收方ack，待考虑多个client的情况。如果使用服务端重传机制，可以不做此处理。
+     * @param
+     * @return void
+     * @author lld
+     * @since 2022/9/18
+     */
+    public void receiveMark(MessageReciveAckContent messageReaded) {
+
+//        shareThreadPool.submit(() -> {
+//            conversationService.messageMarkRead(messageReaded);
+//            MessageReadedAck ack = new MessageReadedAck();
+//            BeanUtils.copyProperties(messageReaded, ack);
+//            ack(messageReaded, ack, messageReaded.getFromId());
+////            //同步给其他端
+//
+//            syncToSender(messageReaded);
+//
+//        });
     }
 
     private void ack(ClientInfo clientInfo, MessageReadedAck readAck, String fromId) {

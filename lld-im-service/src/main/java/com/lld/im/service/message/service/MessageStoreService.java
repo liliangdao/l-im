@@ -1,5 +1,6 @@
 package com.lld.im.service.message.service;
 
+import ch.qos.logback.core.util.TimeUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.common.config.AppConfig;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @description: 消息存储服务
@@ -100,7 +102,7 @@ public class MessageStoreService {
      */
     public void setMessageFromMessageIdCache(P2PMessageContent p2PMessageContent) {
         String key = p2PMessageContent.getAppId() + ":" + Constants.RedisConstants.cacheMessage + ":" + p2PMessageContent.getMessageId();
-        stringRedisTemplate.opsForValue().set(key,JSONObject.toJSONString(p2PMessageContent));
+        stringRedisTemplate.opsForValue().set(key,JSONObject.toJSONString(p2PMessageContent),300, TimeUnit.SECONDS);
     }
 
     /**

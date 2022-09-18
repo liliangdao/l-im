@@ -8,6 +8,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.msg.ChatMessageContent;
 import com.lld.im.common.model.msg.MessageReadedContent;
+import com.lld.im.common.model.msg.MessageReciveAckContent;
 import com.lld.im.service.message.service.MessageSyncService;
 import com.lld.im.service.message.service.P2PMessageService;
 import com.rabbitmq.client.Channel;
@@ -76,11 +77,12 @@ public class ChatOperateReceiver {
                 }.getType());
                 messageSyncService.readMark(messageContent);
             }else if(Objects.equals(command, MessageCommand.MSG_RECIVE_ACK.getCommand())){
-                //TODO 发送给
+                //TODO 发送给发送方
 //                接收方收到消息ack
-//                MessageReadedContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedContent>() {
-//                }.getType());
-//                messageSyncService.readMark(messageContent);
+                MessageReciveAckContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReciveAckContent>() {
+                }.getType());
+                messageSyncService.readMark(messageContent);
+
             }
 
             channel.basicAck(deliveryTag,false);

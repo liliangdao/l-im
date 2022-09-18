@@ -76,7 +76,7 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
 
 
     @Transactional
-    public void msgMarkRead(MessageReadedContent messageReaded) {
+    public void messageMarkRead(MessageReadedContent messageReaded) {
         String conversationId = convertConversationId(messageReaded.getConversationType(), messageReaded.getFromId(), messageReaded.getToId());
         long seq = this.seq.getSeq(messageReaded.getAppId() + ":" + Constants.SeqConstants.Conversation);
         ImConversationSetEntity conversationSet = new ImConversationSetEntity();
