@@ -23,6 +23,9 @@ public enum MessageCommand implements Command {
     //发送消息已读   1106
     MSG_READED(0x452),
 
+    //消息收到ack
+    MSG_RECIVE_ACK(1107),
+
     //推送系统通知
     MSG_SYS(0x44C),
 

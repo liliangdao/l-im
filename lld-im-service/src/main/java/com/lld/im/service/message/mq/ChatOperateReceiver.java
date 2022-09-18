@@ -71,9 +71,16 @@ public class ChatOperateReceiver {
                 }.getType());
                 p2PMessageService.process(messageContent);
             }else if(Objects.equals(command, MessageCommand.MSG_READED.getCommand())){
+                //接收方消息已读 --》更新/插入会话表 已读回执是否发送给发送方？
                 MessageReadedContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedContent>() {
                 }.getType());
                 messageSyncService.readMark(messageContent);
+            }else if(Objects.equals(command, MessageCommand.MSG_RECIVE_ACK.getCommand())){
+
+//                接收方收到消息ack
+//                MessageReadedContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedContent>() {
+//                }.getType());
+//                messageSyncService.readMark(messageContent);
             }
 
             channel.basicAck(deliveryTag,false);
