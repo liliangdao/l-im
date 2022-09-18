@@ -15,10 +15,12 @@ import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
 import com.lld.im.service.message.dao.mapper.ImMessageHistoryMapper;
 import com.lld.im.service.service.seq.Seq;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Service;
@@ -55,6 +57,9 @@ public class MessageStoreService {
     @Autowired
     AppConfig appConfig;
 
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
 
     /**
      * @param
@@ -84,6 +89,34 @@ public class MessageStoreService {
         List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent,imMessageBodyEntity);
         imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
         return imMessageBodyEntity.getMessageKey();
+    }
+
+    /**
+     * @description: 根据客户端messageId从最近的缓存中添加消息
+     * @param
+     * @return java.lang.String
+     * @author lld
+     * @since 2022/9/18
+     */
+    public void setMessageFromMessageIdCache(P2PMessageContent p2PMessageContent) {
+        String key = p2PMessageContent.getAppId() + ":" + Constants.RedisConstants.cacheMessage + ":" + p2PMessageContent.getMessageId();
+        stringRedisTemplate.opsForValue().set(key,JSONObject.toJSONString(p2PMessageContent));
+    }
+
+    /**
+     * @description: 根据客户端messageId从最近的缓存中获取消息,如果存在直接重新发送。如果不存在才走正常发消息逻辑
+     * @param
+     * @return java.lang.String
+     * @author lld
+     * @since 2022/9/18
+     */
+    public P2PMessageContent getMessageFromMessageIdCache(String messageId,Integer appId) {
+        String msg = stringRedisTemplate.opsForValue().get(appId + ":" + Constants.RedisConstants.cacheMessage + ":" + messageId);
+        if(StringUtils.isBlank(msg)){
+            return null;
+        }
+        P2PMessageContent p2PMessageContent = JSONObject.parseObject(msg, P2PMessageContent.class);
+        return p2PMessageContent;
     }
 
     /**

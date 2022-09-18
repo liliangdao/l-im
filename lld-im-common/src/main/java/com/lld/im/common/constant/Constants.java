@@ -44,6 +44,12 @@ public class Constants {
          * 离线消息，格式： appId + :offlineMessage: + userId
          */
         public static final String offlineMessage = "offlineMessage";
+
+        /**
+         * 缓存客户端消息防重，格式： appId + :cacheMessage: + messageId
+         */
+        public static final String cacheMessage = "cacheMessage";
+
     }
 
     public static class SeqConstants{

@@ -521,6 +521,10 @@
             }
 
             var messageId = uuid();
+			if(msg === 'lld'){
+                messageId = msg;
+            }
+
 			var messageData = {};
             if(command == 1103 ){
 				messageData = {

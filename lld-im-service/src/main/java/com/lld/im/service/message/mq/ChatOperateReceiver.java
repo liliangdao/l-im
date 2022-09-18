@@ -76,7 +76,7 @@ public class ChatOperateReceiver {
                 }.getType());
                 messageSyncService.readMark(messageContent);
             }else if(Objects.equals(command, MessageCommand.MSG_RECIVE_ACK.getCommand())){
-
+                //TODO 发送给
 //                接收方收到消息ack
 //                MessageReadedContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedContent>() {
 //                }.getType());

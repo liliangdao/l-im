@@ -30,7 +30,8 @@ public class ImFriendShipRequestController {
 
     @RequestMapping("/readAllFriendRequest")
     public ResponseVO readAllFriendRequest(@RequestBody @Validated ReadFriendShipRequestReq req,Integer appId)  {//@Validated
-        return imFriendShipRequestService.readAllFriendRequest(req.getFromId(),appId);
+        req.setAppId(appId);
+        return imFriendShipRequestService.readAllFriendRequest(req);
     }
 
     @RequestMapping("/approverFriendRequest")

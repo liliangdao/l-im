@@ -72,12 +72,23 @@ public class P2PMessageService {
 
     }
 
-
+    //TODO 改为redis版本，添加幂等性
     public void process(ChatMessageContent chatMessageData) {
 
-        long t0 = System.currentTimeMillis();
         String fromId = chatMessageData.getFromId();
         String toId = chatMessageData.getToId();
+
+        //从换从中获取消息如果存在直接分发和回包
+        P2PMessageContent p2pMessage = messageStoreService.getMessageFromMessageIdCache(chatMessageData.getMessageId(),chatMessageData.getAppId());
+        if(p2pMessage != null){
+            //表示是客户端重发的消息并且服务端已处理完成，可能是没收到ack，直接回包，并分发
+            threadPoolExecutor.execute(() -> {
+                ack(chatMessageData, ResponseVO.successResponse());
+                //消息分发
+                dispatchMessage(p2pMessage,chatMessageData.getOfflinePushInfo());
+            });
+            return;
+        }
 
         ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
 
@@ -86,26 +97,39 @@ public class P2PMessageService {
             chatMessageData.setMessageSequence(seq);
             //落库+回包+分发（发送给同步端和接收方的所有端）
             threadPoolExecutor.execute(() -> {
-                //插入历史库和msgBody
-                String messageKey = messageStoreService.storeP2PMessage(chatMessageData);
-                chatMessageData.setMessageKey(messageKey);
-                //回包
-                ack(chatMessageData,ResponseVO.successResponse());
-
-                P2PMessageContent p2PMessageContent = extractP2PMessage(chatMessageData);
-
-                syncToSender(p2PMessageContent,chatMessageData,chatMessageData.getOfflinePushInfo());
-
-                //消息分发
-                dispatchMessage(p2PMessageContent,chatMessageData.getOfflinePushInfo());
-
-                //插入离线库redis
-                messageStoreService.storeOffLineMessage(chatMessageData);
+                doProcessMessage(chatMessageData);
             });
         } else {
             ack(chatMessageData, responseVO);
         }
 
+    }
+
+    /**
+     * @description: 核心处理消息方法
+     * @param
+     * @return void
+     * @author lld
+     * @since 2022/9/18
+     */
+    public void doProcessMessage(ChatMessageContent chatMessageData){
+        //插入历史库和msgBody
+        String messageKey = messageStoreService.storeP2PMessage(chatMessageData);
+        chatMessageData.setMessageKey(messageKey);
+        //回包
+        ack(chatMessageData,ResponseVO.successResponse());
+
+        P2PMessageContent p2PMessageContent = extractP2PMessage(chatMessageData);
+
+        syncToSender(p2PMessageContent,chatMessageData,chatMessageData.getOfflinePushInfo());
+
+        //消息分发
+        dispatchMessage(p2PMessageContent,chatMessageData.getOfflinePushInfo());
+
+        //插入离线库redis
+        messageStoreService.storeOffLineMessage(chatMessageData);
+
+        messageStoreService.setMessageFromMessageIdCache(p2PMessageContent);
     }
 
     /**
