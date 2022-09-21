@@ -47,9 +47,9 @@ public class UserSessionUtils {
             String str = (String) o;
             UserSession session = JSON.parseObject(str, new TypeReference<UserSession>() {
             }.getType());
-//            if(ImConnectStatusEnum.ONLINE_STATUS.getCode().equals(session.getConnectState())){
+            if(ImConnectStatusEnum.ONLINE_STATUS.getCode().equals(session.getConnectState())){
                 list.add(session);
-//            }
+            }
         }
         return list;
     }

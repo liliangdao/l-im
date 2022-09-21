@@ -267,5 +267,10 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         return ResponseVO.successResponse(groupMember);
     }
 
+    @Override
+    public List<GroupMemberDto> getGroupManager(String groupId, Integer appId) {
+        return imGroupMemberMapper.getGroupManager(groupId,appId);
+    }
+
 
 }
