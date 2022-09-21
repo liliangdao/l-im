@@ -41,9 +41,6 @@ public enum MessageCommand implements Command {
     //消息已读回包  1107
     MSG_READED_ACK(0x453),
 
-    //消息已读回包  8107
-    CSCMSG_READED_ACK(0x1FAB),
-
     //消息撤回 1050
     MSG_RECALL(0x41A),
 

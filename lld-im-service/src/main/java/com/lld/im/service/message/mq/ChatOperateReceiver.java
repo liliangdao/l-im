@@ -76,7 +76,7 @@ public class ChatOperateReceiver {
                 MessageReadedContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedContent>() {
                 }.getType());
                 messageSyncService.readMark(messageContent);
-            }else if(Objects.equals(command, MessageCommand.MSG_RECIVE_ACK.getCommand())){
+            } else if(Objects.equals(command, MessageCommand.MSG_RECIVE_ACK.getCommand())){
 //                接收方收到消息ack
                 MessageReciveAckContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReciveAckContent>() {
                 }.getType());

@@ -181,7 +181,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     }
 
     /**
-     * @description: 添加群成员，如果是后台管理员，则直接拉入群，如果不是则根据群类型是私有群/公开群走不同的逻辑
+     * @description: 添加群成员，拉人入群的逻辑，如果是后台管理员，则直接拉入群，如果不是则根据群类型是私有群/公开群走不同的逻辑。
      * @param
      * @return com.lld.im.common.ResponseVO
      * @author lld
@@ -202,9 +202,10 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
         /**
          * 私有群（private）	类似普通微信群，创建后仅支持已在群内的好友邀请加群，且无需被邀请方同意或群主审批
-         * 陌生人社交群（Public）	类似 QQ 群，创建后群主可以指定群管理员，用户搜索群 ID 发起加群申请后，需要群主或管理员审批通过才能入群
+         * 公开群（Public）	类似 QQ 群，创建后群主可以指定群管理员，用户搜索群 ID 发起加群申请后，需要群主或管理员审批通过才能入群
          * 群类型 1私有群（类似微信） 2公开群(类似qq）
-         * 加入群权限，0 所有人可以加入；1 群成员可以拉人；2 群管理员或群组可以拉人。
+         * 加入群权限，0 所有人可以加入；1 群成员可以拉人；2 群管理员或群组可以拉人。私有群任何人都可以拉人入群。公开群需要管理员或群主审批
+         * 当为公开群时 applyJoinType 生效。
          *
          */
         if(!isAdmin){
