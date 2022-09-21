@@ -1,6 +1,5 @@
 package com.lld.im.service.message.service;
 
-import ch.qos.logback.core.util.TimeUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.common.config.AppConfig;
@@ -10,12 +9,13 @@ import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.SyncFromEnum;
 import com.lld.im.common.model.msg.*;
 import com.lld.im.service.conversation.service.ConversationService;
+import com.lld.im.service.group.dao.ImGroupMessageHistoryEntity;
+import com.lld.im.service.group.dao.mapper.ImGroupMessageHistoryMapper;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.ImMessageHistoryEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
 import com.lld.im.service.message.dao.mapper.ImMessageHistoryMapper;
 import com.lld.im.service.service.seq.Seq;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +23,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -62,6 +60,10 @@ public class MessageStoreService {
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
+    @Autowired
+    ImGroupMessageHistoryMapper imGroupMessageHistoryMapper;
+
+
     /**
      * @param
      * @return void
@@ -72,8 +74,9 @@ public class MessageStoreService {
     public String storeGroupMessage(GroupChatMessageContent chatMessageContent) {
         ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
         imMessageBodyMapper.insert(imMessageBodyEntity);
-        ImMessageHistoryEntity imMessageHistoryEntity = extractToGroupMessageHistory(chatMessageContent, imMessageBodyEntity);
-        imMessageHistoryMapper.insert(imMessageHistoryEntity);
+        ImGroupMessageHistoryEntity imGroupMessageHistoryEntity = extractToGroupMessageHistory(chatMessageContent, imMessageBodyEntity);
+        extractToGroupMessageHistory(chatMessageContent, imMessageBodyEntity);
+        imGroupMessageHistoryMapper.insert(imGroupMessageHistoryEntity);
         return imMessageBodyEntity.getMessageKey();
     }
 
@@ -190,10 +193,10 @@ public class MessageStoreService {
         return list;
     }
 
-    public ImMessageHistoryEntity extractToGroupMessageHistory(GroupChatMessageContent content, ImMessageBodyEntity imMessageBodyEntity) {
-        ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
+    public ImGroupMessageHistoryEntity extractToGroupMessageHistory(GroupChatMessageContent content, ImMessageBodyEntity imMessageBodyEntity) {
+        ImGroupMessageHistoryEntity fromHistory = new ImGroupMessageHistoryEntity();
         BeanUtils.copyProperties(content, fromHistory);
-        fromHistory.setOwnerId(content.getFromId());
+        fromHistory.setGroupId(content.getGroupId());
         long seq = this.seq.getSeq("");
         fromHistory.setMessageHistroyId(seq);
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
