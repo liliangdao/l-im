@@ -18,8 +18,6 @@ import java.util.zip.Inflater;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import static com.lld.im.common.utils.TLSSigAPI2.decompress;
-
 
 /**
  * @description:
