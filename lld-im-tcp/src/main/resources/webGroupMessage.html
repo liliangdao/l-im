@@ -526,7 +526,7 @@
             }
 
 			var messageData = {};
-            if(command == 1103){
+            if(command == 1103 ){
 				messageData = {
 					"messageId": messageId,
 					"fromId": userId,
@@ -536,17 +536,7 @@
 					"imei": imei,
 					"messageBody": msg
 				}
-			}else if (command == 1104){
-                messageData = {
-                    "messageId": messageId,
-                    "fromId": userId,
-                    "groupId": toId,
-                    "appId": 10000,
-                    "clientType": 1,
-                    "imei": imei,
-                    "messageBody": msg
-                }
-            }else{
+			}else{
 				messageData = JSON.parse(msg)
 			}
             data.data = messageData;

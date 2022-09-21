@@ -3,6 +3,7 @@ package com.lld.im.service.group.service;
 import com.lld.im.codec.pack.ChatMessageAck;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.ConversationTypeEnum;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
@@ -94,7 +95,11 @@ public class GroupMessageService {
 
                 GroupMessageContent groupMessageContent = extractGroupMessage(chatMessageData);
                 //插入离线库
-//                messageStoreService.storeOffLineMessage(groupMessageContent);
+                OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+                offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
+                offlineMessageContent.setToId(chatMessageData.getGroupId());
+                BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
+                messageStoreService.storeOffLineMessage(offlineMessageContent);
 
                 //同步给发送方其他端
                 syncToSender(groupMessageContent,chatMessageData,chatMessageData.getOfflinePushInfo());
@@ -119,7 +124,7 @@ public class GroupMessageService {
         logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
         ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence(),content.getAppId());
         result.setData(ackData);
-        messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.MSG_ACK, result, content);
+        messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.GROUP_MSG_ACK, result, content);
     }
 
     /**
@@ -163,6 +168,14 @@ public class GroupMessageService {
                 if(d.getRole() == GroupMemberRoleEnum.LEAVE.getCode()){
                     continue;
                 }
+
+                OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+                BeanUtils.copyProperties(messageContent,offlineMessageContent);
+                offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
+                offlineMessageContent.setToId(messageContent.getGroupId());
+                offlineMessageContent.setFromId(d.getMemberId());
+                messageStoreService.storeOffLineMessage(offlineMessageContent);
+
                 List<ClientInfo> successResults = messageProducer.sendToUser(d.getMemberId()
                         , MessageCommand.MSG_GROUP, groupMessageContent,messageContent.getAppId());
 

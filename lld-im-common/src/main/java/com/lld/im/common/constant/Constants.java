@@ -80,6 +80,8 @@ public class Constants {
 
         public static final String MessageService2Im = "messageService2Pipeline";
 
+        public static final String GroupService2Im = "GroupService2Pipeline";
+
         public static final String FriendShip2Im = "friendShip2Pipeline";
 
     }

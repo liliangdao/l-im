@@ -179,7 +179,11 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             }
         } else {
             //全往mq丢
-
+            try{
+                MqMessageProducer.sendMessageToGroupService(msg.getMessagePack().getData(),command);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

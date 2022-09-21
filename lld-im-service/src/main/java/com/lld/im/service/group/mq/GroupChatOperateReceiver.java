@@ -8,6 +8,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.msg.ChatMessageContent;
 import com.lld.im.common.model.msg.GroupChatMessageContent;
+import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.service.group.service.GroupMessageService;
 import com.lld.im.service.message.service.MessageSyncService;
 import com.lld.im.service.message.service.P2PMessageService;
@@ -37,6 +38,9 @@ public class GroupChatOperateReceiver {
 
     @Autowired
     GroupMessageService groupMessageService;
+
+    @Autowired
+    MessageSyncService messageSyncService;
 
 
     /**
@@ -69,10 +73,11 @@ public class GroupChatOperateReceiver {
                 GroupChatMessageContent messageContent = JSON.parseObject(msg, new TypeReference<GroupChatMessageContent>() {
                 }.getType());
                 groupMessageService.process(messageContent);
-            }else if(Objects.equals(command, MessageCommand.MSG_READED.getCommand())){
-                MessageReadedPack messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedPack>() {
+            }
+            else if(Objects.equals(command, MessageCommand.MSG_READED.getCommand())){
+                MessageReadedContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedContent>() {
                 }.getType());
-//                messageSyncService.readMark(messageContent);
+                messageSyncService.readMark(messageContent);
             }
 
             channel.basicAck(deliveryTag,false);

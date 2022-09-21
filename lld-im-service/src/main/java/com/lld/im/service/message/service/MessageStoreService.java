@@ -62,7 +62,6 @@ public class MessageStoreService {
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
-
     /**
      * @param
      * @return void
@@ -128,19 +127,17 @@ public class MessageStoreService {
      * @param [chatMessageContent]
      * @return void
     */
-    public void storeOffLineMessage(ChatMessageContent chatMessageData) {
+    public void storeOffLineMessage(OfflineMessageContent offlineMessageContent) {
 
-        OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
-        BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
-        offlineMessageContent.setConversationId(conversationService.convertConversationId(ConversationTypeEnum.P2P.getCode(),
-                chatMessageData.getFromId(),chatMessageData.getToId()));
-        offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
-        offlineMessageContent.setMessageKey(chatMessageData.getMessageKey());
+        offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType(),
+                offlineMessageContent.getFromId(),offlineMessageContent.getToId()));
+        offlineMessageContent.setConversationType(offlineMessageContent.getConversationType());
+        offlineMessageContent.setMessageKey(offlineMessageContent.getMessageKey());
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
 
-        String fromKey = chatMessageData.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + chatMessageData.getFromId();
-        String toKey = chatMessageData.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + chatMessageData.getToId();
+        String fromKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + offlineMessageContent.getFromId();
+        String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + offlineMessageContent.getToId();
 
         //给发送方插入离线消息
         Long fromCount = zSetOperations.zCard(fromKey);
@@ -149,16 +146,19 @@ public class MessageStoreService {
             zSetOperations.removeRange(fromKey,0,0);
         }
 
-        zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent),chatMessageData.getMessageSequence());
+        zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent),offlineMessageContent.getMessageSequence());
         //给接收方插入离线消息
-        Long toCount = zSetOperations.zCard(toKey);
+        if(offlineMessageContent.getConversationType() != ConversationTypeEnum.GROUP.getCode()){
+            Long toCount = zSetOperations.zCard(toKey);
 
-        if(toCount > appConfig.getOfflineMessageCount()){
-            zSetOperations.removeRange(toKey,0,0);
+            if(toCount > appConfig.getOfflineMessageCount()){
+                zSetOperations.removeRange(toKey,0,0);
+            }
+            zSetOperations.add(toKey,JSONObject.toJSONString(offlineMessageContent),offlineMessageContent.getMessageSequence());
+
         }
-        zSetOperations.add(toKey,JSONObject.toJSONString(offlineMessageContent),chatMessageData.getMessageSequence());
-
     }
+
 
     public List<ImMessageHistoryEntity> extractToP2PMessageHistory(ChatMessageContent content,ImMessageBodyEntity imMessageBodyEntity) {
         List<ImMessageHistoryEntity> list = new ArrayList<>();

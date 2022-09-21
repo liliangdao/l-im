@@ -84,6 +84,42 @@ public class MqMessageProducer {
 
     }
 
+    /**
+     * @param [msgBody]
+     * @return void
+     * @description 往消息服务投递消息
+     * @author chackylee
+     * @date 2022/5/5 16:52
+     */
+    public static void sendMessageToGroupService(Object msgBody,Integer command) throws IOException, TimeoutException {
+        Channel channel = null;
+        try {
+            channel = MqFactoryUtils.getChannel(Constants.RabbitConstants.GroupService2Im);
+            //四个参数
+            //exchange 交换机，暂时用不到，在后面进行发布订阅时才会用到
+            //队列名称
+            //额外的设置属性
+            //最后一个参数是要传递的消息字节数组
+
+            JSONObject o = (JSONObject)JSONObject.toJSON(msgBody);
+            o.put("command",command);
+
+            String data = o.toJSONString();
+            channel.basicPublish(Constants.RabbitConstants.Im2GroupService
+                    , "", null, data.getBytes());
+            System.out.println("===发送成功===" + data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+//            if (channel != null) {
+//                channel.close();
+//                channel.close();
+//            }
+
+        }
+
+    }
+
 }
 
 

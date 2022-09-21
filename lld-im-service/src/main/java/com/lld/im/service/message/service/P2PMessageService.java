@@ -127,7 +127,10 @@ public class P2PMessageService {
         dispatchMessage(p2PMessageContent,chatMessageData.getOfflinePushInfo());
 
         //插入离线库redis
-        messageStoreService.storeOffLineMessage(chatMessageData);
+        OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+        BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
+        offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
+        messageStoreService.storeOffLineMessage(offlineMessageContent);
 
         messageStoreService.setMessageFromMessageIdCache(p2PMessageContent);
     }

@@ -5,10 +5,10 @@ public enum GroupMuteTypeEnum {
     /**
      * 是否全员禁言，0 不禁言；1 全员禁言。
      */
-    MUTE(0),
+    NOT_MUTE(0),
 
 
-    NOT_MUTE(1),
+    MUTE(1),
 
     ;
 
