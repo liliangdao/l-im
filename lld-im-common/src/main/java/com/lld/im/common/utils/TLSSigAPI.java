@@ -262,7 +262,7 @@ public class TLSSigAPI {
         long currTime = System.currentTimeMillis() / 1000;
 
         JSONObject sigDoc = new JSONObject();
-        sigDoc.put("TLS.ver", "2.0");
+//        sigDoc.put("TLS.ver", "2.0");
         sigDoc.put("TLS.identifier", userid);
         sigDoc.put("TLS.appId", appId);
         sigDoc.put("TLS.expire", expire);
