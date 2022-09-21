@@ -29,7 +29,7 @@ public class GroupMessageProducer {
 
         if(command.equals(GroupEventCommand.JOIN_GROUP.getCommand())){
             //申请入群 推送给管理员跟自己
-            List<GroupMemberDto> groupManager = groupMemberService.getGroupManager(groupId, appId);
+            groupMemberService.getGroupManager(groupId, appId)
         }
 
 
