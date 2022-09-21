@@ -14,9 +14,9 @@
 
 | 接口                                    | 作用                 | 备注                | 进 度 |
 | --------------------------------------- | -------------------- | ------------------- | :---: |
-| /friendship/add                         | 添加好友             | 发送tcp通知未完成   |  100%  |
-| /friendship/delete                      | 删除好友             | 发送tcp通知未完成   |  100%  |
-| /friendship/update                      | 更新好友资料         | 发送tcp通知未完成   |  100%  |
+| /friendship/add                         | 添加好友             |    |  100%  |
+| /friendship/delete                      | 删除好友             |    |  100%  |
+| /friendship/update                      | 更新好友资料         |    |  100%  |
 | /friendship/getRelation                 | 获取单个好友关系信息 |                     |  100%   |
 | /friendship/checkFriend                       | 校验是否为好友,支持单向和双向校验       |                     |  100%   |
 | /friendship/get                         | 拉取好友             | 分页拉取，按照seq拉 |  0%   |
