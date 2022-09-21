@@ -1,20 +1,15 @@
 package com.lld.im.common.utils;
 
-
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Base64Utils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.security.*;
-
 import java.util.Arrays;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
