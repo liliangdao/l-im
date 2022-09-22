@@ -41,7 +41,7 @@ public class TLSSigAPI {
      * @author lld
      * @since 2022-09-22
      */
-    public JSONObject decodeUserSig(String userSig) {
+    public static JSONObject decodeUserSig(String userSig) {
         JSONObject sigDoc = new JSONObject(true);
         try {
             byte[] decodeUrlByte = Base64URL.base64DecodeUrlNotReplace(userSig.getBytes());
