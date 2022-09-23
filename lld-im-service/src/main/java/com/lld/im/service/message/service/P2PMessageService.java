@@ -72,7 +72,6 @@ public class P2PMessageService {
 
     }
 
-    //TODO 改为redis版本，添加幂等性
     public void process(ChatMessageContent chatMessageData) {
 
         String fromId = chatMessageData.getFromId();
@@ -114,7 +113,7 @@ public class P2PMessageService {
      */
     public void doProcessMessage(ChatMessageContent chatMessageData){
         //插入历史库和msgBody
-        String messageKey = messageStoreService.storeP2PMessage(chatMessageData);
+        Long messageKey = messageStoreService.storeP2PMessage(chatMessageData);
         chatMessageData.setMessageKey(messageKey);
         //回包
         ack(chatMessageData,ResponseVO.successResponse());
@@ -195,7 +194,7 @@ public class P2PMessageService {
 
         // 如果成功的session列表中不包括手机，则需要推送离线消息。
         if (!UserSessionUtils.containMobile(successResults)) {
-            //如果接收端没有手机，则推送离线消息 TODO
+            //如果接收端没有手机，则推送离线消息
 //            pushService.pushOfflineInfo(offlinePushInfo, messageContent);
         }
 

@@ -14,14 +14,12 @@ public class ImGroupMessageHistoryEntity {
 
     private Integer appId;
 
-    private Long messageHistroyId;
-
     private String fromId;
 
     private String groupId;
 
     /** messageBodyId*/
-    private String messageKey;
+    private Long messageKey;
     /** 序列号*/
     private Long sequence;
 

@@ -88,7 +88,7 @@ public class GroupMessageService {
             //落库+回包+分发（发送给同步端和接收方的所有端）
             threadPoolExecutor.execute(() -> {
                 //插入历史库和msgBody
-                String messageKey = messageStoreService.storeGroupMessage(chatMessageData);
+                Long messageKey = messageStoreService.storeGroupMessage(chatMessageData);
                 chatMessageData.setMessageKey(messageKey);
                 //回包
                 ack(chatMessageData,ResponseVO.successResponse());
@@ -181,7 +181,7 @@ public class GroupMessageService {
 
                 // 如果成功的session列表中不包括手机，则需要推送离线消息。
                 if (!UserSessionUtils.containMobile(successResults)) {
-                    //如果接收端没有手机，则推送离线消息 TODO
+                    //如果接收端没有手机，则推送离线消息
 //            pushService.pushOfflineInfo(offlinePushInfo, messageContent);
                 }
             }

@@ -15,7 +15,7 @@ public class MessageContent extends ClientInfo {
     //客户端传的messageId
     private String messageId;
 
-    private String messageKey;
+    private Long messageKey;
 
     private String fromId;
 

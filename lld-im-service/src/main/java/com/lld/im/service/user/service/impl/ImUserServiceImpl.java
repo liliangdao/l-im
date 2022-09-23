@@ -99,7 +99,7 @@ public class ImUserServiceImpl implements ImUserService {
     }
 
     /**
-     * @description 获取用户详情,TODO先简单做根据id查询，后面的过滤查询先不做
+     * @description 获取用户详情 先简单做根据id查询，后面的过滤查询先不做
      * @author chackylee
      * @date 2022/5/12 15:26
      * @param [req]

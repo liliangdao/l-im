@@ -14,8 +14,6 @@ public class ImMessageHistoryEntity {
 
     private Integer appId;
 
-    private Long messageHistroyId;
-
     private String fromId;
 
     private String toId;
@@ -23,7 +21,7 @@ public class ImMessageHistoryEntity {
     private String ownerId;
 
     /** messageBodyId*/
-    private String messageKey;
+    private Long messageKey;
     /** 序列号*/
     private Long sequence;
 

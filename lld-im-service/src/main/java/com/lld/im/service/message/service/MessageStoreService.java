@@ -71,7 +71,7 @@ public class MessageStoreService {
      * @author lld
      * @since 2022/7/23
      */
-    public String storeGroupMessage(GroupChatMessageContent chatMessageContent) {
+    public Long storeGroupMessage(GroupChatMessageContent chatMessageContent) {
         ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
         imMessageBodyMapper.insert(imMessageBodyEntity);
         ImGroupMessageHistoryEntity imGroupMessageHistoryEntity = extractToGroupMessageHistory(chatMessageContent, imMessageBodyEntity);
@@ -87,7 +87,7 @@ public class MessageStoreService {
      * @author lld
      * @since 2022/7/23
      */
-    public String storeP2PMessage(ChatMessageContent chatMessageContent) {
+    public Long storeP2PMessage(ChatMessageContent chatMessageContent) {
         ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
         imMessageBodyMapper.insert(imMessageBodyEntity);
         List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent,imMessageBodyEntity);
@@ -170,7 +170,6 @@ public class MessageStoreService {
         BeanUtils.copyProperties(content, fromHistory);
         fromHistory.setOwnerId(content.getFromId());
         long fromMessageHistoryId = this.seq.getSeq("");
-        fromHistory.setMessageHistroyId(fromMessageHistoryId);
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
         fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
         fromHistory.setSequence(content.getMessageSequence());
@@ -182,7 +181,6 @@ public class MessageStoreService {
             toHistory.setOwnerId(content.getToId());
             long toMessageHistoryId = this.seq.getSeq("");
 //            long seq2 = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
-            toHistory.setMessageHistroyId(toMessageHistoryId);
             toHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
             toHistory.setSequence(content.getMessageSequence());
             toHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
@@ -197,8 +195,7 @@ public class MessageStoreService {
         ImGroupMessageHistoryEntity fromHistory = new ImGroupMessageHistoryEntity();
         BeanUtils.copyProperties(content, fromHistory);
         fromHistory.setGroupId(content.getGroupId());
-        long seq = this.seq.getSeq("");
-        fromHistory.setMessageHistroyId(seq);
+//        long seq = this.seq.getSeq("");
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
         fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
         fromHistory.setSequence(content.getMessageSequence());
@@ -214,7 +211,7 @@ public class MessageStoreService {
         body.setAppId(content.getAppId());
         body.setCreateTime(System.currentTimeMillis());
         body.setMessageBody(content.getMessageBody());
-        body.setMessageKey(RandomUtil.randomString(16));
+        body.setMessageKey(seq.getSeq(""));
         body.setSecurityKey("");
         body.setMessageTime(content.getMessageTime());
         return body;

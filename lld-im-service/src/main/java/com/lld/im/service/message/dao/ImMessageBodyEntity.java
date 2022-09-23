@@ -14,7 +14,7 @@ public class ImMessageBodyEntity {
 
     private Integer appId;
     /** messageBodyId*/
-    private String messageKey;
+    private Long messageKey;
 
     /** messageBody*/
     private String messageBody;
