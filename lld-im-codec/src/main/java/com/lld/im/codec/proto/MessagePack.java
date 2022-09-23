@@ -49,4 +49,7 @@ public class MessagePack<T> implements Serializable {
      */
     private T data;
 
+    /** 用户签名*/
+    private String userSign;
+
 }

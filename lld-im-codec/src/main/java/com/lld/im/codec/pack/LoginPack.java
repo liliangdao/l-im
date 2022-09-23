@@ -12,8 +12,12 @@ public class LoginPack {
 
     private String userId;
 
-    /** 用户签名*/
-    private String userSign;
+    //客户端状态由业务传递
+    private int customStatus;
+    //客户端状态字符串
+    private String customText;
 
+    //设备名称如 iphone11
+    private String customClientName;
 
 }
