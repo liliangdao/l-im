@@ -14,6 +14,10 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "appconfig")
 public class AppConfig {
 
+    private Integer appId;
+
+    private String privateKey;
+
     /** zk连接地址*/
     private String zkAddr;
 
