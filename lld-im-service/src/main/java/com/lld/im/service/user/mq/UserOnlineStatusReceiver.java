@@ -12,7 +12,8 @@ import com.lld.im.common.model.msg.MessageReciveAckContent;
 import com.lld.im.service.message.mq.ChatOperateReceiver;
 import com.lld.im.service.message.service.MessageSyncService;
 import com.lld.im.service.message.service.P2PMessageService;
-import com.lld.im.service.user.model.UserOnlineStatusContent;
+import com.lld.im.service.user.model.UserOnlineStatusChangeContent;
+import com.lld.im.service.user.service.UserStatusService;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,8 @@ public class UserOnlineStatusReceiver {
 
     private static Logger logger = LoggerFactory.getLogger(ChatOperateReceiver.class);
 
+    @Autowired
+    UserStatusService userStatusServicel;
 
     /**
      * 订阅MQ单聊消息队列--处理
@@ -65,7 +68,13 @@ public class UserOnlineStatusReceiver {
 
             //1.在线状态变更通知 上线由客户端发起。下线由服务端发起。
             if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand())) {
-                UserOnlineStatusContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusContent>() {
+                UserOnlineStatusChangeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusChangeContent>() {
+                }.getType());
+
+            }
+            //用户在线状态订阅，一般是临时订阅
+            else if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_SUBSCRIBE.getCommand())) {
+                UserOnlineStatusChangeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusChangeContent>() {
                 }.getType());
 
             }

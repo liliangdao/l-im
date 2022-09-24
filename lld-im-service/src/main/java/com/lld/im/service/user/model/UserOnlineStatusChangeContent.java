@@ -11,11 +11,9 @@ import sun.dc.pr.PRError;
  * @version: 1.0
  */
 @Data
-public class UserOnlineStatusContent {
+public class UserOnlineStatusChangeContent {
 
     private Integer appId;
-
-//    private Integer command;
 
     private String userId;
 

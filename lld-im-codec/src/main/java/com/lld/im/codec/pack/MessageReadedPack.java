@@ -1,5 +1,6 @@
 package com.lld.im.codec.pack;
 
+import com.sun.xml.internal.rngom.parse.host.Base;
 import lombok.Data;
 
 /**
@@ -8,7 +9,7 @@ import lombok.Data;
  * @create: 2022-07-29 16:24
  **/
 @Data
-public class MessageReadedPack {
+public class MessageReadedPack extends BasePack {
 
     private String fromId;
 

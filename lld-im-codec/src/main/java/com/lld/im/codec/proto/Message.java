@@ -14,21 +14,6 @@ public class Message {
 
     private MessageHeader messageHeader;
 
-    private MessagePack messagePack;
+    private Object messagePack;
 
-    public static Message createMesssage(MessagePack pack){
-        Message message = new Message();
-        MessageHeader header = new MessageHeader();
-        header.setCommand(pack.getCommand());
-        message.setMessageHeader(header);
-        message.setMessagePack(pack);
-        return message;
-    }
-
-    public Message(MessagePack pack) {
-        MessageHeader header = new MessageHeader();
-        header.setCommand(pack.getCommand());
-        this.messageHeader = header;
-        this.messagePack = pack;
-    }
 }

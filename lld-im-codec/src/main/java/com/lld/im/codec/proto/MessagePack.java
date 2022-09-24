@@ -6,16 +6,14 @@ import java.io.Serializable;
 
 /**
  * @author: Chackylee
- * @description:
+ * @description: 消息服务发送给tcp的包体,tcp再根据改包体解析成Message发给客户端
  * @create: 2022-04-28 10:12
  **/
 @Data
 public class MessagePack<T> implements Serializable {
 
     private String userId;
-    /**
-     * 应用ID
-     */
+
     private Integer appId;
 
     /**
@@ -28,7 +26,6 @@ public class MessagePack<T> implements Serializable {
      */
     private int clientType;
 
-    private int command;
     /**
      * 消息ID
      */
@@ -39,17 +36,14 @@ public class MessagePack<T> implements Serializable {
      */
     private String imei;
 
-    /**
-     * 数据解析类型 和具体业务无关，后续根据解析类型解析data数据 0x0:Json,0x1:ProtoBuf,0x2:Xml,默认:0x0
-     */
-    private Integer messageType = 0x0;
+    private Integer command;
 
     /**
      * 业务数据对象，如果是聊天消息则不需要解析直接透传
      */
     private T data;
 
-    /** 用户签名*/
-    private String userSign;
+//    /** 用户签名*/
+//    private String userSign;
 
 }

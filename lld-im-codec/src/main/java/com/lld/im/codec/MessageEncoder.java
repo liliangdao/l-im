@@ -7,11 +7,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 /**
  * @author: Chackylee
@@ -40,7 +35,7 @@ public class MessageEncoder extends MessageToByteEncoder {
 //            out.writeBytes(bytes);
             MessagePack msgBody = (MessagePack) msg;
             String s = JSONObject.toJSONString(msgBody);
-            ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());
+//            ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());
             byte[] bytes = s.getBytes();
             out.writeInt(bytes.length);
             out.writeInt(msgBody.getCommand());

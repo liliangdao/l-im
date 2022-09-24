@@ -46,7 +46,6 @@ public class WebSocketMessageEncoder extends MessageToMessageEncoder<MessagePack
             byteBuf.writeInt(bytes.length);
             byteBuf.writeInt(msg.getCommand());
             byteBuf.writeBytes(bytes);
-
             out.add(new BinaryWebSocketFrame(byteBuf));
         }catch (Exception e){
             e.printStackTrace();

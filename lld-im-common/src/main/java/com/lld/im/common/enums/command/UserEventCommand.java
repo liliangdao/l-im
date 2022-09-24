@@ -7,6 +7,9 @@ public enum UserEventCommand implements Command {
 
     //2001
     USER_ONLINE_STATUS_CHANGE(2001),
+
+    //2002 在线状态订阅
+    USER_ONLINE_STATUS_SUBSCRIBE(2002),
     ;
 
     private Integer command;

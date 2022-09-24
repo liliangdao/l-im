@@ -1,5 +1,6 @@
 package com.lld.im.codec.pack;
 
+import com.sun.xml.internal.rngom.parse.host.Base;
 import lombok.Data;
 
 /**
@@ -8,7 +9,7 @@ import lombok.Data;
  * @create: 2022-05-05 09:26
  **/
 @Data
-public class LoginPack {
+public class LoginPack extends BasePack {
 
     private String userId;
 

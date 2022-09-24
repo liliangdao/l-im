@@ -405,7 +405,6 @@
         return uuid;
     }
 
-
     var socket;
 
     //如果浏览器支持WebSocket
@@ -416,7 +415,6 @@
         //客户端收到服务器消息的时候就会执行这个回调方法
         socket.onmessage = function (event) {
             var ta = document.getElementById("responseText");
-            console.log("onmessage")
 
             var bytebuf = new ByteBuffer(event.data);
             let byteBuffer = bytebuf.int32().int32().unpack();
@@ -432,6 +430,7 @@
 
             }else{
                 var msg = eval("(" + msgBody + ")");
+                console.log(msg)
 
                 let userId = document.getElementById('userId').value;
                 console.log(userId)
@@ -466,35 +465,63 @@
         alert("浏览器不支持WebSocket！");
     }
 
+    // private Integer appId;
+    // /**
+    //  * 端的标识
+    //  */
+    // private Integer clientType;
+    //
+    // private String imei;
+
+    // private String userId;
+    //
+    // //客户端状态由业务传递
+    // private int customStatus;
+    // //客户端状态字符串
+    // private String customText;
+    //
+    // //设备名称如 iphone11
+    // private String customClientName;
     //登录
     function login(userId, toUser) {
         if (!window.WebSocket) {
             return;
         }
-
         console.log(userId + " " + toUser);
         //当websocket状态打开
         if (socket.readyState == WebSocket.OPEN) {
+
+            var command = 9000;
+            var version = 1;
+            var clientType = 1;
+            var messageType = 0x0;
+
             var userId = userId;
             var toUser = toUser;
-            var command = 9000;
-            var data = {"userId": userId, "toId": toUser, "appId": 10000, "clientType": 1, "imei": "web"};
-            data['data'] = {"userId": userId,"userSign":"123"};
+
+            var data = {"userId": userId, "appId": 10000, "clientType": 1, "imei": "web","customStatus":null,"customClientName":""};
             var jsonData = JSON.stringify(data);
 			console.log(jsonData);
 
             var bodyLen = jsonData.length;
 
             let loginMsg = new ByteBuffer();
-            loginMsg.int32(bodyLen).int32(command).vstring(jsonData, bodyLen);
-            // console.log(loginMsg.pack());
+            loginMsg.int32(command).int32(version)
+                .int32(clientType).int32(messageType).int32(bodyLen).vstring(jsonData, bodyLen);
             socket.send(loginMsg.pack());
-            // localStorage.userId = userId;
-
         } else {
             alert("连接没有开启");
         }
     }
+
+    // *               私有协议规则，
+    // *               4位表示Command表示消息的开始，
+    // *               4位表示version
+    // *               4位表示clientType
+    // *               4位表示messageType
+    // *               4位表示appId(待定)
+    // *               4位表示数据长度
+    // *               后续将解码方式加到数据头根据不同的解码方式解码，如pb，json，现在用json字符串
 
     //发消息
     function sendMsg(userId, toId, command,msg) {

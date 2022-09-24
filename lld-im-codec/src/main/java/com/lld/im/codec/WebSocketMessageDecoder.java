@@ -1,6 +1,6 @@
 package com.lld.im.codec;
 
-import com.lld.im.codec.utils.ByteBufToMsgUtils;
+import com.lld.im.codec.utils.ByteBufToMessageUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,13 +21,10 @@ public class WebSocketMessageDecoder extends MessageToMessageDecoder<BinaryWebSo
     protected void decode(ChannelHandlerContext ctx, BinaryWebSocketFrame frame, List<Object> out) throws Exception {
 
         ByteBuf in = frame.content();
-        if (in.readableBytes() < 8) {
+        if (in.readableBytes() < 24) {
             return;
         }
-        out.add(ByteBufToMsgUtils.transition(in));
+        out.add(ByteBufToMessageUtils.transition(in));
     }
-
-
-
 
 }

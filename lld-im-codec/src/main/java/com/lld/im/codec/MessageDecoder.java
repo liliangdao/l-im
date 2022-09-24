@@ -1,6 +1,6 @@
 package com.lld.im.codec;
 
-import com.lld.im.codec.utils.ByteBufToMsgUtils;
+import com.lld.im.codec.utils.ByteBufToMessageUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -18,12 +18,12 @@ public class MessageDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List out) throws Exception {
 
-        /** 如果可读的数据小于8表示没有数据，4位表示数据长度4位表示command，不做处理*/
-        if (in.readableBytes() < 8) {
+        /** 如果可读的数据小于8表示没有数据*/
+        if (in.readableBytes() < 24) {
             return;
         }
 
-        out.add(ByteBufToMsgUtils.transition(in));
+        out.add(ByteBufToMessageUtils.transition(in));
     }
 
 }

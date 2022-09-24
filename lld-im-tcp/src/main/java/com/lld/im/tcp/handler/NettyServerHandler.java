@@ -5,9 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.codec.proto.Message;
-import com.lld.im.codec.proto.MessagePack;
-import com.lld.im.codec.proto.MessageHeader;
 import com.lld.im.codec.pack.LoginPack;
+import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ImConnectStatusEnum;
 import com.lld.im.common.enums.command.MessageCommand;
@@ -70,13 +69,14 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         int command = msg.getMessageHeader().getCommand();
 
         if (command == SystemCommand.LOGIN.getCommand()) {
-
-            MessagePack<LoginPack> loginPack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()), new TypeReference<MessagePack<LoginPack>>() {
-            }.getType());
-            LoginPack loginReq = loginPack.getData();
+            LoginPack loginPack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()),
+                    new TypeReference<LoginPack>() {
+                    }.getType());
+//            LoginPack loginReq = loginPack.getData();
+            logger.info("收到登录消息{}" , JSONObject.toJSONString(loginPack));
 
             /** 登陸事件 **/
-            String userId = msg.getMessagePack().getUserId();
+            String userId = loginPack.getUserId();
             /** 为channel设置用户id **/
             ctx.channel().attr(AttributeKey.valueOf(Constants.UserId)).set(userId);
             String hashKey = loginPack.getClientType() + ":" + loginPack.getImei();
@@ -90,7 +90,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             session.setAppId(loginPack.getAppId());
             session.setClientType(loginPack.getClientType());
             session.setImei(loginPack.getImei());
-            session.setUserId(loginReq.getUserId());
+            session.setUserId(loginPack.getUserId());
             session.setConnectState(ImConnectStatusEnum.ONLINE_STATUS.getCode());
             try {
                 InetAddress addr = InetAddress.getLocalHost();
@@ -110,65 +110,41 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             dto.setAppId(loginPack.getAppId());
             dto.setClientType(loginPack.getClientType());
             dto.setImei(loginPack.getImei());
-            dto.setUserId(loginReq.getUserId());
+            dto.setUserId(loginPack.getUserId());
             RTopic topic = redissonClient.getTopic(Constants.RedisConstants.UserLoginChannel);
             topic.publish(JSON.toJSONString(dto));
 //            stringRedisTemplate.convertAndSend(Constants.RedisConstants.UserLoginChannel, JSON.toJSONString(dto));
 
+
+            JSONObject loginSuccessPack = new JSONObject();
+            loginSuccessPack.put("code",200);
+//            loginSuccessPack.put("command",SystemCommand.LOGIN.getCommand());
+            MessagePack<JSONObject> loginSuccess = new MessagePack<>();
+            loginSuccess.setData(loginSuccessPack);
+            loginSuccess.setCommand(SystemCommand.LOGIN.getCommand());
+            ctx.writeAndFlush(loginSuccess);
         } else if (command == SystemCommand.LOGOUT.getCommand()) {
             /** 登出事件 **/
             SessionSocketHolder.removeUserSession((NioSocketChannel) ctx.channel());
             /** TODO 去推送服务删除掉推送信息 */
-        } else if (command == MessageCommand.TEST.getCommand()) {
-            /** 测试Data里面是字符串 */
-            String toId = msg.getMessagePack().getToId();
-            List<NioSocketChannel> nioSocketChannels = SessionSocketHolder.get(msg.getMessagePack().getAppId(), toId);
-            if (nioSocketChannels.isEmpty()) {
-                Message sendPack = new Message();
-                MessagePack body = new MessagePack();
-                body.setUserId("system");
-                body.setToId(msg.getMessagePack().getUserId());
-                body.setData("目标不在线");
-                MessageHeader header = new MessageHeader();
-                header.setCommand(0x44F);
-                sendPack.setMessageHeader(header);
-                sendPack.setMessagePack(body);
-                ctx.channel().writeAndFlush(sendPack);
-            } else {
-
-                Message sendPack = new Message();
-                MessagePack body = new MessagePack();
-                body.setUserId(msg.getMessagePack().getUserId());
-                body.setToId(msg.getMessagePack().getToId());
-                body.setData(msg.getMessagePack().getData().toString());
-
-                MessageHeader header = new MessageHeader();
-                header.setCommand(0x44F);
-                sendPack.setMessageHeader(header);
-                sendPack.setMessagePack(body);
-
-                nioSocketChannels.forEach(c -> {
-                    c.writeAndFlush(sendPack);
-                });
-                ctx.channel().writeAndFlush(sendPack);
-            }
-        } else if (command == SystemCommand.PING.getCommand()) {
+        }
+        else if (command == SystemCommand.PING.getCommand()) {
             //PING
 
         } else if (command == MessageCommand.MSG_P2P.getCommand()) {
             try {
-                MqMessageProducer.sendMessageToMessageService(msg.getMessagePack().getData(),command);
+                MqMessageProducer.sendMessageToMessageService(msg.getMessagePack(),command);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }else if (command == MessageCommand.MSG_READED.getCommand()) {
             try {
-                MessagePack<MessageReadedPack> pack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()), new TypeReference<MessagePack<MessageReadedPack>>() {
+                MessageReadedPack pack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()), new TypeReference<MessageReadedPack>() {
                 }.getType());
                 MessageReadedContent content = new MessageReadedContent();
-                content.setConversationType(pack.getData().getConversationType());
-                content.setFromId(pack.getData().getFromId());
-                content.setMessageSequence(pack.getData().getMessageSequence());
+                content.setConversationType(pack.getConversationType());
+                content.setFromId(pack.getFromId());
+                content.setMessageSequence(pack.getMessageSequence());
                 content.setToId(pack.getToId());
                 content.setAppId(pack.getAppId());
                 content.setImei(pack.getImei());
@@ -180,7 +156,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         } else {
             //全往mq丢
             try{
-                MqMessageProducer.sendMessageToGroupService(msg.getMessagePack().getData(),command);
+                MqMessageProducer.sendMessageToGroupService(msg.getMessagePack(),command);
             }catch (Exception e){
                 e.printStackTrace();
             }
