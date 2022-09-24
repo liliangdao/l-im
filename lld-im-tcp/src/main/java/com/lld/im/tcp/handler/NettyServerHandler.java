@@ -11,6 +11,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ImConnectStatusEnum;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.enums.command.SystemCommand;
+import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.common.model.UserClientDto;
 import com.lld.im.common.model.UserSession;
 import com.lld.im.common.model.msg.MessageReadedContent;
@@ -27,9 +28,11 @@ import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @description:
@@ -64,7 +67,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
      * 读取数据
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws InterruptedException {
+    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws InterruptedException, IOException, TimeoutException {
 
         int command = msg.getMessageHeader().getCommand();
 
@@ -123,6 +126,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             loginSuccess.setData(loginSuccessPack);
             loginSuccess.setCommand(SystemCommand.LOGIN.getCommand());
             ctx.writeAndFlush(loginSuccess);
+            //发送mq
+
+            MqMessageProducer.sendMessageByCommand(msg.getMessagePack(), UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand());
         } else if (command == SystemCommand.LOGOUT.getCommand()) {
             /** 登出事件 **/
             SessionSocketHolder.removeUserSession((NioSocketChannel) ctx.channel());
