@@ -13,6 +13,7 @@ import com.lld.im.service.message.mq.ChatOperateReceiver;
 import com.lld.im.service.message.service.MessageSyncService;
 import com.lld.im.service.message.service.P2PMessageService;
 import com.lld.im.service.user.model.UserOnlineStatusChangeContent;
+import com.lld.im.service.user.model.UserOnlineStatusSubscribeContent;
 import com.lld.im.service.user.service.UserStatusService;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
@@ -70,10 +71,16 @@ public class UserOnlineStatusReceiver {
             if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand())) {
                 UserOnlineStatusChangeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusChangeContent>() {
                 }.getType());
-
+                userStatusServicel.processUserLoginNotify(content);
             }
             //用户在线状态订阅，一般是临时订阅
             else if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_SUBSCRIBE.getCommand())) {
+                UserOnlineStatusSubscribeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusSubscribeContent>() {
+                }.getType());
+                userStatusServicel.processUserSubscribeNotify(content);
+
+            }//拉取在线状态信息
+            else if (Objects.equals(command, UserEventCommand.PULL_USER_ONLINE_STATUS.getCommand())) {
                 UserOnlineStatusChangeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusChangeContent>() {
                 }.getType());
 

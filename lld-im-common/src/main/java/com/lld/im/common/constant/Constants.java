@@ -50,6 +50,11 @@ public class Constants {
          */
         public static final String cacheMessage = "cacheMessage";
 
+        /**
+         * 用户订阅列表，格式 ：appId + :subscribe: + userId。Hash结构，filed为订阅自己的人
+         */
+        public static final String subscribe = "subscribe";
+
     }
 
     public static class SeqConstants{
@@ -79,6 +84,8 @@ public class Constants {
         public static final String Im2MessageService = "pipeline2MessageService";
 
         public static final String Im2GroupService = "pipeline2GroupService";
+
+        public static final String Im2FriendshipService = "pipeline2FriendshipService";
 
         public static final String MessageService2Im = "messageService2Pipeline";
 

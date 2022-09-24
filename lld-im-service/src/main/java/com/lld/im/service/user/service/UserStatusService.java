@@ -1,9 +1,13 @@
 package com.lld.im.service.user.service;
 
+import com.lld.im.common.constant.Constants;
 import com.lld.im.service.user.model.UserOnlineStatusChangeContent;
+import com.lld.im.service.user.model.UserOnlineStatusSubscribeContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 /**
  * @description:
@@ -24,8 +28,29 @@ public class UserStatusService {
      * @author lld 
      * @since 2022/9/24
      */
-    private void processUserLoginNotify(UserOnlineStatusChangeContent content){
-        
+    public void processUserLoginNotify(UserOnlineStatusChangeContent content){
+
+        String userKey = content.getAppId()
+                + ":" + Constants.RedisConstants.subscribe +":" +content.getUserId();
+        Set<Object> keys = stringRedisTemplate.opsForHash().keys(userKey);
+
+    }
+
+    /**
+     * @description: 处理用户订阅某个用户
+     * @param
+     * @return void
+     * @author lld
+     * @since 2022/9/24
+     */
+    public void processUserSubscribeNotify(UserOnlineStatusSubscribeContent content){
+        String userKey = content.getAppId()
+                + ":" + Constants.RedisConstants.subscribe +":" +content.getBeSubUserId();
+        Long subExpireTime = 0L;
+        if(content != null && content.getSubTime() > 0){
+            subExpireTime = System.currentTimeMillis() + content.getSubTime();
+        }
+        stringRedisTemplate.opsForHash().put(userKey,content.getUserId(),subExpireTime.toString());
     }
 
 }

@@ -19,7 +19,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List out) throws Exception {
 
         /** 如果可读的数据小于8表示没有数据*/
-        if (in.readableBytes() < 24) {
+        if (in.readableBytes() < 20) {
             return;
         }
 

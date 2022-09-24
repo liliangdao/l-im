@@ -11,7 +11,7 @@ public enum SystemCommand implements Command {
     //下线通知 用于多端互斥  9002
     MUTUALLOGIN(9002),
 
-    //登出  1001
+    //登出  9001
     LOGOUT(9001),
     ;
 

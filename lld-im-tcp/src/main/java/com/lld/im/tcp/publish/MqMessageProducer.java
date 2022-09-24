@@ -26,7 +26,7 @@ public class MqMessageProducer {
     public static void sendMessageToMessageService(Object msgBody) throws IOException, TimeoutException {
         Channel channel = null;
         try {
-            channel = MqFactoryUtils.getChannel(Constants.RabbitConstants.MessageService2Im);
+            channel = MqFactoryUtils.getChannel(Constants.RabbitConstants.Im2MessageService);
             //四个参数
             //exchange 交换机，暂时用不到，在后面进行发布订阅时才会用到
             //队列名称
@@ -106,6 +106,48 @@ public class MqMessageProducer {
 
             String data = o.toJSONString();
             channel.basicPublish(Constants.RabbitConstants.Im2GroupService
+                    , "", null, data.getBytes());
+            System.out.println("===发送成功===" + data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+//            if (channel != null) {
+//                channel.close();
+//                channel.close();
+//            }
+
+        }
+
+    }
+
+    public static void sendMessageByCommand(Object msgBody,Integer command) throws IOException, TimeoutException {
+        Channel channel = null;
+        try {
+
+            String com = command.toString();
+            String channelName = "";
+            if(com.startsWith("1")){
+                channelName = Constants.RabbitConstants.Im2MessageService;
+            }else if(com.startsWith("2")){
+                channelName = Constants.RabbitConstants.Im2GroupService;
+            }else if(com.startsWith("3")){
+                channelName = Constants.RabbitConstants.Im2FriendshipService;
+            }else if(com.startsWith("4")){
+                channelName = Constants.RabbitConstants.Im2UserService;
+            }
+
+            channel = MqFactoryUtils.getChannel(channelName);
+            //四个参数
+            //exchange 交换机，暂时用不到，在后面进行发布订阅时才会用到
+            //队列名称
+            //额外的设置属性
+            //最后一个参数是要传递的消息字节数组
+
+            JSONObject o = (JSONObject)JSONObject.toJSON(msgBody);
+            o.put("command",command);
+
+            String data = o.toJSONString();
+            channel.basicPublish(channelName
                     , "", null, data.getBytes());
             System.out.println("===发送成功===" + data);
         } catch (Exception e) {

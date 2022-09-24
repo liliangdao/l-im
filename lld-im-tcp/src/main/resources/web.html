@@ -532,6 +532,14 @@
         if (socket.readyState == WebSocket.OPEN) {
             // debugger;
             //var command = 1103;
+
+
+            // var command = 9000;
+            var version = 1;
+            var clientType = 1;
+            var messageType = 0x0;
+
+            var userId = userId;
 			
 			if(command == null || command == ''){
 				command = 1103;
@@ -576,14 +584,14 @@
             }else{
 				messageData = JSON.parse(msg)
 			}
-            data.data = messageData;
+            // data.data = messageData;
 
-            var jsonData = JSON.stringify(data);
+            var jsonData = JSON.stringify(messageData);
             console.log(jsonData)
             var bodyLen = getLen(jsonData);
-            // var bodyLen = jsonData.length;
             let sendMsg = new ByteBuffer();
-            sendMsg.int32(bodyLen).int32(command).vstring(jsonData, bodyLen);
+            sendMsg.int32(command).int32(version)
+                .int32(clientType).int32(messageType).int32(bodyLen).vstring(jsonData, bodyLen);
             console.log(sendMsg.pack());
             socket.send(sendMsg.pack());
         } else {

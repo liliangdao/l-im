@@ -18,7 +18,14 @@ public class UserOnlineStatusSubscribeContent {
     //被订阅的id
     private String beSubUserId;
 
-    //订阅时间 单位毫秒
+    //订阅时间 单位毫秒 0表示持久订阅
     private Long subTime;
+
+//    {
+//        "appId":"",
+//        "userId":"",
+//        "beSubUserId":"",
+//        "subTime":""
+//    }
 
 }

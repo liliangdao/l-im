@@ -19,6 +19,8 @@ public class UserOnlineStatusChangeContent {
 
     private String status;
 
+    private Integer clientType;
+
     //客户端状态由业务传递
     private int customStatus;
     //客户端状态字符串
