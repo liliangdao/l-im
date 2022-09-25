@@ -68,8 +68,8 @@ public class UserOnlineStatusReceiver {
             JSONObject jsonObject = JSON.parseObject(msg);
             Integer command = jsonObject.getInteger("command");
 
-            //1.在线状态变更通知 上线由客户端发起。下线由服务端发起。
-            if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand())) {
+            //1.用户上下线通知，由管道服务发起
+            if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand())) {
                 UserStatusChangeNotifyPack content = JSON.parseObject(msg, new TypeReference<UserStatusChangeNotifyPack>() {
                 }.getType());
                 userStatusServicel.processUserLoginNotify(content);

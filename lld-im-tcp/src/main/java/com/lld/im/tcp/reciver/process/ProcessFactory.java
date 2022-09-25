@@ -16,7 +16,7 @@ public class ProcessFactory {
     }
 
     public static MessageProcess getMessageProcess(Integer command){
-        if(command.toString().startsWith("2")){
+        if(command.toString().startsWith("4")){
             //2开头表示是用户消息
             return userEventMessageProcess;
         }

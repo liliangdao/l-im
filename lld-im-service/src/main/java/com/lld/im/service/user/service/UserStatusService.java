@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -62,9 +63,10 @@ public class UserStatusService {
         List<UserSession> userSession = userSessionUtils.getUserSession(pack.getUserId(), pack.getAppId());
         pack.setClient(userSession);
 
-        ResponseVO<List<String>> allFriendId = imFriendShipService.getAllFriendId(pack.getUserId(), pack.getAppId());
+        ResponseVO allFriendId = imFriendShipService.getAllFriendId(pack.getUserId(), pack.getAppId());
         if (allFriendId.isOk()) {
-            List<String> data = allFriendId.getData();
+            LinkedHashSet<String> data = (LinkedHashSet) allFriendId.getData();
+//            data = String []
             for (String fid :
                     data) {
                 messageProducer.sendToUser(fid, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,
@@ -75,7 +77,7 @@ public class UserStatusService {
         for (Object key :
                 keys) {
             String filed = (String) key;
-            Long expire = (Long) stringRedisTemplate.opsForHash().get(userKey, filed);
+            Long expire = Long.valueOf((String) stringRedisTemplate.opsForHash().get(userKey, filed));
             if (expire > 0 && expire > System.currentTimeMillis()) {
                 messageProducer.sendToUser(filed, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,
                         pack,pack.getAppId());
@@ -83,8 +85,6 @@ public class UserStatusService {
                 stringRedisTemplate.opsForHash().delete(userKey, filed);
             }
         }
-
-        logger.info(JSONObject.toJSONString(keys));
     }
 
     /**

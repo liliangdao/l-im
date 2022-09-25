@@ -33,5 +33,5 @@ public interface ImFriendShipService {
 
     ResponseVO checkBlck(CheckFriendShipReq req);
 
-    public ResponseVO<List<String>> getAllFriendId(String userId,Integer appId);
+    public ResponseVO<String []> getAllFriendId(String userId,Integer appId);
 }

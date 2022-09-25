@@ -531,7 +531,7 @@ public class ImFriendShipServiceImpl extends
      * @since 2022/9/25
      */
     @Override
-    public ResponseVO<List<String>> getAllFriendId(String userId, Integer appId) {
+    public ResponseVO<String []> getAllFriendId(String userId, Integer appId) {
 
         String redisKey = appId + ":" + Constants.RedisConstants.friendList + ":" + userId;
         if (stringRedisTemplate.hasKey(redisKey)) {
@@ -540,7 +540,7 @@ public class ImFriendShipServiceImpl extends
         }
 
         List<String> allFriendId = imFriendShipMapper.getAllFriendId(userId, appId);
-        String[] objects = (String[]) allFriendId.toArray();
+        String[] objects = allFriendId.toArray(new String[allFriendId.size()]);
         stringRedisTemplate.opsForSet()
                 .add(redisKey, objects);
         stringRedisTemplate.expire(redisKey,
@@ -553,7 +553,7 @@ public class ImFriendShipServiceImpl extends
             return null;
         });
 
-        return ResponseVO.successResponse(allFriendId);
+        return ResponseVO.successResponse(objects);
     }
 
     //上锁

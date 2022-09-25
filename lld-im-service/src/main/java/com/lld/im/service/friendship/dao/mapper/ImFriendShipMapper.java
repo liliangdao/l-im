@@ -117,7 +117,7 @@ public interface ImFriendShipMapper extends MppBaseMapper<ImFriendShipEntity> {
     List<CheckFriendShipResp> checkFriendShipBlackBoth(CheckFriendShipReq toId);
 
     @Select(
-            " select * from im_friendship where from_id = #{userId} AND app_id = #{appId} and status = 1 and black = 1 "
+            " select to_id from im_friendship where from_id = #{userId} AND app_id = #{appId} and status = 1 and black = 1 "
     )
     List<String> getAllFriendId(String userId,Integer appId);
 
