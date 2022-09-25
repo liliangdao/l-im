@@ -3,6 +3,7 @@ package com.lld.im.service.user.mq;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.enums.command.UserEventCommand;
@@ -69,7 +70,7 @@ public class UserOnlineStatusReceiver {
 
             //1.在线状态变更通知 上线由客户端发起。下线由服务端发起。
             if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand())) {
-                UserOnlineStatusChangeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusChangeContent>() {
+                UserStatusChangeNotifyPack content = JSON.parseObject(msg, new TypeReference<UserStatusChangeNotifyPack>() {
                 }.getType());
                 userStatusServicel.processUserLoginNotify(content);
             }

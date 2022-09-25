@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.lld.im.codec.pack.MessageReadedPack;
+import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
 import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.pack.LoginPack;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ImConnectStatusEnum;
+import com.lld.im.common.enums.UserPipelineConnectState;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.enums.command.SystemCommand;
 import com.lld.im.common.enums.command.UserEventCommand;
@@ -31,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -128,7 +132,24 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             ctx.writeAndFlush(loginSuccess);
             //发送mq
 
-            MqMessageProducer.sendMessageByCommand(msg.getMessagePack(), UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand());
+            MqMessageProducer.sendMessageByCommand(msg.getMessagePack(), UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+            UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
+            Collection<Object> values = map.values();
+            List<UserSession> userSessions = new ArrayList<>();
+            for (Object value : values) {
+                UserSession userSession = JSONObject.parseObject(value.toString(), UserSession.class);
+                userSessions.add(userSession);
+            }
+            pack.setClient(userSessions);
+            pack.setAppId(loginPack.getAppId());
+            pack.setUserId(loginPack.getUserId());
+            pack.setClientType(loginPack.getClientType());
+            pack.setCustomStatus(loginPack.getCustomStatus());
+            pack.setCustomText(loginPack.getCustomText());
+            pack.setStatus(UserPipelineConnectState.ONLINE.getCommand());
+            //发送在线状态信息
+            MqMessageProducer.sendMessageByCommand(pack,UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+
         } else if (command == SystemCommand.LOGOUT.getCommand()) {
             /** 登出事件 **/
             SessionSocketHolder.removeUserSession((NioSocketChannel) ctx.channel());

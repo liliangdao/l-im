@@ -29,10 +29,6 @@ public class UserStatusChangeNotifyPack {
     //客户端状态字符串
     private String customText;
 
-    private Long offlineTime;
-
-    private Long onlineTime;
-
     private List<UserSession> client;
 
 }

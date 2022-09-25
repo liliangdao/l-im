@@ -53,24 +53,22 @@ public class UserStatusService {
      * @author lld
      * @since 2022/9/24
      */
-    public void processUserLoginNotify(UserOnlineStatusChangeContent content) {
+    public void processUserLoginNotify(UserStatusChangeNotifyPack pack) {
 
-        String userKey = content.getAppId()
-                + ":" + Constants.RedisConstants.subscribe + ":" + content.getUserId();
+        String userKey = pack.getAppId()
+                + ":" + Constants.RedisConstants.subscribe + ":" + pack.getUserId();
         Set<Object> keys = stringRedisTemplate.opsForHash().keys(userKey);
 
-        UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
-        BeanUtils.copyProperties(content,pack);
-        List<UserSession> userSession = userSessionUtils.getUserSession(content.getUserId(), content.getAppId());
+        List<UserSession> userSession = userSessionUtils.getUserSession(pack.getUserId(), pack.getAppId());
         pack.setClient(userSession);
 
-        ResponseVO<List<String>> allFriendId = imFriendShipService.getAllFriendId(content.getUserId(), content.getAppId());
+        ResponseVO<List<String>> allFriendId = imFriendShipService.getAllFriendId(pack.getUserId(), pack.getAppId());
         if (allFriendId.isOk()) {
             List<String> data = allFriendId.getData();
             for (String fid :
                     data) {
                 messageProducer.sendToUser(fid, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,
-                        pack,content.getAppId());
+                        pack,pack.getAppId());
             }
         }
 
@@ -80,7 +78,7 @@ public class UserStatusService {
             Long expire = (Long) stringRedisTemplate.opsForHash().get(userKey, filed);
             if (expire > 0 && expire > System.currentTimeMillis()) {
                 messageProducer.sendToUser(filed, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,
-                        pack,content.getAppId());
+                        pack,pack.getAppId());
             } else {
                 stringRedisTemplate.opsForHash().delete(userKey, filed);
             }
