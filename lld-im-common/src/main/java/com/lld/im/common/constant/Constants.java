@@ -55,6 +55,11 @@ public class Constants {
          */
         public static final String subscribe = "subscribe";
 
+        /**
+         * 用户好友列表，格式 ：appId + :friendList: + userId。set，value为好友用户id
+         */
+        public static final String friendList = "friendList";
+
     }
 
     public static class SeqConstants{

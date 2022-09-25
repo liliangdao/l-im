@@ -13,6 +13,9 @@ public enum UserEventCommand implements Command {
 
     //4003 拉取订阅的在线状态好友,只发送给请求端
     PULL_USER_ONLINE_STATUS(4003),
+
+    //4004 用户在线状态通知报文
+    USER_ONLINE_STATUS_CHANGE_NOTIFY(4004),
     ;
 
     private Integer command;

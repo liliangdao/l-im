@@ -51,4 +51,6 @@ public class UserSession {
 
     private String mqRouteKey;
 
+    private Long lastTime;
+
 }

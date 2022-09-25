@@ -1,17 +1,19 @@
-package com.lld.im.service.user.model;
+package com.lld.im.codec.pack;
 
-import com.lld.im.common.model.ClientInfo;
+import com.lld.im.common.model.UserSession;
 import lombok.Data;
 import sun.dc.pr.PRError;
+
+import java.util.List;
 
 /**
  * @description:
  * @author: lld
- * @createDate: 2022-09-23
+ * @createDate: 2022/9/25
  * @version: 1.0
  */
 @Data
-public class UserOnlineStatusChangeContent {
+public class UserStatusChangeNotifyPack {
 
     private Integer appId;
 
@@ -30,5 +32,7 @@ public class UserOnlineStatusChangeContent {
     private Long offlineTime;
 
     private Long onlineTime;
+
+    private List<UserSession> client;
 
 }

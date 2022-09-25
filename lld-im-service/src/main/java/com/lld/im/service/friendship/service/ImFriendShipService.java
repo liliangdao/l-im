@@ -32,4 +32,6 @@ public interface ImFriendShipService {
     public ResponseVO deleteBlack(DeleteBlackReq req);
 
     ResponseVO checkBlck(CheckFriendShipReq req);
+
+    public ResponseVO<List<String>> getAllFriendId(String userId,Integer appId);
 }
