@@ -9,7 +9,9 @@ import com.lld.im.service.service.ImService;
 import com.lld.im.service.user.model.req.DeleteUserReq;
 import com.lld.im.service.user.model.req.ImportUserReq;
 import com.lld.im.service.user.model.req.LoginReq;
+import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
 import com.lld.im.service.user.service.ImUserService;
+import com.lld.im.service.user.service.UserStatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,9 @@ public class ImUserController {
 
     @Autowired
     RouteHandle routeHandle;
+
+    @Autowired
+    UserStatusService userStatusService;
 
     @RequestMapping("/importUser")
     public ResponseVO importUser(@RequestBody ImportUserReq req,Integer appId){//@Validated
@@ -66,6 +71,18 @@ public class ImUserController {
             return ResponseVO.successResponse(route);
         }
         return login;
+    }
+
+    /**
+     * @description im的登录接口
+     * @author chackylee
+     * @date 2022/5/17 10:23
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+     */
+    @RequestMapping("/queryOnlineStatus")
+    public ResponseVO queryOnlineStatus(@RequestBody @Validated PullUserOnlineStatusReq req){
+        return ResponseVO.successResponse(userStatusService.pullAllUserOnlineStatus(req));
     }
 
 }

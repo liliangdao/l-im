@@ -5,15 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.enums.command.UserEventCommand;
-import com.lld.im.common.model.msg.ChatMessageContent;
-import com.lld.im.common.model.msg.MessageReadedContent;
-import com.lld.im.common.model.msg.MessageReciveAckContent;
 import com.lld.im.service.message.mq.ChatOperateReceiver;
-import com.lld.im.service.message.service.MessageSyncService;
-import com.lld.im.service.message.service.P2PMessageService;
-import com.lld.im.service.user.model.UserOnlineStatusChangeContent;
 import com.lld.im.service.user.model.UserOnlineStatusSubscribeContent;
 import com.lld.im.service.user.service.UserStatusService;
 import com.rabbitmq.client.Channel;
@@ -81,11 +74,12 @@ public class UserOnlineStatusReceiver {
                 userStatusServicel.processUserSubscribeNotify(content);
 
             }//拉取在线状态信息
-            else if (Objects.equals(command, UserEventCommand.PULL_USER_ONLINE_STATUS.getCommand())) {
-                UserOnlineStatusChangeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusChangeContent>() {
-                }.getType());
-
-            }
+//            else if (Objects.equals(command, UserEventCommand.PULL_USER_ONLINE_STATUS.getCommand())) {
+//                PullUserOnlineStatusContent content = JSON.parseObject(msg, new TypeReference<PullUserOnlineStatusContent>() {
+//                }.getType());
+//                List<List<UserSession>> lists = userStatusServicel.pullAllUserOnlineStatus(content);
+//
+//            }
 
             channel.basicAck(deliveryTag,false);
 

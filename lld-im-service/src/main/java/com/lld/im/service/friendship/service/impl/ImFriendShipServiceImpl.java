@@ -273,6 +273,7 @@ public class ImFriendShipServiceImpl extends
         messageProducer.sendToUser(toItem.getToId(), null, null,
                 FriendshipEventCommand.FRIEND_ADD, addToFriendPack, requestBase.getAppId());
 
+        this.modifyFirendListForCache(dto.getToId(),fromId,requestBase.getAppId(),"ADD");
         return ResponseVO.successResponse();
     }
 
@@ -531,20 +532,16 @@ public class ImFriendShipServiceImpl extends
      * @since 2022/9/25
      */
     @Override
-    public ResponseVO<String []> getAllFriendId(String userId, Integer appId) {
+    public List<String> getAllFriendId(String userId, Integer appId) {
 
         String redisKey = appId + ":" + Constants.RedisConstants.friendList + ":" + userId;
         if (stringRedisTemplate.hasKey(redisKey)) {
-            return ResponseVO.successResponse(stringRedisTemplate.opsForSet()
+            return new ArrayList<>(stringRedisTemplate.opsForSet()
                     .members(redisKey));
         }
 
         List<String> allFriendId = imFriendShipMapper.getAllFriendId(userId, appId);
         String[] objects = allFriendId.toArray(new String[allFriendId.size()]);
-        stringRedisTemplate.opsForSet()
-                .add(redisKey, objects);
-        stringRedisTemplate.expire(redisKey,
-                5, TimeUnit.MINUTES);
         stringRedisTemplate.execute((RedisConnection redisConnection) -> {
             stringRedisTemplate.opsForSet()
                     .add(redisKey, objects);
@@ -553,24 +550,25 @@ public class ImFriendShipServiceImpl extends
             return null;
         });
 
-        return ResponseVO.successResponse(objects);
+        return allFriendId;
     }
 
-    //上锁
-    private void modifyFirendListForCache(String friendId,String userId,String appId,String operate){
+    private void modifyFirendListForCache(String friendId, String userId, Integer appId, String operate) {
         String redisKey = appId + ":" + Constants.RedisConstants.friendList + ":" + userId;
 
-        if(!stringRedisTemplate.hasKey(redisKey)){
-            return;
-        }
-        if(operate.equals("ADD")){
-            stringRedisTemplate.opsForSet()
-                    .add(redisKey, friendId);
-        }else if(operate.equals("REMOVE")){
-            stringRedisTemplate.opsForSet()
-                    .remove(redisKey, friendId);
-        }
-
+        stringRedisTemplate.execute((RedisConnection redisConnection) -> {
+            if (!stringRedisTemplate.hasKey(redisKey)) {
+                return null;
+            }
+            if (operate.equals("ADD")) {
+                stringRedisTemplate.opsForSet()
+                        .add(redisKey, friendId);
+            } else if (operate.equals("REMOVE")) {
+                stringRedisTemplate.opsForSet()
+                        .remove(redisKey, friendId);
+            }
+            return null;
+        });
     }
 
     /**
@@ -628,6 +626,7 @@ public class ImFriendShipServiceImpl extends
         if (appConfig.isDeleteFriendCallback()) {
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.DeleteFriend, JSONObject.toJSONString(req));
         }
+
         return ResponseVO.successResponse();
     }
 }

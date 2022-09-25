@@ -1,4 +1,4 @@
-package com.lld.im.service.user.model;
+package com.lld.im.service.user.model.req;
 
 import lombok.Data;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * @version: 1.0
  */
 @Data
-public class PullUserOnlineStatusContent {
+public class PullUserOnlineStatusReq {
 
     private Integer appId;
 

@@ -1,26 +1,21 @@
 package com.lld.im.service.user.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
-import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.common.enums.command.Command;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.common.model.UserSession;
 import com.lld.im.service.friendship.service.ImFriendShipService;
-import com.lld.im.service.message.mq.ChatOperateReceiver;
 import com.lld.im.service.message.service.MessageProducer;
-import com.lld.im.service.user.model.UserOnlineStatusChangeContent;
 import com.lld.im.service.user.model.UserOnlineStatusSubscribeContent;
+import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
 import com.lld.im.service.utils.UserSessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -63,15 +58,11 @@ public class UserStatusService {
         List<UserSession> userSession = userSessionUtils.getUserSession(pack.getUserId(), pack.getAppId());
         pack.setClient(userSession);
 
-        ResponseVO allFriendId = imFriendShipService.getAllFriendId(pack.getUserId(), pack.getAppId());
-        if (allFriendId.isOk()) {
-            LinkedHashSet<String> data = (LinkedHashSet) allFriendId.getData();
-//            data = String []
-            for (String fid :
-                    data) {
-                messageProducer.sendToUser(fid, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,
-                        pack,pack.getAppId());
-            }
+        List<String> allFriendId = imFriendShipService.getAllFriendId(pack.getUserId(), pack.getAppId());
+        for (String fid :
+                allFriendId) {
+            messageProducer.sendToUser(fid, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,
+                    pack, pack.getAppId());
         }
 
         for (Object key :
@@ -80,7 +71,7 @@ public class UserStatusService {
             Long expire = Long.valueOf((String) stringRedisTemplate.opsForHash().get(userKey, filed));
             if (expire > 0 && expire > System.currentTimeMillis()) {
                 messageProducer.sendToUser(filed, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,
-                        pack,pack.getAppId());
+                        pack, pack.getAppId());
             } else {
                 stringRedisTemplate.opsForHash().delete(userKey, filed);
             }
@@ -90,7 +81,7 @@ public class UserStatusService {
     /**
      * @param
      * @return void
-     * @description: 处理用户订阅某个用户
+     * @description: 处理用户订阅某个用户，临时订阅
      * @author lld
      * @since 2022/9/24
      */
@@ -101,7 +92,29 @@ public class UserStatusService {
         if (content != null && content.getSubTime() > 0) {
             subExpireTime = System.currentTimeMillis() + content.getSubTime();
         }
-        stringRedisTemplate.opsForHash().put(userKey, content.getUserId(), subExpireTime.toString());
+
+        for (String beSubUserId:
+                content.getBeSubUserId()) {
+            stringRedisTemplate.opsForHash().put(userKey, beSubUserId, subExpireTime.toString());
+        }
+    }
+
+    /**
+     * @description: 拉取所有订阅的用户在线状态（暂时只拉取所有好友的【持久订阅的】）
+     * @param
+     * @return void
+     * @author lld 
+     * @since 2022-09-25
+     */
+    public List<List<UserSession>> pullAllUserOnlineStatus(PullUserOnlineStatusReq content) {
+
+        List<List<UserSession>> result = new ArrayList<>();
+        content.getUserList().forEach(e ->{
+            List<UserSession> userSession = userSessionUtils.getUserSession(e, content.getAppId());
+            result.add(userSession);
+        });
+        return result;
+
     }
 
 }
