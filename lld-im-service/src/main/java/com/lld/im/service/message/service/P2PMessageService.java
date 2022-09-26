@@ -173,7 +173,7 @@ public class P2PMessageService {
      * @return void
     */
     public void revicerAck(MessageContent content,Boolean serverSend) {
-        logger.info("msg revicerAck,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
+        logger.info("msg revicerAck,msgId = {},msgSeq ={}", content.getMessageId(), content.getMessageSequence());
         ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence());
         ackData.setServerSend(true);
         MessageReciveAckContent messageReciveAckContent = new MessageReciveAckContent();
@@ -193,7 +193,7 @@ public class P2PMessageService {
      * @return void
      */
     public void revicerAck(MessageReciveAckContent content) {
-        logger.info("msg revicerAck,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
+        logger.info("msg revicerAck,msgId = {},msgSeq ={}", content.getMessageId(), content.getMessageSequence());
         messageProducer.sendToUserAppointedClient(content.getToId(), MessageCommand.MSG_RECIVE_ACK, content, content);
     }
 
