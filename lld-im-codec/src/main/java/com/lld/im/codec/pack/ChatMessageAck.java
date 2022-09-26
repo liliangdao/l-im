@@ -13,10 +13,13 @@ import lombok.NoArgsConstructor;
 public class ChatMessageAck {
     private String messageId;
 
-    private long messageSequence;
+    private Long messageSequence;
+
+    //消息接收确认时使用
+    private Boolean serverSend;
 //    private String conversationId;
 
-    public ChatMessageAck(String messageId, long messageSequence,int appId) {
+    public ChatMessageAck(String messageId, long messageSequence) {
         this.messageId = messageId;
         this.messageSequence = messageSequence;
     }

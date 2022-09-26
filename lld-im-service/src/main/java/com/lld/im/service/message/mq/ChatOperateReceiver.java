@@ -80,7 +80,7 @@ public class ChatOperateReceiver {
 //                接收方收到消息ack
                 MessageReciveAckContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReciveAckContent>() {
                 }.getType());
-                messageSyncService.receiveMark(messageContent);
+                p2PMessageService.revicerAck(messageContent);
             }
 
             channel.basicAck(deliveryTag,false);

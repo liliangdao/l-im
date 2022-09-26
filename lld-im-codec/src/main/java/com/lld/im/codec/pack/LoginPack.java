@@ -1,6 +1,5 @@
 package com.lld.im.codec.pack;
 
-import com.sun.xml.internal.rngom.parse.host.Base;
 import lombok.Data;
 
 /**

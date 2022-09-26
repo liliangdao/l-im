@@ -4,6 +4,7 @@ import com.lld.im.codec.pack.ChatMessageAck;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ConversationTypeEnum;
+import com.lld.im.common.enums.command.Command;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.*;
@@ -81,10 +82,21 @@ public class P2PMessageService {
         P2PMessageContent p2pMessage = messageStoreService.getMessageFromMessageIdCache(chatMessageData.getMessageId(),chatMessageData.getAppId());
         if(p2pMessage != null){
             //表示是客户端重发的消息并且服务端已处理完成，可能是没收到ack，直接回包，并分发
+            if(chatMessageData.getMessageSequence() == 0L){
+                chatMessageData.setMessageSequence(p2pMessage.getMessageSequence());
+            }
             threadPoolExecutor.execute(() -> {
                 ack(chatMessageData, ResponseVO.successResponse());
                 //消息分发
-                dispatchMessage(p2pMessage,chatMessageData.getOfflinePushInfo());
+                OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+                BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
+                offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
+                messageStoreService.storeOffLineMessage(offlineMessageContent);
+                List<ClientInfo> clientInfos = dispatchMessage(p2pMessage, chatMessageData.getOfflinePushInfo());
+                if(clientInfos.isEmpty()){
+                    //服务端代替客户端发送消息确认ack给发送方
+                    revicerAck(chatMessageData,true);
+                }
             });
             return;
         }
@@ -123,15 +135,19 @@ public class P2PMessageService {
         syncToSender(p2PMessageContent,chatMessageData,chatMessageData.getOfflinePushInfo());
 
         //消息分发
-        dispatchMessage(p2PMessageContent,chatMessageData.getOfflinePushInfo());
+        List<ClientInfo> clientInfos = dispatchMessage(p2PMessageContent, chatMessageData.getOfflinePushInfo());
 
         //插入离线库redis
         OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
         BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
         offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
         messageStoreService.storeOffLineMessage(offlineMessageContent);
-
         messageStoreService.setMessageFromMessageIdCache(p2PMessageContent);
+
+        if(clientInfos.isEmpty()){
+            //服务端代替客户端发送消息确认ack给发送方
+            revicerAck(chatMessageData,true);
+        }
     }
 
     /**
@@ -144,9 +160,41 @@ public class P2PMessageService {
     private void ack(MessageContent content, ResponseVO result) {
         logger.debug("result = {}",result);
         logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
-        ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence(),content.getAppId());
+        ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence());
         result.setData(ackData);
         messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.MSG_ACK, result, content);
+    }
+
+    /**
+     * @description ack，接收方发送给发送方
+     * @author chackylee
+     * @date 2022/9/26 11:16
+     * @param [content, result, command] 
+     * @return void
+    */
+    public void revicerAck(MessageContent content,Boolean serverSend) {
+        logger.info("msg revicerAck,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
+        ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence());
+        ackData.setServerSend(true);
+        MessageReciveAckContent messageReciveAckContent = new MessageReciveAckContent();
+        messageReciveAckContent.setToId(content.getFromId());
+        messageReciveAckContent.setMessageSequence(content.getMessageSequence());
+        messageReciveAckContent.setMessageKey(content.getMessageKey());
+        messageReciveAckContent.setMessageId(content.getMessageId());
+        messageReciveAckContent.setServerSend(serverSend);
+        messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.MSG_RECIVE_ACK, ackData, content);
+    }
+
+    /**
+     * @description ack，接收方发送给发送方
+     * @author chackylee
+     * @date 2022/9/26 11:16
+     * @param [content, result, command]
+     * @return void
+     */
+    public void revicerAck(MessageReciveAckContent content) {
+        logger.info("msg revicerAck,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
+        messageProducer.sendToUserAppointedClient(content.getToId(), MessageCommand.MSG_RECIVE_ACK, content, content);
     }
 
 
@@ -176,7 +224,7 @@ public class P2PMessageService {
         messageProducer.sendToUserExceptClient(content.getFromId(),MessageCommand.MSG_P2P,content,clientInfo);
     }
 
-    private void dispatchMessage(P2PMessageContent messageContent, OfflinePushInfo offlinePushInfo) {
+    private List<ClientInfo> dispatchMessage(P2PMessageContent messageContent, OfflinePushInfo offlinePushInfo) {
 
         logger.debug("dispatchMessage : {}", messageContent);
         String toId = messageContent.getToId();
@@ -204,6 +252,7 @@ public class P2PMessageService {
 //            Set<SyncTerminalEnum> terminalsNotInSessions = SessionUtil.findTerminalsNotInSessions(successResults,messageContent.getAppId());
 //            syncMessageService.syncPeerToPeerReceiveMsg(messageContent, terminalsNotInSessions);
 //        }
+        return successResults;
     }
 
     private P2PMessageContent extractP2PMessage(MessageContent messageContent){

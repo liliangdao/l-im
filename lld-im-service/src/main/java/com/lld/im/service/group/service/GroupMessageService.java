@@ -122,7 +122,7 @@ public class GroupMessageService {
     private void ack(GroupChatMessageContent content, ResponseVO result) {
         logger.debug("result = {}",result);
         logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
-        ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence(),content.getAppId());
+        ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence());
         result.setData(ackData);
         messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.GROUP_MSG_ACK, result, content);
     }
