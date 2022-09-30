@@ -37,7 +37,7 @@ public enum GroupEventCommand implements Command {
     /**
      * 推送删除群成员通知 2006
      */
-    DELETED_MEMBER_SETTING(2006),
+    DELETED_MEMBER(2006),
 
     /**
      * 推送解散群通知 2007

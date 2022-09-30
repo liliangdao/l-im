@@ -4,11 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lld.im.codec.pack.AddGroupMemberPack;
+import com.lld.im.codec.pack.RemoveGroupMemberPack;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.GroupErrorCode;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
 import com.lld.im.common.enums.GroupTypeEnum;
+import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.exception.ApplicationException;
 import com.lld.im.common.model.SyncReq;
 import com.lld.im.service.group.dao.ImGroupEntity;
@@ -28,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.login.Configuration;
 import java.util.*;
 
 /**
@@ -53,6 +58,9 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
     @Autowired
     GroupMessageProducer groupMessageProducer;
+
+    @Autowired
+    AppConfig appConfig;
 
 
     /**
@@ -235,30 +243,40 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         List<String> successId = new ArrayList<>();
         for (GroupMemberDto memberId:
              req.getMembers()) {
-
-            ResponseVO responseVO = groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), memberId);
+            ResponseVO responseVO = null;
+            try {
+                responseVO = groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), memberId);
+            }catch (Exception e){
+                e.printStackTrace();
+                responseVO = ResponseVO.errorResponse();
+            }
             AddMemberResp addMemberResp = new AddMemberResp();
             addMemberResp.setMemberId(memberId.getMemberId());
             if(responseVO.isOk()){
+                successId.add(memberId.getMemberId());
                 addMemberResp.setResult(0);
             }else if(responseVO.getCode() == GroupErrorCode.USER_IS_JOINED_GROUP.getCode()){
                 addMemberResp.setResult(2);
             }else{
-                successId.add(memberId.getMemberId());
                 addMemberResp.setResult(1);
             }
             resp.add(addMemberResp);
         }
 
-        AddMemberCallback addMemberCallback = new AddMemberCallback();
-        addMemberCallback.setGroupId(req.getGroupId());
-        addMemberCallback.setGroupType(group.getGroupType());
-        addMemberCallback.setMemberId(successId);
-        addMemberCallback.setOperater(req.getOperater());
-        addMemberCallback.setJoinType(1);
-        callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberAdd, JSONObject.toJSONString(addMemberCallback));
-        //TODO tcp通知
-//        groupMessageProducer.producer();
+        AddGroupMemberPack addGroupMemberPack = new AddGroupMemberPack();
+        addGroupMemberPack.setGroupId(req.getGroupId());
+        addGroupMemberPack.setMembers(successId);
+        groupMessageProducer.producer(GroupEventCommand.ADDED_MEMBER.getCommand(),addGroupMemberPack);
+
+        if(appConfig.isAddGroupMemberCallback()){
+            AddMemberCallback addMemberCallback = new AddMemberCallback();
+            addMemberCallback.setGroupId(req.getGroupId());
+            addMemberCallback.setGroupType(group.getGroupType());
+            addMemberCallback.setMemberId(successId);
+            addMemberCallback.setOperater(req.getOperater());
+            callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberAdd, JSONObject.toJSONString(addMemberCallback));
+        }
+
         return ResponseVO.successResponse(resp);
     }
 
@@ -306,7 +324,15 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
 
         ResponseVO responseVO = groupMemberService.removeGroupMember(req.getGroupId(), req.getAppId(), req.getMemberId());
-
+        if(responseVO.isOk()){
+            RemoveGroupMemberPack removeGroupMemberPack = new RemoveGroupMemberPack();
+            removeGroupMemberPack.setGroupId(req.getGroupId());
+            removeGroupMemberPack.setMember(req.getMemberId());
+            groupMessageProducer.producer(GroupEventCommand.DELETED_MEMBER.getCommand(),new Object());
+            if(appConfig.isDeleteGroupMemberCallback()){
+                callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberDelete,JSONObject.toJSONString(req));
+            }
+        }
         return responseVO;
     }
 

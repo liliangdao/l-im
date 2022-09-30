@@ -110,6 +110,8 @@ public class Constants {
 
         public static final String GroupMemberAdd = "group.member.add";
 
+        public static final String GroupMemberDelete = "group.member.delete";
+
         public static final String AddFriend = "friend.add";
 
         public static final String UpdateFriend = "friend.update";

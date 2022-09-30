@@ -15,7 +15,6 @@ import java.util.List;
 public class AddMemberCallback {
     private String groupId;
     private Integer groupType;
-    private Integer joinType;
     private String operater;
     private List<String> memberId;
 }

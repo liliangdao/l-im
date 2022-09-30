@@ -67,6 +67,9 @@ public class AppConfig {
 
     private boolean destroyGroupCallback;//解散群聊之后回调开关
 
+    private boolean deleteGroupMemberCallback;//删除群成员之后回调
+
+    private boolean addGroupMemberCallback;//添加群成员之后回调
 
     private Integer offlineMessageCount;//离线消息存储条数
 
