@@ -169,7 +169,7 @@ public class ImUserServiceImpl implements ImUserService {
     public ResponseVO deleteUser(DeleteUserReq req) {
 
         ImUserDataEntity entity = new ImUserDataEntity();
-        entity.setDelFlag(1);
+        entity.setDelFlag(DelFlagEnum.DELETE.getCode());
 
         List<String> errorId = new ArrayList();
         List<String> successId = new ArrayList();

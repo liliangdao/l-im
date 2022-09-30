@@ -15,8 +15,5 @@ public class GetUserInfoReq extends RequestBase {
 
     private List<String> userIds;
 
-    private List<String> standardField;
-
-    private List<String> customField;
 
 }
