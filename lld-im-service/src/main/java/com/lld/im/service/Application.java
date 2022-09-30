@@ -23,12 +23,3 @@ public class Application {
 }
 
 
-@RestController
-class callback {
-    @RequestMapping("/callback")
-    public void callback(@RequestBody Object o, String command) {
-        System.out.println(command);
-        System.out.println(o.toString());
-    }
-}
-

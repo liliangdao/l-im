@@ -28,9 +28,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author: Chackylee
@@ -76,9 +74,14 @@ public class ImUserServiceImpl implements ImUserService {
 
         List<String> errorId = new ArrayList();
         List<String> successId = new ArrayList();
+        Set<String> processId = new HashSet<>();
 
 
         for (ImUserDataEntity data : req.getUserData()) {
+            if(processId.contains(data.getUserId())){
+                continue;
+            }
+            processId.add(data.getUserId());
             data.setAppId(req.getAppId());
             try {
                 data.setAppId(req.getAppId());
