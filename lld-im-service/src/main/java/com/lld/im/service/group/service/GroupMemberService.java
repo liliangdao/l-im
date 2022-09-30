@@ -16,9 +16,13 @@ import java.util.List;
  */
 public interface GroupMemberService {
 
+    public ResponseVO addMember(AddGroupMemberReq req);
+
+    public ResponseVO removeMember(RemoveGroupMemberReq req);
+
     public ResponseVO addGroupMember(String groupId, Integer appId, GroupMemberDto dto);
 
-    public ResponseVO removeGroupMember(String groupId, Integer appId, GroupMemberDto dto);
+    public ResponseVO removeGroupMember(String groupId, Integer appId, String memberId);
 
     public ResponseVO<GetRoleInGroupResp> getRoleInGroupOne(String groupId, String memberId, Integer appId);
 
@@ -27,8 +31,6 @@ public interface GroupMemberService {
     public ResponseVO<Collection<String>> getMemberJoinedGroup(GetJoinedGroupReq req);
 
     public ResponseVO<Collection<String>> syncMemberJoinedGroup(SyncReq req);
-
-    public ResponseVO addMember(AddMemberReq req);
 
     public ResponseVO<List<GroupMemberDto>> getGroupMember(String groupId,Integer appId);
 

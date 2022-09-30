@@ -47,4 +47,6 @@ public class ImFriendShipEntity {
 //    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String addSource;
 
+    private String extra;
+
 }

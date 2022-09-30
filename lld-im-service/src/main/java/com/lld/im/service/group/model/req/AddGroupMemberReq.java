@@ -13,11 +13,11 @@ import java.util.List;
  * @version: 1.0
  */
 @Data
-public class AddMemberReq extends RequestBase {
+public class AddGroupMemberReq extends RequestBase {
 
     @NotBlank(message = "群id不能为空")
     private String groupId;
 
-    private List<String> memberId;
+    private List<GroupMemberDto> members;
 
 }

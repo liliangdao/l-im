@@ -79,6 +79,7 @@ appConfig:
   addFriendShipBlackCallback: false #添加黑名单之后回调开关
   deleteFriendShipBlackCallback: false #删除黑名单之后回调开关
   createGroupCallback: false # 创建群聊之后回调开关
+  modifyGroupCallback: false # 修改群聊之后回调开关
   offlineMessageCount: 10 #离线消息存储条数
 
 

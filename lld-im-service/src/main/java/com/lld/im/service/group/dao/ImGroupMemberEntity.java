@@ -41,4 +41,6 @@ public class ImGroupMemberEntity {
     private Long leaveTime;
 
     private String joinType;
+
+    private String extra;
 }

@@ -70,10 +70,17 @@ public class GroupController {
     }
 
     @RequestMapping("/addMember")
-    public ResponseVO addMember(@RequestBody @Validated AddMemberReq req, Integer appId, String identifier)  {
+    public ResponseVO addMember(@RequestBody @Validated AddGroupMemberReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
         req.setOperater(identifier);
         return groupMemberService.addMember(req);
+    }
+
+    @RequestMapping("/removeMember")
+    public ResponseVO removeMember(@RequestBody @Validated RemoveGroupMemberReq req, Integer appId, String identifier)  {
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return groupMemberService.removeMember(req);
     }
 
     @RequestMapping("/get")

@@ -25,4 +25,6 @@ public class ImMessageBodyEntity {
 
     private Long createTime;
 
+    private String extra;
+
 }

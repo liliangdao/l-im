@@ -4,10 +4,14 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.lld.im.codec.pack.CreateGroupPack;
+import com.lld.im.codec.pack.DestroyGroupPack;
+import com.lld.im.codec.pack.UpdateGroupInfoPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.*;
+import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.exception.ApplicationException;
 import com.lld.im.common.model.SyncReq;
 import com.lld.im.common.model.SyncResp;
@@ -18,6 +22,7 @@ import com.lld.im.service.group.model.resp.GetGroupResp;
 import com.lld.im.service.group.model.resp.GetJoinedGroupResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
 import com.lld.im.service.group.service.GroupMemberService;
+import com.lld.im.service.group.service.GroupMessageProducer;
 import com.lld.im.service.group.service.GroupService;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.utils.CallbackService;
@@ -58,6 +63,9 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     CallbackService callbackService;
 
+    @Autowired
+    GroupMessageProducer groupMessageProducer;
+
     @Override
     @Transactional
     public ResponseVO createGroup(CreateGroupReq req) {
@@ -97,11 +105,13 @@ public class GroupServiceImpl implements GroupService {
         int insert = imGroupDataMapper.insert(imGroupEntity);
         //插入群成员
 
-        for (GroupMemberDto dto : req.getMember()) {
+        for (GroupMemberDto  dto : req.getMember()) {
             groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), dto);
         }
 
-        //TODO 发送tcp通知
+        CreateGroupPack createGroupPack = new CreateGroupPack();
+        BeanUtils.copyProperties(imGroupEntity,createGroupPack);
+        groupMessageProducer.producer(GroupEventCommand.CREATED_GROUP.getCommand(),createGroupPack);
 
         //回调
         if(appConfig.isCreateGroupCallback()){
@@ -169,8 +179,16 @@ public class GroupServiceImpl implements GroupService {
             throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
         }
 
-        //TODO 发送Tcp通知
-        callbackService.callback(req.getAppId(), Constants.CallbackCommand.UpdateGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
+        UpdateGroupInfoPack pack = new UpdateGroupInfoPack();
+        BeanUtils.copyProperties(req,pack);
+
+        groupMessageProducer.producer(GroupEventCommand.UPDATED_GROUP.getCommand(),
+                pack);
+        if(appConfig.isModifyGroupCallback()){
+            callbackService.callback(req.getAppId(), Constants.CallbackCommand.UpdateGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
+
+        }
+
         return ResponseVO.successResponse();
     }
 
@@ -292,7 +310,13 @@ public class GroupServiceImpl implements GroupService {
             throw new ApplicationException(GroupErrorCode.UPDATE_GROUP_BASE_INFO_ERROR);
         }
 
-        callbackService.callback(req.getAppId(), Constants.CallbackCommand.DestoryGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(objectQueryWrapper)));
+        DestroyGroupPack pack = new DestroyGroupPack();
+        pack.setGroupId(req.getGroupId());
+        groupMessageProducer.producer(GroupEventCommand.DESTROY_GROUP.getCommand(),pack);
+
+        if(appConfig.isDestroyGroupCallback()){
+            callbackService.callback(req.getAppId(), Constants.CallbackCommand.DestoryGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(objectQueryWrapper)));
+        }
         return ResponseVO.successResponse();
     }
 

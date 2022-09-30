@@ -27,6 +27,8 @@ public enum GroupErrorCode implements ApplicationExceptionEnum {
 
     THIS_OPERATE_NEED_OWNER_ROLE(40008,"该操作只允许群主操作"),
 
+    GROUP_OWNER_IS_NOT_REMOVE(40011,"群主无法移除"),
+
     UPDATE_GROUP_BASE_INFO_ERROR(40009,"更新群信息失败"),
 
     THIS_GROUP_IS_MUTE(40010,"该群禁止发言"),

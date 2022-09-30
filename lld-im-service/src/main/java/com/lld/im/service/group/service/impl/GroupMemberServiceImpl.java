@@ -19,7 +19,9 @@ import com.lld.im.service.group.model.req.*;
 import com.lld.im.service.group.model.resp.AddMemberResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
 import com.lld.im.service.group.service.GroupMemberService;
+import com.lld.im.service.group.service.GroupMessageProducer;
 import com.lld.im.service.group.service.GroupService;
+import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.utils.CallbackService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,9 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
     @Autowired
     CallbackService callbackService;
+
+    @Autowired
+    GroupMessageProducer groupMessageProducer;
 
 
     /**
@@ -110,7 +115,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     }
 
     @Override
-    public ResponseVO removeGroupMember(String groupId, Integer appId, GroupMemberDto dto) {
+    public ResponseVO removeGroupMember(String groupId, Integer appId, String memberId) {
         return null;
     }
 
@@ -188,7 +193,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
      * @since 2022/7/16
      */
     @Override
-    public ResponseVO addMember(AddMemberReq req) {
+    public ResponseVO addMember(AddGroupMemberReq req) {
 
         List<AddMemberResp> resp = new ArrayList<>();
 
@@ -228,20 +233,18 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         }
 
         List<String> successId = new ArrayList<>();
-        for (String memberId:
-             req.getMemberId()) {
-            GroupMemberDto groupMemberDto = new GroupMemberDto();
-            groupMemberDto.setMemberId(memberId);
+        for (GroupMemberDto memberId:
+             req.getMembers()) {
 
-            ResponseVO responseVO = groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), groupMemberDto);
+            ResponseVO responseVO = groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), memberId);
             AddMemberResp addMemberResp = new AddMemberResp();
-            addMemberResp.setMemberId(memberId);
+            addMemberResp.setMemberId(memberId.getMemberId());
             if(responseVO.isOk()){
                 addMemberResp.setResult(0);
             }else if(responseVO.getCode() == GroupErrorCode.USER_IS_JOINED_GROUP.getCode()){
                 addMemberResp.setResult(2);
             }else{
-                successId.add(memberId);
+                successId.add(memberId.getMemberId());
                 addMemberResp.setResult(1);
             }
             resp.add(addMemberResp);
@@ -254,11 +257,57 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         addMemberCallback.setOperater(req.getOperater());
         addMemberCallback.setJoinType(1);
         callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberAdd, JSONObject.toJSONString(addMemberCallback));
-
         //TODO tcp通知
-
-
+//        groupMessageProducer.producer();
         return ResponseVO.successResponse(resp);
+    }
+
+    @Override
+    public ResponseVO removeMember(RemoveGroupMemberReq req) {
+
+        List<AddMemberResp> resp = new ArrayList<>();
+        boolean isAdmin = false;
+        ResponseVO<ImGroupEntity> groupResp = groupService.getGroup(req.getGroupId(), req.getAppId());
+        if(!groupResp.isOk()){
+            return groupResp;
+        }
+
+        ImGroupEntity group = groupResp.getData();
+
+        if(!isAdmin){
+            if(GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()){
+                //不是群成员无法拉人入群
+                ResponseVO<GetRoleInGroupResp> role = getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+                if(!role.isOk()){
+                    return role;
+                }
+
+                GetRoleInGroupResp data = role.getData();
+                Integer roleInfo = data.getRole();
+
+                boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode()
+                        || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
+                //公开群必须是管理员才能踢人
+                if(!isManager && GroupTypeEnum.PRIVATE.getCode() == group.getGroupType()){
+                    throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+                }
+
+                ResponseVO<GetRoleInGroupResp> roleInGroupOne = this.getRoleInGroupOne(req.getGroupId(), req.getMemberId(), req.getAppId());
+                if(!roleInGroupOne.isOk()){
+                    return roleInGroupOne;
+                }
+
+                GetRoleInGroupResp memberRole = roleInGroupOne.getData();
+                if(memberRole.getRole() == GroupMemberRoleEnum.OWNER.getCode()){
+                    throw new ApplicationException(GroupErrorCode.GROUP_OWNER_IS_NOT_REMOVE);
+                }
+            }
+        }
+
+
+        ResponseVO responseVO = groupMemberService.removeGroupMember(req.getGroupId(), req.getAppId(), req.getMemberId());
+
+        return responseVO;
     }
 
     @Override

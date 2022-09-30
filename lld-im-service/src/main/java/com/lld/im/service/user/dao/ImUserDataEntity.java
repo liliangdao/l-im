@@ -50,5 +50,6 @@ public class ImUserDataEntity {
 
     private Integer delFlag;
 
+    private String extra;
 
 }
