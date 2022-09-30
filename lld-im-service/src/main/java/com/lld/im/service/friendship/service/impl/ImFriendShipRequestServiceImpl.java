@@ -167,7 +167,6 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         update.setReadStatus(1);
         imFriendShipRequestMapper.update(update, query);
 
-
         ReadAllFriendRequestPack readAllFriendRequestPack = new ReadAllFriendRequestPack();
         readAllFriendRequestPack.setFromId(req.getFromId());
         readAllFriendRequestPack.setAppId(req.getAppId());

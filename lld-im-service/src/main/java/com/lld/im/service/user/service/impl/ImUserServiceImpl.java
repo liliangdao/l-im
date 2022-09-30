@@ -3,11 +3,9 @@ package com.lld.im.service.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.codec.pack.UserModifyPack;
 import com.lld.im.common.ResponseVO;
-import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.service.message.service.MessageProducer;
-import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.dao.mapper.ImUserDataMapper;
 import com.lld.im.common.enums.UserErrorCode;
@@ -19,7 +17,6 @@ import com.lld.im.service.user.model.req.ModifyUserInfoReq;
 import com.lld.im.service.user.model.resp.GetUserInfoResp;
 import com.lld.im.service.user.model.resp.ImportUserResp;
 import com.lld.im.service.user.service.ImUserService;
-import com.lld.im.service.utils.WriteUserSeq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -44,18 +41,7 @@ public class ImUserServiceImpl implements ImUserService {
     ImUserDataMapper imUserDataMapper;
 
     @Autowired
-    WriteUserSeq writeUserSeq;
-
-    @Autowired
     MessageProducer messageProducer;
-
-    @Autowired
-    @Qualifier("snowflakeSeq")
-    Seq seq;
-
-    @Autowired
-    @Qualifier("redisSeq")
-    Seq redisSeq;
 
     /**
      * @description 導入用戶
@@ -230,10 +216,7 @@ public class ImUserServiceImpl implements ImUserService {
 
         update.setAppId(null);
         update.setUserId(null);
-        long seq = this.redisSeq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.User);
-        update.setSequence(seq);
         imUserDataMapper.update(update,query);
-        writeUserSeq.writeUserSeq(req.getAppId(),req.getUserId(),Constants.SeqConstants.User,seq);
 
         UserModifyPack pack = new UserModifyPack();
         update.setAppId(req.getAppId());

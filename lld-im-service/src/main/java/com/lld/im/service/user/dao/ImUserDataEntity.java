@@ -48,9 +48,6 @@ public class ImUserDataEntity {
 
     private Integer appId;
 
-    /** 序列号*/
-    private Long sequence;
-
     private Integer delFlag;
 
 
