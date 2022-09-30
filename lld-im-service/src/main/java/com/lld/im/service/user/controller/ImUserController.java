@@ -74,12 +74,12 @@ public class ImUserController {
     }
 
     /**
-     * @description im的登录接口
+     * @description 查询用户在线状态
      * @author chackylee
-     * @date 2022/5/17 10:23
+     * @date 2022/9/30 15:58
      * @param [req]
      * @return com.lld.im.common.ResponseVO
-     */
+    */
     @RequestMapping("/queryOnlineStatus")
     public ResponseVO queryOnlineStatus(@RequestBody @Validated PullUserOnlineStatusReq req){
         return ResponseVO.successResponse(userStatusService.pullAllUserOnlineStatus(req));

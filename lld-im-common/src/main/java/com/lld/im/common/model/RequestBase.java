@@ -9,7 +9,6 @@ import lombok.Data;
  **/
 @Data
 public class RequestBase {
-
     private Integer appId;
 
     private Integer clientType;
@@ -17,5 +16,4 @@ public class RequestBase {
     private String operater;
 
     private String imel;
-
 }
