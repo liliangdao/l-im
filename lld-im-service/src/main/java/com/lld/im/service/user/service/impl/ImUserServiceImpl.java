@@ -60,14 +60,13 @@ public class ImUserServiceImpl implements ImUserService {
 
         List<String> errorId = new ArrayList();
         List<String> successId = new ArrayList();
-        Set<String> processId = new HashSet<>();
-
+        Set<String> processedId = new HashSet<>();
 
         for (ImUserDataEntity data : req.getUserData()) {
-            if(processId.contains(data.getUserId())){
+            if(processedId.contains(data.getUserId())){
                 continue;
             }
-            processId.add(data.getUserId());
+            processedId.add(data.getUserId());
             data.setAppId(req.getAppId());
             try {
                 data.setAppId(req.getAppId());

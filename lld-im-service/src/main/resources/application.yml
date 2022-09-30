@@ -7,11 +7,11 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: 123456
-    url: jdbc:mysql://139.198.177.234:3306/im-core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
-    username: faka
+    url: jdbc:mysql://43.139.108.123:3306/im-core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
+    username: root
 
   redis:
-    host: localhost
+    host: 43.139.108.123
     port: 6379
     jedis:
       pool:
@@ -19,10 +19,11 @@ spring:
         max-idle: 100
         max-wait: 1000
         min-idle: 10
+    password: 123456
   rabbitmq:
-    host: localhost
+    host: 43.139.108.123
     port: 5672
-    addresses: localhost
+    addresses: 43.139.108.123
     username: guest
     password: guest
 #    virtual-host:
