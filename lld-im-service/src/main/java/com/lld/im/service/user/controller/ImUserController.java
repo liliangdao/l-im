@@ -50,7 +50,8 @@ public class ImUserController {
     }
 
     @RequestMapping("/deleteUser")
-    public ResponseVO deleteUser(@RequestBody DeleteUserReq req){//@Validated
+    public ResponseVO deleteUser(@RequestBody DeleteUserReq req,Integer appId){//@Validated
+        req.setAppId(appId);
         return imUserService.deleteUser(req);
     }
 

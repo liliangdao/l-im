@@ -99,6 +99,8 @@ public class ImUserServiceImpl implements ImUserService {
         QueryWrapper<ImUserDataEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("app_id",req.getAppId());
         queryWrapper.in("user_id",req.getUserIds());
+        queryWrapper.eq("del_flag",DelFlagEnum.NORMAL.getCode());
+
 
         List<ImUserDataEntity> userDataEntities = imUserDataMapper.selectList(queryWrapper);
         HashMap<String, ImUserDataEntity> map = new HashMap<>();
@@ -179,6 +181,7 @@ public class ImUserServiceImpl implements ImUserService {
             QueryWrapper wrapper = new QueryWrapper();
             wrapper.eq("app_id",req.getAppId());
             wrapper.eq("user_id",userId);
+            wrapper.eq("del_flag",DelFlagEnum.NORMAL.getCode());
             int update = 0;
 
             try {
@@ -215,14 +218,18 @@ public class ImUserServiceImpl implements ImUserService {
 
         update.setAppId(null);
         update.setUserId(null);
-        imUserDataMapper.update(update,query);
+        int update1 = imUserDataMapper.update(update, query);
+        if(update1 == 1){
+            UserModifyPack pack = new UserModifyPack();
+            update.setAppId(req.getAppId());
+            update.setUserId(req.getUserId());
+            BeanUtils.copyProperties(update,pack);
+            messageProducer.sendToUser(req.getUserId(),req.getClientType(),req.getImel(), UserEventCommand.USER_MODIFY,
+                    pack,req.getAppId());
+            return ResponseVO.successResponse();
+        }else{
+            throw new ApplicationException(UserErrorCode.MODIFY_USER_ERROR);
+        }
 
-        UserModifyPack pack = new UserModifyPack();
-        update.setAppId(req.getAppId());
-        update.setUserId(req.getUserId());
-        BeanUtils.copyProperties(update,pack);
-        messageProducer.sendToUser(req.getUserId(),req.getClientType(),req.getImel(), UserEventCommand.USER_MODIFY,
-                pack,req.getAppId());
-        return ResponseVO.successResponse();
     }
 }
