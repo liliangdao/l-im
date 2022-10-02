@@ -12,7 +12,6 @@ public class FriendDto {
 
     /** 备注*/
     private String remark;
-
     private String toId;
     /** 好友来源*/
     private String addSource;

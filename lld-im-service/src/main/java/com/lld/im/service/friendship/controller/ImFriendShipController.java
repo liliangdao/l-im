@@ -22,6 +22,12 @@ public class ImFriendShipController {
     @Autowired
     ImFriendShipService imFriendShipService;
 
+    @RequestMapping("/importFriendShip")
+    public ResponseVO importFriendShip(@RequestBody @Validated ImportFriendShipReq req,Integer appId)  {
+        req.setAppId(appId);
+        return imFriendShipService.importFriendShip(req);
+    }
+
     @RequestMapping("/addFriend")
     public ResponseVO addFriend(@RequestBody @Validated AddFriendShipReq req,Integer appId)  {
         req.setAppId(appId);

@@ -26,6 +26,7 @@ import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.*;
 import com.lld.im.service.friendship.model.resp.AddFriendShipResp;
 import com.lld.im.service.friendship.model.resp.CheckFriendShipResp;
+import com.lld.im.service.friendship.model.resp.ImportFriendShipResp;
 import com.lld.im.service.friendship.model.resp.UpdateFriendshipResp;
 import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.user.dao.ImUserDataEntity;
@@ -93,6 +94,51 @@ public class ImFriendShipServiceImpl extends
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * @description: 导入好友
+     * @param
+     * @return com.lld.im.common.ResponseVO
+     * @author lld 
+     * @since 2022-10-02
+     */
+    @Override
+    public ResponseVO importFriendShip(ImportFriendShipReq req) {
+
+        if(req.getFriendItem().size() > 100){
+            return ResponseVO.errorResponse(FriendShipErrorCode
+                    .FRIEND_SHIP_IMPORT_SIZE_TO_LONG);
+        }
+        ImportFriendShipResp importFriendShipResp = new ImportFriendShipResp();
+        List<String> errorId = new ArrayList<>();
+        List<String> successId = new ArrayList<>();
+
+        for (ImportFriendShipReq.ImportFriendDto dto : req.getFriendItem()) {
+            if(StringUtils.isBlank(dto.getToId())){
+                errorId.add(dto.getToId());
+                continue;
+            }
+            ImFriendShipEntity entity = new ImFriendShipEntity();
+            entity.setFromId(req.getFromId());
+            BeanUtils.copyProperties(dto,entity);
+            entity.setAppId(req.getAppId());
+            try {
+                int insert = imFriendShipMapper.insert(entity);
+                if(insert == 1){
+                    successId.add(dto.getToId());
+                }else{
+                    errorId.add(dto.getToId());
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                errorId.add(dto.getToId());
+            }
+        }
+
+        importFriendShipResp.setSuccessId(successId);
+        importFriendShipResp.setErrorId(errorId);
+        return ResponseVO.successResponse(importFriendShipResp);
+    }
 
     /**
      * @param [req]

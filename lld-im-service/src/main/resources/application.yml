@@ -24,8 +24,8 @@ spring:
     host: 43.139.108.123
     port: 5672
     addresses: 43.139.108.123
-    username: guest
-    password: guest
+    username: admin
+    password: 123456
 #    virtual-host:
     listener:
       simple:
@@ -57,8 +57,8 @@ server:
 appConfig:
   appId: 10000
   privateKey: 123456
-  zkAddr: 127.0.0.1:2181 # zk连接地址
-  zkConnectTimeOut: 5000 #zk超时时间
+  zkAddr: 43.139.108.123:2181 # zk连接地址
+  zkConnectTimeOut: 50000 #zk超时时间
   imRouteWay: 1 # 路由策略1轮训 2随机 3hash
   consistentHashWay: 1 # 如果选用一致性hash的话具体hash算法 1 TreeMap 2 自定义Map
   tcpPort: 9000 # tcp端口
