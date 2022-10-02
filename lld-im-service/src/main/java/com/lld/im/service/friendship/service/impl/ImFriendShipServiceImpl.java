@@ -155,7 +155,7 @@ public class ImFriendShipServiceImpl extends
         ResponseVO fromInfo = imUserService.getSingleUserInfo(req.getFromId(), req.getAppId());
         if (fromInfo.getCode() != BaseErrorCode.SUCCESS.getCode()) {
             return ResponseVO.errorResponse(fromInfo.getCode(), fromInfo.getMsg());
-        }
+    }
 
         for (FriendDto dto : req.getAddItems()) {
             AddFriendShipResp resp = new AddFriendShipResp();
