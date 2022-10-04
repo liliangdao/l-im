@@ -101,12 +101,12 @@ public interface ImFriendShipMapper extends MppBaseMapper<ImFriendShipEntity> {
             " end \n" +
             " ) \n " +
             " as status from "+
-            " (select from_id AS fromId , to_id AS toId , if(black = 1,1,0) as status from im_friendship where app_id = #{appId} and from_id = #{fromId} AND to_id in " +
+            " (select from_id AS fromId , to_id AS toId , if(black = 1,1,0) as black from im_friendship where app_id = #{appId} and from_id = #{fromId} AND to_id in " +
             "<foreach collection='toIds' index='index' item='id' separator=',' close=')' open='('>" +
             " #{id} " +
             "</foreach>" +
             " ) as a INNER join" +
-            " (select from_id AS fromId, to_id AS toId , if(black = 1,1,0) as status from im_friendship where app_id = #{appId} and to_id = #{fromId} AND from_id in " +
+            " (select from_id AS fromId, to_id AS toId , if(black = 1,1,0) as black from im_friendship where app_id = #{appId} and to_id = #{fromId} AND from_id in " +
             "<foreach collection='toIds' index='index' item='id' separator=',' close=')' open='('>" +
             " #{id} " +
             "</foreach>" +
