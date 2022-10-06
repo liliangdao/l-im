@@ -21,6 +21,8 @@ import com.lld.im.common.model.msg.MessageReciveAckContent;
 import com.lld.im.common.model.msg.OfflineMessageContent;
 import com.lld.im.common.model.msg.RecallMessageContent;
 import com.lld.im.service.conversation.service.ConversationService;
+import com.lld.im.service.group.service.GroupMemberService;
+import com.lld.im.service.group.service.GroupMessageProducer;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
 import com.lld.im.service.service.seq.Seq;
@@ -70,6 +72,13 @@ public class MessageSyncService {
     @Autowired
             @Qualifier("redisSeq")
     Seq seq;
+
+    @Autowired
+    GroupMessageProducer groupMessageProducer;
+
+    @Autowired
+    GroupMemberService groupMemberService;
+
 
     private static Logger logger = LoggerFactory.getLogger(MessageSyncService.class);
 
@@ -190,31 +199,52 @@ public class MessageSyncService {
         body.setDelFlag(DelFlagEnum.DELETE.getCode());
         imMessageBodyMapper.updateById(body);
 
-        //修改离线库的消息
-        String fromKey = content.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + content.getFromId();
-        String toKey = content.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + content.getToId();
-        OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
-        offlineMessageContent.setDelFlag(DelFlagEnum.DELETE.getCode());
-        BeanUtils.copyProperties(content,offlineMessageContent);
-        offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
-        offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
-        ,content.getFromId(),content.getToId()));
-        offlineMessageContent.setMessageBody(body.getMessageBody());
+        if(content.getConversationType() == ConversationTypeEnum.P2P.getCode()){
+            //修改离线库的消息
+            String fromKey = content.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + content.getFromId();
+            String toKey = content.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + content.getToId();
+            OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+            offlineMessageContent.setDelFlag(DelFlagEnum.DELETE.getCode());
+            BeanUtils.copyProperties(content,offlineMessageContent);
+            offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
+            offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
+                    ,content.getFromId(),content.getToId()));
+            offlineMessageContent.setMessageBody(body.getMessageBody());
 
-        long seq = this.seq.getSeq(content.getAppId() + ":" + Constants.SeqConstants.Message);
-        offlineMessageContent.setMessageSequence(seq);
+            long seq = this.seq.getSeq(content.getAppId() + ":" + Constants.SeqConstants.Message);
+            offlineMessageContent.setMessageSequence(seq);
 
-        redisTemplate.opsForZSet().add(fromKey,JSONObject.toJSONString(offlineMessageContent),seq);
-        offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
-                ,content.getFromId(),content.getFromId()));
-        redisTemplate.opsForZSet().add(toKey,JSONObject.toJSONString(offlineMessageContent),content.getMessageSequence());
+            redisTemplate.opsForZSet().add(fromKey,JSONObject.toJSONString(offlineMessageContent),seq);
+            offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
+                    ,content.getFromId(),content.getFromId()));
+            redisTemplate.opsForZSet().add(toKey,JSONObject.toJSONString(offlineMessageContent),content.getMessageSequence());
 
-        //发送给同步端
-        messageProducer.sendToUserExceptClient(content.getFromId(), MessageCommand.MSG_RECALL_NOTIFY, pack
-                , content);
+            //发送给同步端
+            messageProducer.sendToUserExceptClient(content.getFromId(), MessageCommand.MSG_RECALL_NOTIFY, pack
+                    , content);
+            //发送给接收方
+            messageProducer.sendToUser(content.getToId(), MessageCommand.MSG_RECALL_NOTIFY, pack,content.getAppId());
+        }else{
+            List<String> groupMemberId = groupMemberService.getGroupMemberId(content.getToId(), content.getAppId());
+            long seq = this.seq.getSeq(content.getAppId() + ":" + Constants.SeqConstants.Message);
+            for (String memberId : groupMemberId) {
+                String toKey = content.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + memberId;
+                OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+                offlineMessageContent.setDelFlag(DelFlagEnum.DELETE.getCode());
+                BeanUtils.copyProperties(content,offlineMessageContent);
+                offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
+                offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
+                        ,content.getFromId(),content.getToId()));
+                offlineMessageContent.setMessageBody(body.getMessageBody());
+                offlineMessageContent.setMessageSequence(seq);
+                redisTemplate.opsForZSet().add(toKey,JSONObject.toJSONString(offlineMessageContent),seq);
 
-        //发送给接收方
-        messageProducer.sendToUser(content.getToId(), MessageCommand.MSG_RECALL_NOTIFY, pack,content.getAppId());
+                //TODO groupMessageProducer
+                groupMessageProducer.producer(1,pack);
+            }
+
+        }
+
     }
 
     private void recallAck(RecallMessageNotifyPack recallPack, ResponseVO<Object> success, ClientInfo clientInfo) {

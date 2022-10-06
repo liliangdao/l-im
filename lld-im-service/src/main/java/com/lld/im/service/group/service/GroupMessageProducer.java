@@ -31,8 +31,8 @@ public class GroupMessageProducer {
             //申请入群 推送给管理员跟自己
             groupMemberService.getGroupManager(groupId, appId);
         }
-
-
     }
+
+
 
 }
