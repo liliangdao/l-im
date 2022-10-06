@@ -21,6 +21,8 @@ public class RecallMessageContent extends ClientInfo {
 
     private Long messageSequence;
 
+    private Integer conversationType;
+
 
 //    {
 //        "messageKey":419455774914383872,

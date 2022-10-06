@@ -2,6 +2,8 @@ package com.lld.im.common.model.msg;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author: Chackylee
  * @description:
@@ -11,6 +13,8 @@ import lombok.Data;
 public class OfflineMessageContent {
 
     private String messageKey;
+
+    private List<String> members;
 
     private Integer conversationType;
 

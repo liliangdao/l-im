@@ -34,6 +34,8 @@ public interface GroupMemberService {
 
     public ResponseVO<List<GroupMemberDto>> getGroupMember(String groupId,Integer appId);
 
+    public List<String> getGroupMemberId(String groupId,Integer appId);
+
     public List<GroupMemberDto> getGroupManager(String groupId,Integer appId);
 
 }

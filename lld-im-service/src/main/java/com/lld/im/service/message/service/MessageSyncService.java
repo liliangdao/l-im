@@ -23,11 +23,13 @@ import com.lld.im.common.model.msg.RecallMessageContent;
 import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
+import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.utils.ShareThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.*;
@@ -64,6 +66,10 @@ public class MessageSyncService {
 
     @Autowired
     AppConfig appConfig;
+
+    @Autowired
+            @Qualifier("redisSeq")
+    Seq seq;
 
     private static Logger logger = LoggerFactory.getLogger(MessageSyncService.class);
 
@@ -194,7 +200,11 @@ public class MessageSyncService {
         offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
         ,content.getFromId(),content.getToId()));
         offlineMessageContent.setMessageBody(body.getMessageBody());
-        redisTemplate.opsForZSet().add(fromKey,JSONObject.toJSONString(offlineMessageContent),content.getMessageSequence());
+
+        long seq = this.seq.getSeq(content.getAppId() + ":" + Constants.SeqConstants.Message);
+        offlineMessageContent.setMessageSequence(seq);
+
+        redisTemplate.opsForZSet().add(fromKey,JSONObject.toJSONString(offlineMessageContent),seq);
         offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
                 ,content.getFromId(),content.getFromId()));
         redisTemplate.opsForZSet().add(toKey,JSONObject.toJSONString(offlineMessageContent),content.getMessageSequence());

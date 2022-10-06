@@ -343,6 +343,11 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     }
 
     @Override
+    public List<String> getGroupMemberId(String groupId, Integer appId) {
+        return imGroupMemberMapper.getGroupMemberId(appId,groupId);
+    }
+
+    @Override
     public List<GroupMemberDto> getGroupManager(String groupId, Integer appId) {
         return imGroupMemberMapper.getGroupManager(groupId,appId);
     }

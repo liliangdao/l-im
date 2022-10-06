@@ -134,13 +134,11 @@ public class MessageStoreService {
 
         offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType(),
                 offlineMessageContent.getFromId(),offlineMessageContent.getToId()));
-        offlineMessageContent.setConversationType(offlineMessageContent.getConversationType());
         offlineMessageContent.setMessageKey(offlineMessageContent.getMessageKey());
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
 
         String fromKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + offlineMessageContent.getFromId();
-        String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + offlineMessageContent.getToId();
 
         //给发送方插入离线消息
         Long fromCount = zSetOperations.zCard(fromKey);
@@ -151,7 +149,9 @@ public class MessageStoreService {
 
         zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent),offlineMessageContent.getMessageSequence());
         //给接收方插入离线消息
-        if(offlineMessageContent.getConversationType() != ConversationTypeEnum.GROUP.getCode()){
+        if(offlineMessageContent.getConversationType() == ConversationTypeEnum.P2P.getCode()){
+            String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + offlineMessageContent.getToId();
+
             Long toCount = zSetOperations.zCard(toKey);
 
             if(toCount > appConfig.getOfflineMessageCount()){
@@ -159,6 +159,16 @@ public class MessageStoreService {
             }
             zSetOperations.add(toKey,JSONObject.toJSONString(offlineMessageContent),offlineMessageContent.getMessageSequence());
 
+        }else if(offlineMessageContent.getConversationType() == ConversationTypeEnum.GROUP.getCode()){
+            for (String member : offlineMessageContent.getMembers()) {
+                String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + member;
+                Long toCount = zSetOperations.zCard(toKey);
+                if(toCount > appConfig.getOfflineMessageCount()){
+                    zSetOperations.removeRange(toKey,0,0);
+                }
+                zSetOperations.add(toKey,JSONObject.toJSONString(offlineMessageContent),offlineMessageContent.getMessageSequence());
+
+            }
         }
     }
 

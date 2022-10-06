@@ -46,6 +46,11 @@ public class Constants {
         public static final String offlineMessage = "offlineMessage";
 
         /**
+         * 离线消息，格式： appId + :offlineGroupMessage: + userId
+         */
+        public static final String offlineGroupMessage = "offlineGroupMessage";
+
+        /**
          * 缓存客户端消息防重，格式： appId + :cacheMessage: + messageId
          */
         public static final String cacheMessage = "cacheMessage";

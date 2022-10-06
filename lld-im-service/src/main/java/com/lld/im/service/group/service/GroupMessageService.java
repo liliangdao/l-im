@@ -94,6 +94,9 @@ public class GroupMessageService {
                 //回包
                 ack(chatMessageData,ResponseVO.successResponse());
 
+                List<String> groupMemberId = groupMemberService.getGroupMemberId(toId, chatMessageData.getAppId());
+                chatMessageData.setMembers(groupMemberId);
+
                 GroupMessageContent groupMessageContent = extractGroupMessage(chatMessageData);
                 //插入离线库
                 OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
