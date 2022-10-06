@@ -9,6 +9,7 @@ import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.msg.ChatMessageContent;
 import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.common.model.msg.MessageReciveAckContent;
+import com.lld.im.common.model.msg.RecallMessageContent;
 import com.lld.im.service.message.service.MessageSyncService;
 import com.lld.im.service.message.service.P2PMessageService;
 import com.rabbitmq.client.Channel;
@@ -71,27 +72,32 @@ public class ChatOperateReceiver {
                 ChatMessageContent messageContent = JSON.parseObject(msg, new TypeReference<ChatMessageContent>() {
                 }.getType());
                 p2PMessageService.process(messageContent);
-            }else if(Objects.equals(command, MessageCommand.MSG_READED.getCommand())){
+            } else if (Objects.equals(command, MessageCommand.MSG_READED.getCommand())) {
                 //接收方消息已读 --》更新/插入会话表 已读回执是否发送给发送方？
                 MessageReadedContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReadedContent>() {
                 }.getType());
                 messageSyncService.readMark(messageContent);
-            } else if(Objects.equals(command, MessageCommand.MSG_RECIVE_ACK.getCommand())){
+            } else if (Objects.equals(command, MessageCommand.MSG_RECIVE_ACK.getCommand())) {
 //                接收方收到消息ack
                 MessageReciveAckContent messageContent = JSON.parseObject(msg, new TypeReference<MessageReciveAckContent>() {
                 }.getType());
                 p2PMessageService.revicerAck(messageContent);
+            } else if (Objects.equals(command, MessageCommand.MSG_RECALL.getCommand())) {
+//                撤回消息
+                RecallMessageContent messageContent = JSON.parseObject(msg, new TypeReference<RecallMessageContent>() {
+                }.getType());
+                messageSyncService.recallMessage(messageContent);
             }
 
-            channel.basicAck(deliveryTag,false);
+            channel.basicAck(deliveryTag, false);
 
-        }catch (Exception e){
-            logger.error("处理消息出现异常：{}",e.getMessage());
+        } catch (Exception e) {
+            logger.error("处理消息出现异常：{}", e.getMessage());
             logger.error("RMQ_CHAT_TRAN_ERROR", e);
             logger.error("NACK_MSG:{}", msg);
             //第一个false 表示不批量拒绝，第二个false表示不重回队列
             channel.basicNack(deliveryTag, false, false);
-        }finally {
+        } finally {
             long end = System.currentTimeMillis();
             logger.debug("channel {} basic-Ack ,it costs {} ms,threadName = {},threadId={}", channel, end - start, t.getName(), t.getId());
         }

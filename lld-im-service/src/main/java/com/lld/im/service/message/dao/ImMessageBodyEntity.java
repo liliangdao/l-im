@@ -1,5 +1,6 @@
 package com.lld.im.service.message.dao;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class ImMessageBodyEntity {
 
     private Integer appId;
     /** messageBodyId*/
+    @TableId
     private Long messageKey;
 
     /** messageBody*/
@@ -26,5 +28,7 @@ public class ImMessageBodyEntity {
     private Long createTime;
 
     private String extra;
+
+    private Integer delFlag;
 
 }

@@ -34,4 +34,6 @@ public class OfflineMessageContent {
 
     private Integer appId;
 
+    private Integer delFlag;
+
 }

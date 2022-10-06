@@ -31,8 +31,4 @@ public class ImMessageHistoryEntity {
 
     private Long createTime;
 
-    /** 删除标识*/
-    private Integer delFlag;
-
-
 }

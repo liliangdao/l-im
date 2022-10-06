@@ -169,9 +169,7 @@ public class MessageStoreService {
         ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
         BeanUtils.copyProperties(content, fromHistory);
         fromHistory.setOwnerId(content.getFromId());
-        long fromMessageHistoryId = this.seq.getSeq("");
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
-        fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
         fromHistory.setSequence(content.getMessageSequence());
         fromHistory.setCreateTime(System.currentTimeMillis());
         list.add(fromHistory);
@@ -179,11 +177,8 @@ public class MessageStoreService {
             ImMessageHistoryEntity toHistory = new ImMessageHistoryEntity();
             BeanUtils.copyProperties(content, toHistory);
             toHistory.setOwnerId(content.getToId());
-            long toMessageHistoryId = this.seq.getSeq("");
-//            long seq2 = this.seq.getSeq(content.getAppId() + Constants.SeqConstants.Message);
             toHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
             toHistory.setSequence(content.getMessageSequence());
-            toHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
             toHistory.setCreateTime(System.currentTimeMillis());
             list.add(toHistory);
         }
@@ -197,7 +192,6 @@ public class MessageStoreService {
         fromHistory.setGroupId(content.getGroupId());
 //        long seq = this.seq.getSeq("");
         fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
-        fromHistory.setDelFlag(DelFlagEnum.NORMAL.getCode());
         fromHistory.setSequence(content.getMessageSequence());
         fromHistory.setCreateTime(System.currentTimeMillis());
 
@@ -213,7 +207,8 @@ public class MessageStoreService {
         body.setMessageBody(content.getMessageBody());
         body.setMessageKey(seq.getSeq(""));
         body.setSecurityKey("");
-        body.setMessageTime(content.getMessageTime());
+        body.setMessageTime(System.currentTimeMillis());
+        body.setDelFlag(DelFlagEnum.NORMAL.getCode());
         return body;
     }
 }

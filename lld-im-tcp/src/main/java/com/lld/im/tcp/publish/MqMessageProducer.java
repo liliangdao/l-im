@@ -58,7 +58,7 @@ public class MqMessageProducer {
     public static void sendMessageToMessageService(Object msgBody,Integer command) throws IOException, TimeoutException {
         Channel channel = null;
         try {
-            channel = MqFactoryUtils.getChannel(Constants.RabbitConstants.MessageService2Im);
+            channel = MqFactoryUtils.getChannel(Constants.RabbitConstants.Im2MessageService);
             //四个参数
             //exchange 交换机，暂时用不到，在后面进行发布订阅时才会用到
             //队列名称

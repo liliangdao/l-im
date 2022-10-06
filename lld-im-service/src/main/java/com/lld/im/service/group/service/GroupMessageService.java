@@ -4,6 +4,7 @@ import com.lld.im.codec.pack.ChatMessageAck;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ConversationTypeEnum;
+import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
@@ -98,6 +99,7 @@ public class GroupMessageService {
                 OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
                 offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
                 offlineMessageContent.setToId(chatMessageData.getGroupId());
+                offlineMessageContent.setDelFlag(DelFlagEnum.NORMAL.getCode());
                 BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
                 messageStoreService.storeOffLineMessage(offlineMessageContent);
 

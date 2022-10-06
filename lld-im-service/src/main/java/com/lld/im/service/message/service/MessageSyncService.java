@@ -1,11 +1,17 @@
 package com.lld.im.service.message.service;
 
+import ch.qos.logback.core.net.server.Client;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.pack.MessageReadedAck;
 import com.lld.im.codec.pack.MessageReadedPack;
+import com.lld.im.codec.pack.RecallMessageNotifyPack;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.ConversationTypeEnum;
+import com.lld.im.common.enums.DelFlagEnum;
+import com.lld.im.common.enums.MessageErrorCode;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.SyncReq;
@@ -13,19 +19,25 @@ import com.lld.im.common.model.SyncResp;
 import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.common.model.msg.MessageReciveAckContent;
 import com.lld.im.common.model.msg.OfflineMessageContent;
+import com.lld.im.common.model.msg.RecallMessageContent;
 import com.lld.im.service.conversation.service.ConversationService;
+import com.lld.im.service.message.dao.ImMessageBodyEntity;
+import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
 import com.lld.im.service.utils.ShareThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: Chackylee
@@ -46,6 +58,12 @@ public class MessageSyncService {
 
     @Autowired
     RedisTemplate redisTemplate;
+
+    @Autowired
+    ImMessageBodyMapper imMessageBodyMapper;
+
+    @Autowired
+    AppConfig appConfig;
 
     private static Logger logger = LoggerFactory.getLogger(MessageSyncService.class);
 
@@ -137,6 +155,62 @@ public class MessageSyncService {
         }
 
         return ResponseVO.successResponse(resp);
+    }
+
+    public void recallMessage(RecallMessageContent content){
+
+        Long messageTime = content.getMessageTime();
+        Long now = System.currentTimeMillis();
+
+        RecallMessageNotifyPack pack = new RecallMessageNotifyPack();
+        BeanUtils.copyProperties(content,pack);
+
+        if(appConfig.getMessageRecallTimeOut() > messageTime + now){
+            recallAck(pack,ResponseVO.errorResponse(MessageErrorCode.MESSAGE_RECALL_TIME_OUT),content);
+            return;
+        }
+
+        ImMessageBodyEntity body = imMessageBodyMapper.selectById(content.getMessageKey());
+        if(body == null){
+            recallAck(pack,ResponseVO.errorResponse(MessageErrorCode.MESSAGEBODY_IS_NOT_EXIST),content);
+            return;
+        }
+
+        if(body.getDelFlag() == DelFlagEnum.DELETE.getCode()){
+            recallAck(pack,ResponseVO.errorResponse(MessageErrorCode.MESSAGE_IS_RECALLED),content);
+            return;
+        }
+
+        body.setDelFlag(DelFlagEnum.DELETE.getCode());
+        imMessageBodyMapper.updateById(body);
+
+        //修改离线库的消息
+        String fromKey = content.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + content.getFromId();
+        String toKey = content.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + content.getToId();
+        OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+        offlineMessageContent.setDelFlag(DelFlagEnum.DELETE.getCode());
+        BeanUtils.copyProperties(content,offlineMessageContent);
+        offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
+        offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
+        ,content.getFromId(),content.getToId()));
+        offlineMessageContent.setMessageBody(body.getMessageBody());
+        redisTemplate.opsForZSet().add(fromKey,JSONObject.toJSONString(offlineMessageContent),content.getMessageSequence());
+        offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
+                ,content.getFromId(),content.getFromId()));
+        redisTemplate.opsForZSet().add(toKey,JSONObject.toJSONString(offlineMessageContent),content.getMessageSequence());
+
+        //发送给同步端
+        messageProducer.sendToUserExceptClient(content.getFromId(), MessageCommand.MSG_RECALL_NOTIFY, pack
+                , content);
+
+        //发送给接收方
+        messageProducer.sendToUser(content.getToId(), MessageCommand.MSG_RECALL_NOTIFY, pack,content.getAppId());
+    }
+
+    private void recallAck(RecallMessageNotifyPack recallPack, ResponseVO<Object> success, ClientInfo clientInfo) {
+        ResponseVO<Object> wrappedResp = success;
+        messageProducer.sendToUserAppointedClient(recallPack.getFromId(),
+                MessageCommand.MSG_RECALL_ACK, wrappedResp, clientInfo);
     }
 
 }

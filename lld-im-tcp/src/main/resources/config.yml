@@ -13,19 +13,19 @@ lim:
   #  *                            3 允许手机和电脑单设备 + web 同时在线 踢掉非本client+imel的同端设备
   #  *                            4 允许所有端多设备登录 不踢任何设备
   zkConfig:
-    zkAddr: 127.0.0.1:2181
+    zkAddr: 43.139.108.123:2181
     zkConnectTimeOut: 5000
 
   redis:
     mode: single # 单机模式：single 哨兵模式：sentinel 集群模式：cluster
     database: 0
-    password:
+    password: 123456
     timeout: 3000 # 超时时间
     poolMinIdle: 8 #最小空闲数
     poolConnTimeout: 3000 # 连接超时时间(毫秒)
     poolSize: 10 # 连接池大小
     single: #redis单机配置
-      address: 127.0.0.1:6379
+      address: 43.139.108.123:6379
     cluster: #redis集群模式配置
       scanInterval: 1000
       nodes: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002,127.0.0.1:7003,127.0.0.1:7004,127.0.0.1:7005
@@ -39,8 +39,8 @@ lim:
       nodes: 127.0.0.1:26379,127.0.0.1:26379,127.0.0.1:26379
 
   rabbitmq:
-    host: 127.0.0.1
+    host: 43.139.108.123
     port: 5672
     virtualHost: /
-    userName: guest
-    password: guest
+    userName: admin
+    password: 123456

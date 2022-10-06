@@ -42,6 +42,8 @@ public class AppConfig {
 //  #  *                            4 允许所有端多设备登录 不踢任何设备
     private Integer loginModel;
 
+    private Long messageRecallTimeOut;//#消息可撤回时间 单位毫秒
+
     //群成员的最大人数
     private Integer groupMaxMemberCount;
 
@@ -72,5 +74,7 @@ public class AppConfig {
     private boolean addGroupMemberCallback;//添加群成员之后回调
 
     private Integer offlineMessageCount;//离线消息存储条数
+
+
 
 }
