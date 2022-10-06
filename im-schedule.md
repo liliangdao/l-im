@@ -5,10 +5,10 @@
 | /user/importUser             | 导入用户         |                                          | 100%  |
 | /user/deleteUser             | 删除用户         |                                          | 100%  |
 | /user/login                  | 登录             | 返回服务地址                             | 100%  |
-| /user/data/getUserInfo       | 获取用户         | 获取用户拓展信息，根据字段获取信息未完成 |  50%  |
+| /user/data/getUserInfo       | 获取用户         | 获取用户拓展信息 |  100%  |
 | /user/data/getSingleUserInfo | 获取单个用户     | 获取所有的服务列表                       | 100%  |
 | /user/data/modifyUserInfo    | 修改用户信息     | 发送tcp通知未完成                        |  100%  |
-| /user/qeuryOnlineStatus      | 查询用户在线状态 |                                          |  0%   |
+| /user/qeuryOnlineStatus      | 查询用户在线状态 |                                          |  100%   |
 
 ## 好友
 
@@ -40,7 +40,7 @@
 | /group/getGroupMember     | 获取群成员详细资料     | 分页返回                                         |  0%   |
 | /group/update             | 修改群基础资料         | tcp通知未完成                                    |  90%  |
 | /group/addMember          | 增加群成员             | 发送tcp通知未完成，群的tcp通知要发给所有群成员，添加静默加人                  |  80%  |
-| /group/deleteMember       | 删除群成员             |  群的tcp通知要发给所有群成员                                                |  0%   |
+| /group/deleteMember       | 删除群成员             |  群的tcp通知要发给所有群成员                                                |  100%   |
 | /group/updateMember       | 修改群成员资料         | 修改单个，群的tcp通知要发给所有群成员                                         |  0%   |
 | /group/destroyGroup       | 解散群                 | 需要发送tcp通知未完成                            |  90%  |
 | /group/getJoinedGroup     | 获取用户所加入的群组   | 支持群类型过滤，分页拉取，分页返回小问题日后修复 |  95%  |
@@ -66,7 +66,7 @@
 | /message/sendMessage           | 发送单聊消息 |                                                       |  0%   |
 | /message/getMessage        | 查询历史消息 |                                                       |  0%   |
 | /message/getHistoryMessage | 获取历史消息 |                                                       |  0%   |
-| /message/withdrawMessage   | 撤回单聊消息 |                                                       |  0%   |
+| /message/withdrawMessage   | 撤回单聊消息 |                                                       |  100%   |
 | 单聊消息发送               |              |                                                       |  100%   |
 | 单聊消息已读               |              | 更新会话已读seq，并分发给同步端（视情况分发给接收方） |  100%   |
 | 单聊消息接收确认           |              |                                                       |  0%   |
@@ -75,10 +75,9 @@
 
 | 接口                       | 作用         | 备注                                                  | 进 度 |
 | -------------------------- | ------------ | ----------------------------------------------------- | :---: |
-| /group/sendMsg           | 发送单聊消息 |                                                       |  0%   |
-| /group/withdrawMessage   | 撤回群聊消息 |                                                       |  0%   |
+| /group/sendMsg           | 发送群聊消息 |                                                       |  0%   |
+| /group/withdrawMessage   | 撤回群聊消息 |                                                       |  100%   |
 | 群聊消息发送               |              |                                                       |  100%   |
-| 群聊消息已读               |              | 更新会话已读seq，并分发给同步端（视情况分发给接收方） |  0%   |
 | 群聊消息接收确认           |              |                                                       |  0%   |
 
 ## 综合
@@ -97,7 +96,7 @@
 | 功能                      | 备注                                    | 进 度 |
 | ------------------------- | --------------------------------------- | :---: |
 | friendship/syncFriendShipList      | 增量同步好友 |  100%  |
-| friendship/syncFriendShipRequestList               | 增量同步好友申请                             |  0%  |
+| friendship/syncFriendShipRequestList               | 增量同步好友申请                             |  100%  |
 | friendship/syncBlackList |    增量同步黑名单                                     |  0%   |
 | conversation/syncConversationList |        增量同步会话列表                                 |  100%   |
 | group/syncJoinedGroup | 增量同步加入的群聊                                        |  100%   |
