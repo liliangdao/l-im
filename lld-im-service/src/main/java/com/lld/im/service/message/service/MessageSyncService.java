@@ -240,7 +240,7 @@ public class MessageSyncService {
                 redisTemplate.opsForZSet().add(toKey,JSONObject.toJSONString(offlineMessageContent),seq);
 
                 //TODO groupMessageProducer
-                groupMessageProducer.producer(1,pack);
+//                groupMessageProducer.producer(1,pack);
             }
 
         }
