@@ -37,8 +37,6 @@ public class ImGroupEntity {
 //    2 表示允许无需审批自由加入群组
     private Integer applyJoinType;
 
-    private Integer privateChat; //是否禁止私聊，0 允许群成员发起私聊；1 不允许群成员发起私聊。
-
     private String introduction;//群简介
 
     private String notification;//群公告

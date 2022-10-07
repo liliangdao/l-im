@@ -10,15 +10,18 @@ import lombok.NoArgsConstructor;
  * @create: 2022-07-22 15:52
  **/
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class ClientInfo {
 
     private Integer appId;
 
-    private int clientType;
+    private Integer clientType;
 
     private String imei;
 
-
+    public ClientInfo(Integer appId, Integer clientType, String imei) {
+        this.appId = appId;
+        this.clientType = clientType;
+        this.imei = imei;
+    }
 }

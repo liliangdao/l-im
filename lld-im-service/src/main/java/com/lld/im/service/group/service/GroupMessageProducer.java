@@ -70,7 +70,7 @@ public class GroupMessageProducer {
         }else{
             List<String> groupMemberId = groupMemberService.getGroupMemberId(groupId, clientInfo.getAppId());
             groupMemberId.forEach(e->{
-                if(clientInfo.getClientType() != ClientType.WEBAPI.getCode() && !e.equals(userId)){
+                if(clientInfo.getClientType() != null && clientInfo.getClientType() != ClientType.WEBAPI.getCode() && !e.equals(userId)){
                     messageProducer.sendToUserExceptClient(e,command,data,clientInfo);
                 }else{
                     messageProducer.sendToUser(e,command,data,clientInfo.getAppId());

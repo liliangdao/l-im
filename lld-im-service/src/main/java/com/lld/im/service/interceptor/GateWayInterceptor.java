@@ -1,13 +1,17 @@
 package com.lld.im.service.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
+import com.lld.im.common.BaseErrorCode;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.enums.GateWayErrorCode;
+import com.lld.im.common.exception.ApplicationException;
+import com.lld.im.common.exception.ApplicationExceptionEnum;
 import com.lld.im.common.utils.TLSSigAPI;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -21,14 +25,15 @@ import java.io.PrintWriter;
  * @description: 拦截器网关
  * @create: 2022-09-22 16:27
  **/
-@Service
+@Component
 public class GateWayInterceptor implements HandlerInterceptor {
 
     @Autowired
     AppConfig appConfig;
 
     @Autowired
-    StringRedisTemplate stringRedisTemplate;
+    IdentityCheck identityCheck;
+
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -39,7 +44,7 @@ public class GateWayInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        String operater = request.getParameter("operater");
+        String operater = request.getParameter("identifier");
         if(StringUtils.isBlank(operater)){
             resp(ResponseVO.errorResponse(GateWayErrorCode.OPERATER_NOT_EXIST),response);
             return false;
@@ -51,11 +56,18 @@ public class GateWayInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        TLSSigAPI tlsSigAPI = new TLSSigAPI(appConfig.getAppId(),appConfig.getPrivateKey());
+        ApplicationExceptionEnum result = identityCheck.checkUserSig(operater, appId, userSign);
+        if(result.getCode() != BaseErrorCode.SUCCESS.getCode()){
+            resp(ResponseVO.errorResponse(result),response);
+            return false;
+        }
 
+        return true;
+    }
 
-
-        return false;
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        RequestHolder.remove();
     }
 
     private void resp(ResponseVO vo,HttpServletResponse response) throws Exception {

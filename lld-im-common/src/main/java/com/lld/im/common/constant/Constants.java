@@ -25,6 +25,11 @@ public class Constants {
     public static class RedisConstants{
 
         /**
+         * userSign，格式：appId:userSign:
+         */
+        public static final String userSign = "userSign";
+
+        /**
          * 用户session
          */
         public static final String UserSessionConstants = ":accountSession:";
@@ -33,7 +38,6 @@ public class Constants {
          * 用户上线通知channel
          */
         public static final String UserLoginChannel = "signal/channel/LOGIN_USER_INNER_QUEUE";
-
 
         /**
          * seq前缀

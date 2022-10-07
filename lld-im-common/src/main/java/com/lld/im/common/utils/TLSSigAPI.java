@@ -30,8 +30,8 @@ public class TLSSigAPI {
     }
 
     public static void main(String[] args) {
-        TLSSigAPI asd = new TLSSigAPI(10000, "asd");
-        System.out.println(asd.decodeUserSig(asd.genUserSig("asd",180000)));
+        TLSSigAPI asd = new TLSSigAPI(10000, "123456");
+        System.out.println(asd.genUserSig("lld",180));
     }
 
     /**
@@ -240,7 +240,7 @@ public class TLSSigAPI {
     private String hmacsha256(String identifier, long currTime, long expire, String base64Userbuf) {
         String contentToBeSigned = "TLS.identifier:" + identifier + "\n"
                 + "TLS.appId:" + appId + "\n"
-                + "TLS.time:" + currTime + "\n"
+                + "TLS.expireTime:" + currTime + "\n"
                 + "TLS.expire:" + expire + "\n";
         if (null != base64Userbuf) {
             contentToBeSigned += "TLS.userbuf:" + base64Userbuf + "\n";
@@ -266,7 +266,7 @@ public class TLSSigAPI {
         sigDoc.put("TLS.identifier", userid);
         sigDoc.put("TLS.appId", appId);
         sigDoc.put("TLS.expire", expire);
-        sigDoc.put("TLS.time", currTime);
+        sigDoc.put("TLS.expireTime", currTime);
 
         String base64UserBuf = null;
         if (null != userbuf) {
