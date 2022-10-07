@@ -40,4 +40,9 @@ public interface GroupMemberService {
 
     public List<GroupMemberDto> getGroupManager(String groupId,Integer appId);
 
+    public ResponseVO updateGroupMember(UpdateGroupMemberReq req);
+
+    public ResponseVO transferGroupMember(String owner,String groupId,Integer appId);
+
+
 }

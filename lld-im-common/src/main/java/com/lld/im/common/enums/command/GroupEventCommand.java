@@ -44,6 +44,11 @@ public enum GroupEventCommand implements Command {
      */
     DESTROY_GROUP(2007),
 
+    /**
+     * 推送转让群主 2008，通知所有人
+     */
+    TRANSFER_GROUP(2008),
+
     ;
 
     private Integer command;

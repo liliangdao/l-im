@@ -3,9 +3,11 @@ package com.lld.im.service.group.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.lld.im.codec.pack.CreateGroupPack;
 import com.lld.im.codec.pack.DestroyGroupPack;
+import com.lld.im.codec.pack.TransferGroupPack;
 import com.lld.im.codec.pack.UpdateGroupInfoPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.config.AppConfig;
@@ -360,6 +362,40 @@ public class GroupServiceImpl implements GroupService {
         if (appConfig.isDestroyGroupCallback()) {
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.DestoryGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(objectQueryWrapper)));
         }
+        return ResponseVO.successResponse();
+    }
+
+    @Override
+    @Transactional
+    public ResponseVO transferGroup(TransferGroupReq req) {
+
+        ResponseVO<GetRoleInGroupResp> roleInGroupOne = groupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+        if(!roleInGroupOne.isOk()){
+            return roleInGroupOne;
+        }
+
+        if(roleInGroupOne.getData().getRole() == GroupMemberRoleEnum.OWNER.getCode()){
+            return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
+        }
+
+        ResponseVO<GetRoleInGroupResp> newOwnerRole = groupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOwnerId(), req.getAppId());
+        if(!newOwnerRole.isOk()){
+            return newOwnerRole;
+        }
+
+        ImGroupEntity updateGroup = new ImGroupEntity();
+        updateGroup.setOwnerId(req.getOwnerId());
+        UpdateWrapper<ImGroupEntity> updateGroupWrapper = new UpdateWrapper<>();
+        updateGroupWrapper.eq("app_id",req.getAppId());
+        updateGroupWrapper.eq("group_id",req.getGroupId());
+        imGroupDataMapper.update(updateGroup,updateGroupWrapper);
+        groupMemberService.transferGroupMember(req.getOwnerId(), req.getGroupId(), req.getAppId());
+
+        TransferGroupPack pack = new TransferGroupPack();
+        pack.setGroupId(req.getGroupId());
+        pack.setOwnerId(req.getOwnerId());
+        groupMessageProducer.producer(req.getOperater(),GroupEventCommand.TRANSFER_GROUP,pack,new ClientInfo(req.getAppId(),req.getClientType(),req.getImel()));
+
         return ResponseVO.successResponse();
     }
 

@@ -35,19 +35,19 @@
 | 接口                      | 作用                   | 备注                                             | 进 度 |
 | ------------------------- | ---------------------- | ------------------------------------------------ | :---: |
 | /group/createGroup        | 创建群                 | 发送tcp通知未完成，群的tcp通知要发给所有群成员                                |  100%  |
-| /group/get                | 获取群组资料           | 群资料+群成员信息                                |  0%   |
+| /group/get                | 获取群组资料           | 群资料+群成员信息                                |  100%   |
 | /group/getAll             | 获取所有群组           | 只支持根据群类型过滤                             |  0%   |
 | /group/getGroupMember     | 获取群成员详细资料     | 分页返回                                         |  0%   |
-| /group/update             | 修改群基础资料         | tcp通知未完成                                    |  90%  |
-| /group/addMember          | 增加群成员             | 发送tcp通知未完成，群的tcp通知要发给所有群成员，添加静默加人                  |  80%  |
+| /group/update             | 修改群基础资料         |                                    |  100%  |
+| /group/addMember          | 增加群成员             |                   |  100%  |
 | /group/deleteMember       | 删除群成员             |  群的tcp通知要发给所有群成员                                                |  100%   |
-| /group/updateMember       | 修改群成员资料         | 修改单个，群的tcp通知要发给所有群成员                                         |  0%   |
-| /group/destroyGroup       | 解散群                 | 需要发送tcp通知未完成                            |  90%  |
+| /group/updateMember       | 修改群成员资料         | 修改单个                                         |  100%   |
+| /group/destroyGroup       | 解散群                 | 需要发送tcp通知未完成                            |  100%  |
 | /group/getJoinedGroup     | 获取用户所加入的群组   | 支持群类型过滤，分页拉取，分页返回小问题日后修复 |  95%  |
 | /group/getRoleInGroup     | 查询用户在群组中的身份 | 支持批量拉取                                     |  0%   |
 | /group/forbidSendMsg      | 批量禁言/解禁          | ShutUpTime为0表示解禁言                          |  0%   |
 | /group/getGroupShuttedUin | 获取被禁言群成员列表   | 单个群                                           |  0%   |
-| /group/changeGroupOwner   | 转让群主               | 转让后的群主必须在群内                           |  0%   |
+| /group/transferGroup   | 转让群主               | 转让后的群主必须在群内                           |  100%   |
 | /group/import             | 导入群                 | 不会发tcp通知，不会触发回调                      |  100%   |
 | /group/importMember       | 导入群成员             | 不会触发回调、不会下发通知。                     |  100%   |
 

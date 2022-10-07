@@ -35,6 +35,9 @@ public enum GroupErrorCode implements ApplicationExceptionEnum {
 
     IMPORT_GROUP_ERROR(40011,"导入群组失败"),
 
+    THIS_OPERATE_NEED_ONESELF(40012,"该操作只允许自己操作"),
+
+
     ;
 
     private int code;

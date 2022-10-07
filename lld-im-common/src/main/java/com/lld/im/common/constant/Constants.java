@@ -113,6 +113,8 @@ public class Constants {
 
         public static final String DestoryGroup = "group.destory";
 
+        public static final String TransferGroup = "group.transfer";
+
         public static final String GroupMemberAdd = "group.member.add";
 
         public static final String GroupMemberDelete = "group.member.delete";

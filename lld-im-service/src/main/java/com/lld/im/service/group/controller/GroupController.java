@@ -68,12 +68,18 @@ public class GroupController {
         return groupService.syncJoinedGroupList(req);
     }
 
-
     @RequestMapping("/destroyGroup")
     public ResponseVO destroyGroup(@RequestBody @Validated DestroyGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
         req.setOperater(identifier);
         return groupService.destroyGroup(req);
+    }
+
+    @RequestMapping("/transferGroup")
+    public ResponseVO transferGroup(@RequestBody @Validated TransferGroupReq req, Integer appId, String identifier)  {
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return groupService.transferGroup(req);
     }
 
     @RequestMapping("/importGroupMember")
@@ -95,6 +101,13 @@ public class GroupController {
         req.setAppId(appId);
         req.setOperater(identifier);
         return groupMemberService.removeMember(req);
+    }
+
+    @RequestMapping("/updateGroupMember")
+    public ResponseVO updateGroupMember(@RequestBody @Validated UpdateGroupMemberReq req, Integer appId, String identifier)  {
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return groupMemberService.updateGroupMember(req);
     }
 
     @RequestMapping("/get")

@@ -2,6 +2,7 @@ package com.lld.im.service.group.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lld.im.codec.pack.AddGroupMemberPack;
@@ -28,6 +29,7 @@ import com.lld.im.service.group.service.GroupMessageProducer;
 import com.lld.im.service.group.service.GroupService;
 import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.utils.CallbackService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -389,6 +391,66 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     public List<GroupMemberDto> getGroupManager(String groupId, Integer appId) {
         return imGroupMemberMapper.getGroupManager(groupId,appId);
     }
+
+    @Override
+    public ResponseVO updateGroupMember(UpdateGroupMemberReq req) {
+
+        boolean isadmin = false;
+
+        boolean isMeOperate = req.getOperater().equals(req.getMemberId());
+
+        if(isadmin){
+            //昵称只能自己修改 权限只能群主或管理员修改
+            if(StringUtils.isBlank(req.getAlias()) && isMeOperate){
+                return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_ONESELF);
+            }
+            if(req.getRole() != null && GroupMemberRoleEnum.getItem(req.getRole()) != null){
+                return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+            }
+        }
+
+        ImGroupMemberEntity update = new ImGroupMemberEntity();
+        if(req.getRole() != null && GroupMemberRoleEnum.getItem(req.getRole()) != null ){
+            update.setRole(req.getRole());
+        }
+
+        if(StringUtils.isNotBlank(req.getAlias())){
+            update.setAlias(req.getAlias());
+        }
+
+        UpdateWrapper<ImGroupMemberEntity> objectUpdateWrapper = new UpdateWrapper<>();
+        objectUpdateWrapper.eq("app_id",req.getAppId());
+        objectUpdateWrapper.eq("member_id",req.getMemberId());
+        objectUpdateWrapper.eq("group_id",req.getGroupId());
+        imGroupMemberMapper.update(update, objectUpdateWrapper);
+        return ResponseVO.successResponse();
+    }
+
+    @Override
+    @Transactional
+    public ResponseVO transferGroupMember(String owner, String groupId, Integer appId) {
+
+        //更新旧群主
+        ImGroupMemberEntity imGroupMemberEntity = new ImGroupMemberEntity();
+        imGroupMemberEntity.setRole(GroupMemberRoleEnum.ORDINARY.getCode());
+        UpdateWrapper<ImGroupMemberEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("app_id",appId);
+        updateWrapper.eq("group_id",groupId);
+        updateWrapper.eq("role",GroupMemberRoleEnum.OWNER.getCode());
+        imGroupMemberMapper.update(imGroupMemberEntity,updateWrapper);
+
+        //更新新群主
+        ImGroupMemberEntity newOwner = new ImGroupMemberEntity();
+        newOwner.setRole(GroupMemberRoleEnum.OWNER.getCode());
+        UpdateWrapper<ImGroupMemberEntity> ownerWrapper = new UpdateWrapper<>();
+        ownerWrapper.eq("app_id",appId);
+        ownerWrapper.eq("group_id",groupId);
+        ownerWrapper.eq("member_id",owner);
+        imGroupMemberMapper.update(newOwner,ownerWrapper);
+
+        return ResponseVO.successResponse();
+    }
+
 
 
 }
