@@ -18,8 +18,6 @@ public class UpdateGroupInfoPack {
 
     private Integer joinType;//加入群权限，0 所有人可以加入；1 群成员可以拉人；2 群管理员或群组可以拉人。
 
-    private Integer privateChat; //是否禁止私聊，0 允许群成员发起私聊；1 不允许群成员发起私聊。
-
     private String introduction;//群简介
 
     private String notification;//群公告
