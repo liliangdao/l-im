@@ -16,6 +16,8 @@ import java.util.List;
  */
 public interface GroupMemberService {
 
+    public ResponseVO importGroupMember(ImportGroupMemberReq req);
+
     public ResponseVO addMember(AddGroupMemberReq req);
 
     public ResponseVO removeMember(RemoveGroupMemberReq req);

@@ -42,4 +42,6 @@ public class CreateGroupReq extends RequestBase {
 
     private List<GroupMemberDto> member;
 
+    private String extra;
+
 }

@@ -1,21 +1,30 @@
 package com.lld.im.service.group.model.req;
 
+import com.lld.im.common.model.KeyValuesBase;
 import com.lld.im.common.model.RequestBase;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
- * @author: Chackylee
  * @description:
- * @create: 2022-07-14 10:05
- **/
+ * @author: lld
+ * @createDate: 2022/7/9
+ * @version: 1.0
+ */
 @Data
-public class UpdateGroupReq extends RequestBase {
+public class ImportGroupReq extends RequestBase {
 
-    @NotBlank(message = "群id不能为空")
     private String groupId;
+    //群主id
+    private String ownerId;
 
+    //群类型 1私有群（类似微信） 2公开群(类似qq）
+    private Integer groupType;
+
+    @NotBlank(message = "群名称不能为空")
     private String groupName;
 
     private Integer mute;// 是否全员禁言，0 不禁言；1 全员禁言。
@@ -30,7 +39,7 @@ public class UpdateGroupReq extends RequestBase {
 
     private String photo;//群头像
 
-    private Integer maxMemberCount;//群成员上限
+    private Integer MaxMemberCount;
 
     private String extra;
 

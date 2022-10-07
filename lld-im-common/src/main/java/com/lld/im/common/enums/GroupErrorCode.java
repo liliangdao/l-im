@@ -33,7 +33,7 @@ public enum GroupErrorCode implements ApplicationExceptionEnum {
 
     THIS_GROUP_IS_MUTE(40010,"该群禁止发言"),
 
-//    ADD_FRIEND_REQUEST_ERROR(30003,"好友验证添加失败"),
+    IMPORT_GROUP_ERROR(40011,"导入群组失败"),
 
     ;
 

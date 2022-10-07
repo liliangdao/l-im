@@ -63,6 +63,41 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     @Autowired
     AppConfig appConfig;
 
+    @Override
+    public ResponseVO importGroupMember(ImportGroupMemberReq req) {
+
+        List<AddMemberResp> resp = new ArrayList<>();
+
+        ResponseVO<ImGroupEntity> groupResp = groupService.getGroup(req.getGroupId(), req.getAppId());
+        if(!groupResp.isOk()){
+            return groupResp;
+        }
+
+        List<String> successId = new ArrayList<>();
+        for (GroupMemberDto memberId:
+                req.getMembers()) {
+            ResponseVO responseVO = null;
+            try {
+                responseVO = groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), memberId);
+            }catch (Exception e){
+                e.printStackTrace();
+                responseVO = ResponseVO.errorResponse();
+            }
+            AddMemberResp addMemberResp = new AddMemberResp();
+            addMemberResp.setMemberId(memberId.getMemberId());
+            if(responseVO.isOk()){
+                successId.add(memberId.getMemberId());
+                addMemberResp.setResult(0);
+            }else if(responseVO.getCode() == GroupErrorCode.USER_IS_JOINED_GROUP.getCode()){
+                addMemberResp.setResult(2);
+            }else{
+                addMemberResp.setResult(1);
+            }
+            resp.add(addMemberResp);
+        }
+
+        return ResponseVO.successResponse(resp);
+    }
 
     /**
      * @param

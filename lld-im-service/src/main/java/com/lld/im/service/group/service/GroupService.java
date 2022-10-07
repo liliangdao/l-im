@@ -13,6 +13,8 @@ import com.lld.im.service.group.model.req.*;
  */
 public interface GroupService {
 
+    public ResponseVO importGroup(ImportGroupReq req);
+
     public ResponseVO createGroup(CreateGroupReq req);
 
     public ResponseVO updateBaseGroupInfo(UpdateGroupReq req);

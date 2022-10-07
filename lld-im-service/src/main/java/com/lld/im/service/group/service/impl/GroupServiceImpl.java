@@ -13,6 +13,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.*;
 import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.exception.ApplicationException;
+import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.SyncReq;
 import com.lld.im.common.model.SyncResp;
 import com.lld.im.service.group.dao.ImGroupEntity;
@@ -67,6 +68,40 @@ public class GroupServiceImpl implements GroupService {
     GroupMessageProducer groupMessageProducer;
 
     @Override
+    public ResponseVO importGroup(ImportGroupReq req) {
+
+        //1.判断群id是否存在
+        QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
+
+        if (StringUtils.isEmpty(req.getGroupId())) {
+            req.setGroupId(UUID.randomUUID().toString().replace("-", ""));
+        } else {
+            query.eq("group_id", req.getGroupId());
+            query.eq("app_id", req.getAppId());
+            Integer integer = imGroupDataMapper.selectCount(query);
+            if (integer > 0) {
+                throw new ApplicationException(GroupErrorCode.GROUP_IS_EXIST);
+            }
+        }
+
+        if (req.getMaxMemberCount() != null && req.getMaxMemberCount() > appConfig.getGroupMaxMemberCount()) {
+            throw new ApplicationException(GroupErrorCode.GROUP_MEMBER_IS_BEYOND);
+        }
+
+        ImGroupEntity imGroupEntity = new ImGroupEntity();
+        long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
+        imGroupEntity.setSequence(seq);
+        BeanUtils.copyProperties(req, imGroupEntity);
+        int insert = imGroupDataMapper.insert(imGroupEntity);
+
+        if (insert != 1) {
+            throw new ApplicationException(GroupErrorCode.IMPORT_GROUP_ERROR);
+        }
+
+        return ResponseVO.successResponse();
+    }
+
+    @Override
     @Transactional
     public ResponseVO createGroup(CreateGroupReq req) {
 
@@ -105,16 +140,17 @@ public class GroupServiceImpl implements GroupService {
         int insert = imGroupDataMapper.insert(imGroupEntity);
         //插入群成员
 
-        for (GroupMemberDto  dto : req.getMember()) {
+        for (GroupMemberDto dto : req.getMember()) {
             groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), dto);
         }
 
         CreateGroupPack createGroupPack = new CreateGroupPack();
-        BeanUtils.copyProperties(imGroupEntity,createGroupPack);
-        groupMessageProducer.producer(GroupEventCommand.CREATED_GROUP.getCommand(),createGroupPack);
+        BeanUtils.copyProperties(imGroupEntity, createGroupPack);
+        groupMessageProducer.producer(req.getOperater(), GroupEventCommand.CREATED_GROUP, createGroupPack
+                , new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
 
         //回调
-        if(appConfig.isCreateGroupCallback()){
+        if (appConfig.isCreateGroupCallback()) {
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.CreateGroup, JSONObject.toJSONString(imGroupEntity));
         }
         return ResponseVO.successResponse();
@@ -147,7 +183,7 @@ public class GroupServiceImpl implements GroupService {
             //不是后台调用需要检查权限
             ResponseVO<GetRoleInGroupResp> role = groupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
 
-            if(!role.isOk()){
+            if (!role.isOk()) {
                 return role;
             }
 
@@ -156,15 +192,15 @@ public class GroupServiceImpl implements GroupService {
 
             boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
 
-            if(!isManager && GroupTypeEnum.PRIVATE.getCode() == imGroupEntity.getGroupType()){
+            if (!isManager && GroupTypeEnum.PRIVATE.getCode() == imGroupEntity.getGroupType()) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
             }
 
-            if (StringUtils.isNotBlank(req.getIntroduction()) ||StringUtils.isNotBlank(req.getGroupName()) ||
+            if (StringUtils.isNotBlank(req.getIntroduction()) || StringUtils.isNotBlank(req.getGroupName()) ||
                     StringUtils.isNotBlank(req.getNotification()) ||
                     GroupPrivateChatTypeEnum.getEnum(req.getPrivateChat()) != null ||
                     StringUtils.isNotBlank(req.getPhoto()) || GroupPrivateChatTypeEnum.getEnum(req.getPrivateChat()) != null ||
-                    GroupMuteTypeEnum.getEnum(req.getJoinType()) != null ) {
+                    GroupMuteTypeEnum.getEnum(req.getJoinType()) != null) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
             }
         }
@@ -180,11 +216,11 @@ public class GroupServiceImpl implements GroupService {
         }
 
         UpdateGroupInfoPack pack = new UpdateGroupInfoPack();
-        BeanUtils.copyProperties(req,pack);
+        BeanUtils.copyProperties(req, pack);
 
-        groupMessageProducer.producer(GroupEventCommand.UPDATED_GROUP.getCommand(),
-                pack);
-        if(appConfig.isModifyGroupCallback()){
+        groupMessageProducer.producer(req.getOperater(), GroupEventCommand.UPDATED_GROUP,
+                pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
+        if (appConfig.isModifyGroupCallback()) {
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.UpdateGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
 
         }
@@ -207,7 +243,7 @@ public class GroupServiceImpl implements GroupService {
 
             GetJoinedGroupResp resp = new GetJoinedGroupResp();
 
-            if(CollectionUtils.isEmpty(memberJoinedGroup.getData())){
+            if (CollectionUtils.isEmpty(memberJoinedGroup.getData())) {
                 resp.setTotalCount(0);
                 resp.setGroupList(new ArrayList<>());
                 return ResponseVO.successResponse(resp);
@@ -225,7 +261,7 @@ public class GroupServiceImpl implements GroupService {
             resp.setGroupList(groupList);
             if (req.getLimit() == null) {
                 resp.setTotalCount(groupList.size());
-            }else{
+            } else {
                 resp.setTotalCount(imGroupDataMapper.selectCount(query));
             }
             return ResponseVO.successResponse(resp);
@@ -235,35 +271,35 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
      * @description 增量同步加入的群聊列表，传0拉所有
      * @author chackylee
      * @date 2022/8/18 10:01
-     * @param [req]
-     * @return com.lld.im.common.ResponseVO
-    */
+     */
     @Override
     public ResponseVO syncJoinedGroupList(SyncReq req) {
 
-        if(req.getMaxLimit() > 100){
+        if (req.getMaxLimit() > 100) {
             req.setMaxLimit(100);
         }
 
         SyncResp resp = new SyncResp();
 
         ResponseVO<Collection<String>> memberJoinedGroup = groupMemberService.syncMemberJoinedGroup(req);
-        if(memberJoinedGroup.isOk()){
+        if (memberJoinedGroup.isOk()) {
 
             Collection<String> data = memberJoinedGroup.getData();
             QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
-            query.eq("app_id",req.getAppId());
-            query.in("group_id",data);
-            query.gt("sequence",req.getLastSequence());
+            query.eq("app_id", req.getAppId());
+            query.in("group_id", data);
+            query.gt("sequence", req.getLastSequence());
             query.orderByAsc("sequence");
             query.last("limit " + req.getMaxLimit());
 
             List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
-            if(!CollectionUtil.isEmpty(imGroupEntities)){
-                ImGroupEntity imGroupEntity = imGroupEntities.get(imGroupEntities.size()-1);
+            if (!CollectionUtil.isEmpty(imGroupEntities)) {
+                ImGroupEntity imGroupEntity = imGroupEntities.get(imGroupEntities.size() - 1);
                 Long memberJoinedGroupMaxSeq = imGroupDataMapper.getMemberJoinedGroupMaxSeq(req.getAppId(), data);
                 resp.setCompleted(imGroupEntity.getSequence() >= memberJoinedGroupMaxSeq);
                 resp.setDataList(imGroupEntities);
@@ -288,47 +324,48 @@ public class GroupServiceImpl implements GroupService {
         boolean isAdmin = false;
 
         QueryWrapper<ImGroupEntity> objectQueryWrapper = new QueryWrapper<>();
-        objectQueryWrapper.eq("group_id",req.getGroupId());
-        objectQueryWrapper.eq("app_id",req.getAppId());
+        objectQueryWrapper.eq("group_id", req.getGroupId());
+        objectQueryWrapper.eq("app_id", req.getAppId());
         ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(objectQueryWrapper);
-        if(imGroupEntity == null){
+        if (imGroupEntity == null) {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_NOT_EXIST);
         }
 
-        if(!isAdmin){
-            if(!imGroupEntity.getOwnerId().equals(req.getOperater())){
+        if (!isAdmin) {
+            if (!imGroupEntity.getOwnerId().equals(req.getOperater())) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
             }
         }
 
         ImGroupEntity update = new ImGroupEntity();
         update.setStatus(GroupStatusEnum.DESTROY.getCode());
-        long seq = this.seq.getSeq(req.getAppId()+ ":" + Constants.SeqConstants.Group);
+        long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         update.setSequence(seq);
         int update1 = imGroupDataMapper.update(update, objectQueryWrapper);
-        if(update1 != 1){
+        if (update1 != 1) {
             throw new ApplicationException(GroupErrorCode.UPDATE_GROUP_BASE_INFO_ERROR);
         }
 
         DestroyGroupPack pack = new DestroyGroupPack();
         pack.setGroupId(req.getGroupId());
-        groupMessageProducer.producer(GroupEventCommand.DESTROY_GROUP.getCommand(),pack);
+        groupMessageProducer.producer(req.getOperater(),
+                GroupEventCommand.DESTROY_GROUP, pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
 
-        if(appConfig.isDestroyGroupCallback()){
+        if (appConfig.isDestroyGroupCallback()) {
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.DestoryGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(objectQueryWrapper)));
         }
         return ResponseVO.successResponse();
     }
 
     @Override
-    public ResponseVO getGroup(String groupId,Integer appId) {
+    public ResponseVO getGroup(String groupId, Integer appId) {
 
         QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
         query.eq("app_id", appId);
         query.eq("group_id", groupId);
         ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(query);
 
-        if(imGroupEntity == null){
+        if (imGroupEntity == null) {
             return ResponseVO.errorResponse(GroupErrorCode.GROUP_IS_NOT_EXIST);
         }
         return ResponseVO.successResponse(imGroupEntity);
@@ -340,21 +377,21 @@ public class GroupServiceImpl implements GroupService {
         QueryWrapper<ImGroupEntity> query = new QueryWrapper<>();
 
         query.eq("app_id", req.getAppId());
-        query.in("group_id",req.getGroupId());
+        query.in("group_id", req.getGroupId());
         List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
 
         List<GetGroupResp> resp = new ArrayList<>(req.getGroupId().size());
 
-        imGroupEntities.forEach(g ->{
+        imGroupEntities.forEach(g -> {
 
             GetGroupResp getGroupResp = new GetGroupResp();
-            BeanUtils.copyProperties(g,getGroupResp);
+            BeanUtils.copyProperties(g, getGroupResp);
             try {
                 ResponseVO<List<GroupMemberDto>> groupMember = groupMemberService.getGroupMember(g.getGroupId(), req.getAppId());
-                if(groupMember.isOk()){
+                if (groupMember.isOk()) {
                     getGroupResp.setMemberList(groupMember.getData());
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
 
             }
         });

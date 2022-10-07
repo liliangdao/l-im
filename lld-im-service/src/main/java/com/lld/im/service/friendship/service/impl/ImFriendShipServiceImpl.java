@@ -99,16 +99,16 @@ public class ImFriendShipServiceImpl extends
     StringRedisTemplate stringRedisTemplate;
 
     /**
-     * @description: 导入好友
      * @param
      * @return com.lld.im.common.ResponseVO
-     * @author lld 
+     * @description: 导入好友
+     * @author lld
      * @since 2022-10-02
      */
     @Override
     public ResponseVO importFriendShip(ImportFriendShipReq req) {
 
-        if(req.getFriendItem().size() > 100){
+        if (req.getFriendItem().size() > 100) {
             return ResponseVO.errorResponse(FriendShipErrorCode
                     .FRIEND_SHIP_IMPORT_SIZE_TO_LONG);
         }
@@ -117,22 +117,22 @@ public class ImFriendShipServiceImpl extends
         List<String> successId = new ArrayList<>();
 
         for (ImportFriendShipReq.ImportFriendDto dto : req.getFriendItem()) {
-            if(StringUtils.isBlank(dto.getToId())){
+            if (StringUtils.isBlank(dto.getToId())) {
                 errorId.add(dto.getToId());
                 continue;
             }
             ImFriendShipEntity entity = new ImFriendShipEntity();
             entity.setFromId(req.getFromId());
-            BeanUtils.copyProperties(dto,entity);
+            BeanUtils.copyProperties(dto, entity);
             entity.setAppId(req.getAppId());
             try {
                 int insert = imFriendShipMapper.insert(entity);
-                if(insert == 1){
+                if (insert == 1) {
                     successId.add(dto.getToId());
-                }else{
+                } else {
                     errorId.add(dto.getToId());
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 errorId.add(dto.getToId());
             }
@@ -158,7 +158,7 @@ public class ImFriendShipServiceImpl extends
         ResponseVO fromInfo = imUserService.getSingleUserInfo(req.getFromId(), req.getAppId());
         if (fromInfo.getCode() != BaseErrorCode.SUCCESS.getCode()) {
             return ResponseVO.errorResponse(fromInfo.getCode(), fromInfo.getMsg());
-    }
+        }
 
         for (FriendDto dto : req.getAddItems()) {
             AddFriendShipResp resp = new AddFriendShipResp();
@@ -311,7 +311,7 @@ public class ImFriendShipServiceImpl extends
             messageProducer.sendToUser(fromId, requestBase.getClientType(), requestBase.getImel(),
                     FriendshipEventCommand.FRIEND_ADD, addFriendPack, requestBase.getAppId());
         } else {
-            messageProducer.sendToUser(fromId, null, null,
+            messageProducer.sendToUser(fromId,
                     FriendshipEventCommand.FRIEND_ADD, addFriendPack, requestBase.getAppId());
         }
 
@@ -319,10 +319,10 @@ public class ImFriendShipServiceImpl extends
         AddFriendPack addToFriendPack = new AddFriendPack();
         BeanUtils.copyProperties(toItem, addToFriendPack);
         //TCP通知给from
-        messageProducer.sendToUser(toItem.getToId(), null, null,
+        messageProducer.sendToUser(toItem.getToId(),
                 FriendshipEventCommand.FRIEND_ADD, addToFriendPack, requestBase.getAppId());
 
-        this.modifyFirendListForCache(dto.getToId(),fromId,requestBase.getAppId(),"ADD");
+        this.modifyFirendListForCache(dto.getToId(), fromId, requestBase.getAppId(), "ADD");
         return ResponseVO.successResponse();
     }
 
@@ -450,15 +450,15 @@ public class ImFriendShipServiceImpl extends
 
         Map<String, Integer> result
                 = req.getToIds().stream()
-                .collect(Collectors.toMap(Function.identity(), s-> 0));
+                .collect(Collectors.toMap(Function.identity(), s -> 0));
 
         if (req.getCheckType() == CheckFriendShipTypeEnum.SINGLE.getType()) {
             List<CheckFriendShipResp> sigleCheck = imFriendShipMapper.checkFriendShip(req);
             Map<String, Integer> collect = sigleCheck.stream()
                     .collect(Collectors.toMap(CheckFriendShipResp::getToId
                             , CheckFriendShipResp::getStatus));
-            for (String toId :result.keySet()) {
-                if(!collect.containsKey(toId)){
+            for (String toId : result.keySet()) {
+                if (!collect.containsKey(toId)) {
                     CheckFriendShipResp checkFriendShipResp = new CheckFriendShipResp();
                     checkFriendShipResp.setFromId(req.getFromId());
                     checkFriendShipResp.setStatus(result.get(toId));
@@ -472,8 +472,8 @@ public class ImFriendShipServiceImpl extends
             Map<String, Integer> collect = checkFriendShipResps.stream()
                     .collect(Collectors.toMap(CheckFriendShipResp::getToId
                             , CheckFriendShipResp::getStatus));
-            for (String toId :result.keySet()) {
-                if(!collect.containsKey(toId)){
+            for (String toId : result.keySet()) {
+                if (!collect.containsKey(toId)) {
                     CheckFriendShipResp checkFriendShipResp = new CheckFriendShipResp();
                     checkFriendShipResp.setFromId(req.getFromId());
                     checkFriendShipResp.setStatus(result.get(toId));
@@ -504,7 +504,6 @@ public class ImFriendShipServiceImpl extends
                 resp.setToId(toId);
                 result.add(resp);
             } else {
-                ImUserDataEntity data = userInfo.getData();
                 ImFriendShipEntity entity = new ImFriendShipEntity();
                 entity.setFromId(req.getFromId());
                 entity.setToId(toId);
