@@ -28,6 +28,13 @@ public class GroupController {
     @Autowired
     GroupMemberService groupMemberService;
 
+    @RequestMapping("/importGroup")
+    public ResponseVO importGroup(@RequestBody @Validated ImportGroupReq req,Integer appId,String identifier)  {
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return groupService.importGroup(req);
+    }
+
     @RequestMapping("/createGroup")
     public ResponseVO createGroup(@RequestBody @Validated CreateGroupReq req,Integer appId,String identifier)  {
         req.setAppId(appId);
@@ -67,6 +74,13 @@ public class GroupController {
         req.setAppId(appId);
         req.setOperater(identifier);
         return groupService.destroyGroup(req);
+    }
+
+    @RequestMapping("/importGroupMember")
+    public ResponseVO importGroupMember(@RequestBody @Validated ImportGroupMemberReq req, Integer appId, String identifier)  {
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return groupMemberService.importGroupMember(req);
     }
 
     @RequestMapping("/addMember")

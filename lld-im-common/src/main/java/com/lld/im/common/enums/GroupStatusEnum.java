@@ -3,7 +3,7 @@ package com.lld.im.common.enums;
 public enum GroupStatusEnum {
 
     /**
-     * 0正常 1解散 其他待定比如封禁...
+     * 1正常 2解散 其他待定比如封禁...
      */
     NORMAL(1),
 

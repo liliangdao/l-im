@@ -89,6 +89,10 @@ public class GroupServiceImpl implements GroupService {
         }
 
         ImGroupEntity imGroupEntity = new ImGroupEntity();
+        if(req.getCreateTime() == null){
+            imGroupEntity.setCreateTime(System.currentTimeMillis());
+        }
+        imGroupEntity.setStatus(GroupStatusEnum.NORMAL.getCode());
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         imGroupEntity.setSequence(seq);
         BeanUtils.copyProperties(req, imGroupEntity);
@@ -136,6 +140,8 @@ public class GroupServiceImpl implements GroupService {
         ImGroupEntity imGroupEntity = new ImGroupEntity();
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         imGroupEntity.setSequence(seq);
+        imGroupEntity.setCreateTime(System.currentTimeMillis());
+        imGroupEntity.setStatus(GroupStatusEnum.NORMAL.getCode());
         BeanUtils.copyProperties(req, imGroupEntity);
         int insert = imGroupDataMapper.insert(imGroupEntity);
         //插入群成员

@@ -41,6 +41,8 @@ public class ImportGroupReq extends RequestBase {
 
     private Integer MaxMemberCount;
 
+    private Long createTime;
+
     private String extra;
 
 }
