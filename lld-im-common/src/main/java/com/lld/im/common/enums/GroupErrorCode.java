@@ -25,19 +25,23 @@ public enum GroupErrorCode implements ApplicationExceptionEnum {
 
     THIS_OPERATE_NEED_MANAGER_ROLE(40007,"该操作只允许群主/管理员操作"),
 
-    THIS_OPERATE_NEED_OWNER_ROLE(40008,"该操作只允许群主操作"),
+    THIS_OPERATE_NEED_APPMANAGER_ROLE(40008,"该操作只允许APP管理员操作"),
 
-    GROUP_OWNER_IS_NOT_REMOVE(40011,"群主无法移除"),
+    THIS_OPERATE_NEED_OWNER_ROLE(40009,"该操作只允许群主操作"),
 
-    UPDATE_GROUP_BASE_INFO_ERROR(40009,"更新群信息失败"),
+    GROUP_OWNER_IS_NOT_REMOVE(40010,"群主无法移除"),
 
-    THIS_GROUP_IS_MUTE(40010,"该群禁止发言"),
+    UPDATE_GROUP_BASE_INFO_ERROR(40011,"更新群信息失败"),
 
-    IMPORT_GROUP_ERROR(40011,"导入群组失败"),
+    THIS_GROUP_IS_MUTE(40012,"该群禁止发言"),
 
-    THIS_OPERATE_NEED_ONESELF(40012,"该操作只允许自己操作"),
+    IMPORT_GROUP_ERROR(40013,"导入群组失败"),
 
+    THIS_OPERATE_NEED_ONESELF(40014,"该操作只允许自己操作"),
 
+    PRIVATE_GROUP_CAN_NOT_DESTORY(40015,"私有群不允许解散"),
+
+    PUBLIC_GROUP_MUST_HAVE_OWNER(40016,"公开群必须指定群主"),
     ;
 
     private int code;

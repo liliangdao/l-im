@@ -91,6 +91,11 @@ public class GroupServiceImpl implements GroupService {
         }
 
         ImGroupEntity imGroupEntity = new ImGroupEntity();
+
+        if(req.getGroupType() == GroupTypeEnum.PUBLIC.getCode() && StringUtils.isBlank(req.getOwnerId())){
+            throw new ApplicationException(GroupErrorCode.PUBLIC_GROUP_MUST_HAVE_OWNER);
+        }
+
         if(req.getCreateTime() == null){
             imGroupEntity.setCreateTime(System.currentTimeMillis());
         }
@@ -131,6 +136,10 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
+        if(req.getGroupType() == GroupTypeEnum.PUBLIC.getCode() && StringUtils.isBlank(req.getOwnerId())){
+            throw new ApplicationException(GroupErrorCode.PUBLIC_GROUP_MUST_HAVE_OWNER);
+        }
+
         if (req.getMaxMemberCount() != null && req.getMaxMemberCount() > appConfig.getGroupMaxMemberCount()) {
             throw new ApplicationException(GroupErrorCode.GROUP_MEMBER_IS_BEYOND);
         }
@@ -146,8 +155,14 @@ public class GroupServiceImpl implements GroupService {
         imGroupEntity.setStatus(GroupStatusEnum.NORMAL.getCode());
         BeanUtils.copyProperties(req, imGroupEntity);
         int insert = imGroupDataMapper.insert(imGroupEntity);
-        //插入群成员
 
+        GroupMemberDto groupMemberDto = new GroupMemberDto();
+        groupMemberDto.setMemberId(req.getOwnerId());
+        groupMemberDto.setRole(GroupMemberRoleEnum.OWNER.getCode());
+        groupMemberDto.setJoinTime(System.currentTimeMillis());
+        groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), groupMemberDto);
+
+        //插入群成员
         for (GroupMemberDto dto : req.getMember()) {
             groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), dto);
         }
@@ -200,23 +215,25 @@ public class GroupServiceImpl implements GroupService {
 
             boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
 
-            if (!isManager && GroupTypeEnum.PRIVATE.getCode() == imGroupEntity.getGroupType()) {
+            //公开群只能群主修改资料
+            if (!isManager && GroupTypeEnum.PUBLIC.getCode() == imGroupEntity.getGroupType()) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
             }
 
-            if (StringUtils.isNotBlank(req.getIntroduction()) || StringUtils.isNotBlank(req.getGroupName()) ||
-                    StringUtils.isNotBlank(req.getNotification()) ||
-                    GroupPrivateChatTypeEnum.getEnum(req.getPrivateChat()) != null ||
-                    StringUtils.isNotBlank(req.getPhoto()) || GroupPrivateChatTypeEnum.getEnum(req.getPrivateChat()) != null ||
-                    GroupMuteTypeEnum.getEnum(req.getJoinType()) != null) {
-                throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
-            }
+//            if (StringUtils.isNotBlank(req.getIntroduction()) || StringUtils.isNotBlank(req.getGroupName()) ||
+//                    StringUtils.isNotBlank(req.getNotification()) ||
+//                    StringUtils.isNotBlank(req.getPhoto()) ||
+//                    req.getMute() != null ||
+//                    GroupMuteTypeEnum.getEnum(req.getMute()) != null) {
+//                throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+//            }
         }
 
         ImGroupEntity update = new ImGroupEntity();
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         update.setSequence(seq);
         BeanUtils.copyProperties(req, update);
+        update.setUpdateTime(System.currentTimeMillis());
 
         int row = imGroupDataMapper.update(update, query);
         if (row != 1) {
@@ -336,11 +353,16 @@ public class GroupServiceImpl implements GroupService {
         objectQueryWrapper.eq("app_id", req.getAppId());
         ImGroupEntity imGroupEntity = imGroupDataMapper.selectOne(objectQueryWrapper);
         if (imGroupEntity == null) {
-            throw new ApplicationException(GroupErrorCode.GROUP_IS_NOT_EXIST);
+            throw new ApplicationException(GroupErrorCode.PRIVATE_GROUP_CAN_NOT_DESTORY);
         }
 
         if (!isAdmin) {
-            if (!imGroupEntity.getOwnerId().equals(req.getOperater())) {
+            if(imGroupEntity.getGroupType() == GroupTypeEnum.PUBLIC.getCode()){
+                throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
+            }
+
+            if (imGroupEntity.getGroupType() == GroupTypeEnum.PUBLIC.getCode() &&
+                    !imGroupEntity.getOwnerId().equals(req.getOperater())) {
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
             }
         }

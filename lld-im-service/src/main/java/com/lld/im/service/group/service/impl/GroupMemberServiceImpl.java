@@ -135,7 +135,6 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             //初次加群
             memberDto = new ImGroupMemberEntity();
             BeanUtils.copyProperties(dto, memberDto);
-//            memberDto.setMemberId(dto.getMemberId());
             memberDto.setGroupId(groupId);
             memberDto.setAppId(appId);
             memberDto.setJoinTime(now);
@@ -232,7 +231,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     }
 
     /**
-     * @description: 添加群成员，拉人入群的逻辑，如果是后台管理员，则直接拉入群，如果不是则根据群类型是私有群/公开群走不同的逻辑。
+     * @description: 添加群成员，拉人入群的逻辑，直接进入群聊。如果是后台管理员，则直接拉入群，否则只有私有群可以调用本接口，并且群成员也可以拉人入群
      * @param
      * @return com.lld.im.common.ResponseVO
      * @author lld
@@ -255,27 +254,29 @@ public class GroupMemberServiceImpl implements GroupMemberService {
          * 私有群（private）	类似普通微信群，创建后仅支持已在群内的好友邀请加群，且无需被邀请方同意或群主审批
          * 公开群（Public）	类似 QQ 群，创建后群主可以指定群管理员，需要群主或管理员审批通过才能入群
          * 群类型 1私有群（类似微信） 2公开群(类似qq）
-         * 加入群权限，0 所有人可以加入；1 群成员可以拉人；2 群管理员或群组可以拉人。私有群任何人都可以拉人入群。公开群需要管理员或群主审批
-         * 当为公开群时 applyJoinType 生效。
-         *
+         * 只有私有群可以调用本接口
          */
-        if(!isAdmin){
-             if(GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()){
-                 //不是群成员无法拉人入群
-                 ResponseVO<GetRoleInGroupResp> role = getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
-                 if(!role.isOk()){
-                     return role;
-                 }
+//        if(!isAdmin){
+//             if(GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()){
+//                 //不是群成员无法拉人入群
+//                 ResponseVO<GetRoleInGroupResp> role = getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+//                 if(!role.isOk()){
+//                     return role;
+//                 }
+//
+//                 GetRoleInGroupResp data = role.getData();
+//                 Integer roleInfo = data.getRole();
+//
+//                 boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
+//                //公开群必须是管理员才能拉人
+//                 if(!isManager && GroupTypeEnum.PRIVATE.getCode() == group.getGroupType()){
+//                     throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+//                 }
+//            }
+//        }
 
-                 GetRoleInGroupResp data = role.getData();
-                 Integer roleInfo = data.getRole();
-
-                 boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-                //公开群必须是管理员才能拉人
-                 if(!isManager && GroupTypeEnum.PRIVATE.getCode() == group.getGroupType()){
-                     throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
-                 }
-            }
+        if(!isAdmin && GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()) {
+            throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_APPMANAGER_ROLE);
         }
 
         List<String> successId = new ArrayList<>();
@@ -333,7 +334,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
         if(!isAdmin){
             if(GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()){
-                //不是群成员无法拉人入群
+
+                //获取操作人的权限 是管理员or群主or群成员
                 ResponseVO<GetRoleInGroupResp> role = getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
                 if(!role.isOk()){
                     return role;
@@ -342,21 +344,34 @@ public class GroupMemberServiceImpl implements GroupMemberService {
                 GetRoleInGroupResp data = role.getData();
                 Integer roleInfo = data.getRole();
 
-                boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode()
-                        || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-                //公开群必须是管理员才能踢人
-                if(!isManager && GroupTypeEnum.PRIVATE.getCode() == group.getGroupType()){
+                boolean isOwner = roleInfo == GroupMemberRoleEnum.OWNER.getCode();
+                boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode();
+
+                if(!isOwner && !isManager){
                     throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
                 }
 
-                ResponseVO<GetRoleInGroupResp> roleInGroupOne = this.getRoleInGroupOne(req.getGroupId(), req.getMemberId(), req.getAppId());
-                if(!roleInGroupOne.isOk()){
-                    return roleInGroupOne;
+                //私有群必须是群主才能踢人
+                if(!isOwner && GroupTypeEnum.PRIVATE.getCode() == group.getGroupType()){
+                    throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
                 }
 
-                GetRoleInGroupResp memberRole = roleInGroupOne.getData();
-                if(memberRole.getRole() == GroupMemberRoleEnum.OWNER.getCode()){
-                    throw new ApplicationException(GroupErrorCode.GROUP_OWNER_IS_NOT_REMOVE);
+                //公开群管理员和群主可踢人，但管理员只能踢普通群成员
+                if(GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()){
+//                    throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+                    //获取被踢人的权限
+                    ResponseVO<GetRoleInGroupResp> roleInGroupOne = this.getRoleInGroupOne(req.getGroupId(), req.getMemberId(), req.getAppId());
+                    if(!roleInGroupOne.isOk()){
+                        return roleInGroupOne;
+                    }
+                    GetRoleInGroupResp memberRole = roleInGroupOne.getData();
+                    if(memberRole.getRole() == GroupMemberRoleEnum.OWNER.getCode()){
+                        throw new ApplicationException(GroupErrorCode.GROUP_OWNER_IS_NOT_REMOVE);
+                    }
+                    //是管理员并且被踢人不是群成员，无法操作
+                    if(isManager && memberRole.getRole() != GroupMemberRoleEnum.ORDINARY.getCode()){
+                        throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
+                    }
                 }
             }
         }
@@ -397,6 +412,14 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
         boolean isadmin = false;
 
+        ResponseVO<ImGroupEntity> group = groupService.getGroup(req.getGroupId(), req.getAppId());
+        if(!group.isOk()){
+            return group;
+        }
+
+        ImGroupEntity groupData = group.getData();
+
+        //是否是自己修改自己的资料
         boolean isMeOperate = req.getOperater().equals(req.getMemberId());
 
         if(isadmin){
@@ -404,7 +427,9 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             if(StringUtils.isBlank(req.getAlias()) && isMeOperate){
                 return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_ONESELF);
             }
-            if(req.getRole() != null && GroupMemberRoleEnum.getItem(req.getRole()) != null){
+            //私有群不能设置管理员
+            if(groupData.getGroupType() == GroupTypeEnum.PRIVATE.getCode() &&
+                    req.getRole() != null && GroupMemberRoleEnum.getItem(req.getRole()) != null){
                 return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
             }
         }
