@@ -235,7 +235,7 @@ public class ImFriendShipServiceImpl extends
         ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(queryFrom);
 
         if (fromItem != null) {
-            if (fromItem.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()) {
+            if (fromItem.getStatus() != null && fromItem.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NORMAL.getStatus()) {
                 //重复添加
                 return ResponseVO.errorResponse(FriendShipErrorCode.REPEAT_TO_ADD.getCode()
                         , FriendShipErrorCode.REPEAT_TO_ADD.getError());
