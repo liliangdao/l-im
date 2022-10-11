@@ -104,7 +104,7 @@ public class GroupMessageService {
                 offlineMessageContent.setToId(chatMessageData.getGroupId());
                 offlineMessageContent.setDelFlag(DelFlagEnum.NORMAL.getCode());
                 BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
-                messageStoreService.storeOffLineMessage(offlineMessageContent);
+                messageStoreService.storeGroupOffLineMessage(offlineMessageContent);
 
                 //同步给发送方其他端
                 syncToSender(groupMessageContent,chatMessageData,chatMessageData.getOfflinePushInfo());

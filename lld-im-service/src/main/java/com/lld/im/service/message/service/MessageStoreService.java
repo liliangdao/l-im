@@ -90,33 +90,33 @@ public class MessageStoreService {
     public Long storeP2PMessage(ChatMessageContent chatMessageContent) {
         ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
         imMessageBodyMapper.insert(imMessageBodyEntity);
-        List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent,imMessageBodyEntity);
+        List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent, imMessageBodyEntity);
         imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
         return imMessageBodyEntity.getMessageKey();
     }
 
     /**
-     * @description: 根据客户端messageId从最近的缓存中添加消息
      * @param
      * @return java.lang.String
+     * @description: 根据客户端messageId从最近的缓存中添加消息
      * @author lld
      * @since 2022/9/18
      */
     public void setMessageFromMessageIdCache(P2PMessageContent p2PMessageContent) {
         String key = p2PMessageContent.getAppId() + ":" + Constants.RedisConstants.cacheMessage + ":" + p2PMessageContent.getMessageId();
-        stringRedisTemplate.opsForValue().set(key,JSONObject.toJSONString(p2PMessageContent),300, TimeUnit.SECONDS);
+        stringRedisTemplate.opsForValue().set(key, JSONObject.toJSONString(p2PMessageContent), 300, TimeUnit.SECONDS);
     }
 
     /**
-     * @description: 根据客户端messageId从最近的缓存中获取消息,如果存在直接重新发送。如果不存在才走正常发消息逻辑
      * @param
      * @return java.lang.String
+     * @description: 根据客户端messageId从最近的缓存中获取消息, 如果存在直接重新发送。如果不存在才走正常发消息逻辑
      * @author lld
      * @since 2022/9/18
      */
-    public P2PMessageContent getMessageFromMessageIdCache(String messageId,Integer appId) {
+    public P2PMessageContent getMessageFromMessageIdCache(String messageId, Integer appId) {
         String msg = stringRedisTemplate.opsForValue().get(appId + ":" + Constants.RedisConstants.cacheMessage + ":" + messageId);
-        if(StringUtils.isBlank(msg)){
+        if (StringUtils.isBlank(msg)) {
             return null;
         }
         P2PMessageContent p2PMessageContent = JSONObject.parseObject(msg, P2PMessageContent.class);
@@ -124,16 +124,16 @@ public class MessageStoreService {
     }
 
     /**
+     * @param
+     * @return void
      * @description 存储离线消息到redis，发送方和接收方都要存一份
      * @author chackylee
      * @date 2022/8/19 15:30
-     * @param [chatMessageContent]
-     * @return void
-    */
+     */
     public void storeOffLineMessage(OfflineMessageContent offlineMessageContent) {
 
-        offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType(),
-                offlineMessageContent.getFromId(),offlineMessageContent.getToId()));
+        offlineMessageContent.setConversationId(conversationService.convertConversationId(ConversationTypeEnum.P2P.getCode(),
+                offlineMessageContent.getFromId(), offlineMessageContent.getToId()));
         offlineMessageContent.setMessageKey(offlineMessageContent.getMessageKey());
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
@@ -143,37 +143,55 @@ public class MessageStoreService {
         //给发送方插入离线消息
         Long fromCount = zSetOperations.zCard(fromKey);
 
-        if(fromCount > appConfig.getOfflineMessageCount()){
-            zSetOperations.removeRange(fromKey,0,0);
+        if (fromCount > appConfig.getOfflineMessageCount()) {
+            zSetOperations.removeRange(fromKey, 0, 0);
         }
 
-        zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent),offlineMessageContent.getMessageSequence());
+        zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageSequence());
         //给接收方插入离线消息
-        if(offlineMessageContent.getConversationType() == ConversationTypeEnum.P2P.getCode()){
-            String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + offlineMessageContent.getToId();
+        String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + offlineMessageContent.getToId();
 
+        Long toCount = zSetOperations.zCard(toKey);
+
+        if (toCount > appConfig.getOfflineMessageCount()) {
+            zSetOperations.removeRange(toKey, 0, 0);
+        }
+        zSetOperations.add(toKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageSequence());
+
+    }
+
+    public void storeGroupOffLineMessage(OfflineMessageContent offlineMessageContent) {
+
+        offlineMessageContent.setConversationId(conversationService.convertConversationId(ConversationTypeEnum.GROUP.getCode(),
+                offlineMessageContent.getFromId(), offlineMessageContent.getToId()));
+        offlineMessageContent.setMessageKey(offlineMessageContent.getMessageKey());
+
+        ZSetOperations zSetOperations = redisTemplate.opsForZSet();
+
+        String fromKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.groupOfflineMessage + ":" + offlineMessageContent.getFromId();
+
+        //给发送方插入离线消息
+        Long fromCount = zSetOperations.zCard(fromKey);
+
+        if (fromCount > appConfig.getOfflineMessageCount()) {
+            zSetOperations.removeRange(fromKey, 0, 0);
+        }
+
+        zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageSequence());
+        //给接收方插入离线消息
+        for (String member : offlineMessageContent.getMembers()) {
+            String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.groupOfflineMessage + ":" + member;
             Long toCount = zSetOperations.zCard(toKey);
-
-            if(toCount > appConfig.getOfflineMessageCount()){
-                zSetOperations.removeRange(toKey,0,0);
+            if (toCount > appConfig.getOfflineMessageCount()) {
+                zSetOperations.removeRange(toKey, 0, 0);
             }
-            zSetOperations.add(toKey,JSONObject.toJSONString(offlineMessageContent),offlineMessageContent.getMessageSequence());
+            zSetOperations.add(toKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageSequence());
 
-        }else if(offlineMessageContent.getConversationType() == ConversationTypeEnum.GROUP.getCode()){
-            for (String member : offlineMessageContent.getMembers()) {
-                String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + member;
-                Long toCount = zSetOperations.zCard(toKey);
-                if(toCount > appConfig.getOfflineMessageCount()){
-                    zSetOperations.removeRange(toKey,0,0);
-                }
-                zSetOperations.add(toKey,JSONObject.toJSONString(offlineMessageContent),offlineMessageContent.getMessageSequence());
-
-            }
         }
     }
 
 
-    public List<ImMessageHistoryEntity> extractToP2PMessageHistory(ChatMessageContent content,ImMessageBodyEntity imMessageBodyEntity) {
+    public List<ImMessageHistoryEntity> extractToP2PMessageHistory(ChatMessageContent content, ImMessageBodyEntity imMessageBodyEntity) {
         List<ImMessageHistoryEntity> list = new ArrayList<>();
         // 1 2 存2份
         ImMessageHistoryEntity fromHistory = new ImMessageHistoryEntity();
