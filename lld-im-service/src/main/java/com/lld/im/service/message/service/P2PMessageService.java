@@ -12,6 +12,7 @@ import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
 import com.lld.im.service.utils.UserSessionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -80,7 +81,8 @@ public class P2PMessageService {
 
         //从换从中获取消息如果存在直接分发和回包
         P2PMessageContent p2pMessage = messageStoreService.getMessageFromMessageIdCache(chatMessageData.getMessageId(),chatMessageData.getAppId());
-        if(p2pMessage != null){
+        if(chatMessageData.getMessageKey() != null || p2pMessage != null){
+
             //表示是客户端重发的消息并且服务端已处理完成，可能是没收到ack，直接回包，并分发
             if(chatMessageData.getMessageSequence() == 0L){
                 chatMessageData.setMessageSequence(p2pMessage.getMessageSequence());
