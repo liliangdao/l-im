@@ -1,6 +1,8 @@
 package com.lld.im.service.message.service;
 
 import com.lld.im.codec.pack.ChatMessageAck;
+import com.lld.im.codec.pack.P2PMessagePack;
+import com.lld.im.codec.proto.Message;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ConversationTypeEnum;
@@ -9,6 +11,8 @@ import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.*;
 import com.lld.im.service.conversation.service.ConversationService;
+import com.lld.im.service.message.model.req.SendMessageReq;
+import com.lld.im.service.message.model.resp.SendMessageResp;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
 import com.lld.im.service.utils.UserSessionUtils;
@@ -21,12 +25,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.springframework.beans.BeanUtils.copyProperties;
 
 /**
  * @author: Chackylee
@@ -80,7 +87,7 @@ public class P2PMessageService {
         String toId = chatMessageData.getToId();
 
         //从换从中获取消息如果存在直接分发和回包
-        P2PMessageContent p2pMessage = messageStoreService.getMessageFromMessageIdCache(chatMessageData.getMessageId(),chatMessageData.getAppId());
+        MessageContent p2pMessage = messageStoreService.getMessageFromMessageIdCache(chatMessageData.getMessageId(),chatMessageData.getAppId());
         if(chatMessageData.getMessageKey() != null || p2pMessage != null){
 
             //表示是客户端重发的消息并且服务端已处理完成，可能是没收到ack，直接回包，并分发
@@ -132,25 +139,52 @@ public class P2PMessageService {
         //回包
         ack(chatMessageData,ResponseVO.successResponse());
 
-        P2PMessageContent p2PMessageContent = extractP2PMessage(chatMessageData);
-
-        syncToSender(p2PMessageContent,chatMessageData,chatMessageData.getOfflinePushInfo());
-
-        //消息分发
-        List<ClientInfo> clientInfos = dispatchMessage(p2PMessageContent, chatMessageData.getOfflinePushInfo());
+        syncToSender(chatMessageData,chatMessageData,chatMessageData.getOfflinePushInfo());
 
         //插入离线库redis
         OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
         BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
         offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
         messageStoreService.storeOffLineMessage(offlineMessageContent);
-        messageStoreService.setMessageFromMessageIdCache(p2PMessageContent);
+
+        //消息分发
+        List<ClientInfo> clientInfos = dispatchMessage(chatMessageData, chatMessageData.getOfflinePushInfo());
+
+        messageStoreService.setMessageFromMessageIdCache(chatMessageData);
 
         if(clientInfos.isEmpty()){
             //服务端代替客户端发送消息确认ack给发送方
             revicerAck(chatMessageData,true);
         }
     }
+
+
+    public SendMessageResp send(SendMessageReq req){
+
+        SendMessageResp sendMessageResp = new SendMessageResp();
+
+        ChatMessageContent message = new ChatMessageContent();
+        BeanUtils.copyProperties(req,message);
+        long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Message);
+        message.setMessageSequence(seq);
+
+        Long messageKey = messageStoreService.storeP2PMessage(message);
+
+        //插入离线库redis
+        OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+        BeanUtils.copyProperties(message,offlineMessageContent);
+        offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
+        messageStoreService.storeOffLineMessage(offlineMessageContent);
+
+        sendMessageResp.setMessageKey(messageKey);
+        sendMessageResp.setMessageTime(System.currentTimeMillis());
+
+        dispatchMessage(message, req.getOfflinePushInfo());
+        syncToSender(message,message,req.getOfflinePushInfo());
+
+        return sendMessageResp;
+    }
+
 
     /**
      * @param content result
@@ -171,7 +205,7 @@ public class P2PMessageService {
      * @description ack，接收方发送给发送方
      * @author chackylee
      * @date 2022/9/26 11:16
-     * @param [content, result, command] 
+     * @param content, result, command
      * @return void
     */
     public void revicerAck(MessageContent content,Boolean serverSend) {
@@ -222,16 +256,16 @@ public class P2PMessageService {
         return ResponseVO.successResponse();
     }
 
-    private void syncToSender(P2PMessageContent content,ClientInfo clientInfo, OfflinePushInfo offlinePushInfo) {
+    private void syncToSender(MessageContent content,ClientInfo clientInfo, OfflinePushInfo offlinePushInfo) {
         messageProducer.sendToUserExceptClient(content.getFromId(),MessageCommand.MSG_P2P,content,clientInfo);
     }
 
-    private List<ClientInfo> dispatchMessage(P2PMessageContent messageContent, OfflinePushInfo offlinePushInfo) {
+    private List<ClientInfo> dispatchMessage(MessageContent messageContent, OfflinePushInfo offlinePushInfo) {
 
         logger.debug("dispatchMessage : {}", messageContent);
         String toId = messageContent.getToId();
 
-        P2PMessageContent p2PMessagePack = new P2PMessageContent();
+        P2PMessagePack p2PMessagePack = new P2PMessagePack();
         BeanUtils.copyProperties(messageContent, p2PMessagePack);
 
         if (p2PMessagePack.getMessageLifeTime() != null && p2PMessagePack.getMessageLifeTime() != 0) {
@@ -257,11 +291,11 @@ public class P2PMessageService {
         return successResults;
     }
 
-    private P2PMessageContent extractP2PMessage(MessageContent messageContent){
-        P2PMessageContent p2PMessagePack = new P2PMessageContent();
-        BeanUtils.copyProperties(messageContent, p2PMessagePack);
-        return p2PMessagePack;
-    }
+//    private P2PMessagePack extractP2PMessage(MessageContent messageContent){
+//        P2PMessageContent p2PMessagePack = new P2PMessageContent();
+//        BeanUtils.copyProperties(messageContent, p2PMessagePack);
+//        return p2PMessagePack;
+//    }
 
 
 }

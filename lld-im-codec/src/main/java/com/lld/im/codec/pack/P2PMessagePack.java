@@ -1,16 +1,14 @@
-package com.lld.im.common.model.msg;
+package com.lld.im.codec.pack;
 
-import com.lld.im.common.enums.SyncFromEnum;
-import com.lld.im.common.model.ClientInfo;
 import lombok.Data;
 
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-07-22 15:52
+ * @create: 2022-10-12 10:15
  **/
 @Data
-public class P2PMessageContent {
+public class P2PMessagePack {
 
     //客户端传的messageId
     private String messageId;
@@ -36,5 +34,4 @@ public class P2PMessageContent {
     private Long messageLifeTime;
 
     private Integer appId;
-
 }

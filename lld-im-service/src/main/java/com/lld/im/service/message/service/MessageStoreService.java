@@ -102,7 +102,7 @@ public class MessageStoreService {
      * @author lld
      * @since 2022/9/18
      */
-    public void setMessageFromMessageIdCache(P2PMessageContent p2PMessageContent) {
+    public void setMessageFromMessageIdCache(MessageContent p2PMessageContent) {
         String key = p2PMessageContent.getAppId() + ":" + Constants.RedisConstants.cacheMessage + ":" + p2PMessageContent.getMessageId();
         stringRedisTemplate.opsForValue().set(key, JSONObject.toJSONString(p2PMessageContent), 300, TimeUnit.SECONDS);
     }
@@ -114,12 +114,12 @@ public class MessageStoreService {
      * @author lld
      * @since 2022/9/18
      */
-    public P2PMessageContent getMessageFromMessageIdCache(String messageId, Integer appId) {
+    public MessageContent getMessageFromMessageIdCache(String messageId, Integer appId) {
         String msg = stringRedisTemplate.opsForValue().get(appId + ":" + Constants.RedisConstants.cacheMessage + ":" + messageId);
         if (StringUtils.isBlank(msg)) {
             return null;
         }
-        P2PMessageContent p2PMessageContent = JSONObject.parseObject(msg, P2PMessageContent.class);
+        MessageContent p2PMessageContent = JSONObject.parseObject(msg, MessageContent.class);
         return p2PMessageContent;
     }
 
