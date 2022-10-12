@@ -452,38 +452,31 @@ public class ImFriendShipServiceImpl extends
                 = req.getToIds().stream()
                 .collect(Collectors.toMap(Function.identity(), s -> 0));
 
-        if (req.getCheckType() == CheckFriendShipTypeEnum.SINGLE.getType()) {
-            List<CheckFriendShipResp> sigleCheck = imFriendShipMapper.checkFriendShip(req);
-            Map<String, Integer> collect = sigleCheck.stream()
-                    .collect(Collectors.toMap(CheckFriendShipResp::getToId
-                            , CheckFriendShipResp::getStatus));
-            for (String toId : result.keySet()) {
-                if (!collect.containsKey(toId)) {
-                    CheckFriendShipResp checkFriendShipResp = new CheckFriendShipResp();
-                    checkFriendShipResp.setFromId(req.getFromId());
-                    checkFriendShipResp.setStatus(result.get(toId));
-                    checkFriendShipResp.setToId(toId);
-                    sigleCheck.add(checkFriendShipResp);
-                }
-            }
-            return ResponseVO.successResponse(sigleCheck);
-        } else {
-            List<CheckFriendShipResp> checkFriendShipResps = imFriendShipMapper.checkFriendShipBoth(req);
-            Map<String, Integer> collect = checkFriendShipResps.stream()
-                    .collect(Collectors.toMap(CheckFriendShipResp::getToId
-                            , CheckFriendShipResp::getStatus));
-            for (String toId : result.keySet()) {
-                if (!collect.containsKey(toId)) {
-                    CheckFriendShipResp checkFriendShipResp = new CheckFriendShipResp();
-                    checkFriendShipResp.setFromId(req.getFromId());
-                    checkFriendShipResp.setStatus(result.get(toId));
-                    checkFriendShipResp.setToId(toId);
-                    checkFriendShipResps.add(checkFriendShipResp);
-                }
-            }
-            return ResponseVO.successResponse(checkFriendShipResps);
+        List<CheckFriendShipResp> resp = new ArrayList<>();
+
+        if(req.getCheckType() == CheckFriendShipTypeEnum.SINGLE.getType()){
+            resp =imFriendShipMapper.checkFriendShip(req);
+        }else {
+            resp =imFriendShipMapper.checkFriendShipBoth(req);
         }
+
+        Map<String, Integer> collect = resp.stream()
+                .collect(Collectors.toMap(CheckFriendShipResp::getToId
+                        , CheckFriendShipResp::getStatus));
+
+        for (String toId : result.keySet()){
+            if(!collect.containsKey(toId)){
+                CheckFriendShipResp checkFriendShipResp = new CheckFriendShipResp();
+                checkFriendShipResp.setFromId(req.getFromId());
+                checkFriendShipResp.setToId(toId);
+                checkFriendShipResp.setStatus(result.get(toId));
+                resp.add(checkFriendShipResp);
+            }
+        }
+
+        return ResponseVO.successResponse(resp);
     }
+
 
     @Override
     public ResponseVO addBlack(AddFriendShipBlackReq req) {
