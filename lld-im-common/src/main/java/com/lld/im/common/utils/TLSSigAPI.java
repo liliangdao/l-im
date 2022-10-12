@@ -31,7 +31,7 @@ public class TLSSigAPI {
 
     public static void main(String[] args) {
         TLSSigAPI asd = new TLSSigAPI(10000, "123456");
-        System.out.println(asd.genUserSig("lld",180));
+        System.out.println(asd.genUserSig("lld",180000000));
     }
 
     /**

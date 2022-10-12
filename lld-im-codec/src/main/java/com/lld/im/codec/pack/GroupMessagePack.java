@@ -1,7 +1,5 @@
-package com.lld.im.common.model.msg;
+package com.lld.im.codec.pack;
 
-import com.lld.im.common.enums.SyncFromEnum;
-import com.lld.im.common.model.ClientInfo;
 import lombok.Data;
 
 /**
@@ -10,7 +8,7 @@ import lombok.Data;
  * @create: 2022-07-22 15:52
  **/
 @Data
-public class GroupMessageContent  {
+public class GroupMessagePack {
 
     //客户端传的messageId
     private String messageId;

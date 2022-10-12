@@ -1,11 +1,9 @@
-package com.lld.im.service.message.model.req;
+package com.lld.im.service.group.model.req;
 
 import com.lld.im.common.enums.SyncFromEnum;
 import com.lld.im.common.model.RequestBase;
 import com.lld.im.common.model.msg.OfflinePushInfo;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * @author: Chackylee
@@ -13,7 +11,7 @@ import java.util.List;
  * @create: 2022-10-12 09:01
  **/
 @Data
-public class SendMessageReq extends RequestBase {
+public class SendGroupMessageReq extends RequestBase {
 
     //客户端传的messageId
         private String messageId;
@@ -22,7 +20,7 @@ public class SendMessageReq extends RequestBase {
 
     private String fromId;
 
-    private String toId;
+    private String groupId;
 
     private int messageRandom;
 
