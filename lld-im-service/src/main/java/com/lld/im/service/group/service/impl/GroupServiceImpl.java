@@ -344,6 +344,7 @@ public class GroupServiceImpl implements GroupService {
      * @date 2022/7/14 11:45
      */
     @Override
+    @Transactional
     public ResponseVO destroyGroup(DestroyGroupReq req) {
 
         boolean isAdmin = false;
@@ -396,7 +397,7 @@ public class GroupServiceImpl implements GroupService {
             return roleInGroupOne;
         }
 
-        if(roleInGroupOne.getData().getRole() == GroupMemberRoleEnum.OWNER.getCode()){
+        if(roleInGroupOne.getData().getRole() != GroupMemberRoleEnum.OWNER.getCode()){
             return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
         }
 

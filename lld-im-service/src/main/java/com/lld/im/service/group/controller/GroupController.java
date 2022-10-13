@@ -114,13 +114,6 @@ public class GroupController {
         return groupMemberService.updateGroupMember(req);
     }
 
-    @RequestMapping("/get")
-    public ResponseVO get(@RequestBody @Validated GetGroupReq req, Integer appId, String identifier)  {
-        req.setAppId(appId);
-        req.setOperater(identifier);
-        return groupService.getGroup(req);
-    }
-
     @RequestMapping("/sendMessage")
     public ResponseVO sendMessage(@RequestBody @Validated SendGroupMessageReq req, Integer appId, String identifier)  {
         req.setAppId(appId);

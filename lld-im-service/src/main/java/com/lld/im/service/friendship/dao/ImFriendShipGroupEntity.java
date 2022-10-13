@@ -1,5 +1,6 @@
 package com.lld.im.service.friendship.dao;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -18,7 +19,7 @@ import lombok.Data;
 @AutoMap
 public class ImFriendShipGroupEntity {
 
-    @TableId(value = "group_id")
+    @TableId(value = "group_id" , type = IdType.AUTO)
     private Long groupId;
 
     private String fromId;
@@ -34,8 +35,5 @@ public class ImFriendShipGroupEntity {
 
     /** 序列号*/
     private Long sequence;
-
-    private int delFlag;
-
 
 }

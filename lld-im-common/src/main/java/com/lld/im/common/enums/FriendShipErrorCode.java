@@ -39,6 +39,8 @@ public enum FriendShipErrorCode implements ApplicationExceptionEnum {
 
     FRIEND_SHIP_IMPORT_SIZE_TO_LONG(30014,"导入好友数据过多"),
 
+    FRIEND_SHIP_GROUP_CREATE_ERROR(30015,"好友分组创建失败"),
+
     ;
 
     private int code;
