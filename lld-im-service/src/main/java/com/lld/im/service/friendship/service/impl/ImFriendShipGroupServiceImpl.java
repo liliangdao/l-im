@@ -67,6 +67,7 @@ public class ImFriendShipGroupServiceImpl extends MppServiceImpl<ImFriendShipGro
         query.eq("group_name", req.getGroupName());
         query.eq("app_id",req.getAppId());
         query.eq("from_id",req.getFromId());
+        query.eq("del_flag",DelFlagEnum.NORMAL.getCode());
 
         ImFriendShipGroupEntity entity = imFriendShipGroupMapper.selectOne(query);
 
@@ -78,6 +79,7 @@ public class ImFriendShipGroupServiceImpl extends MppServiceImpl<ImFriendShipGro
         ImFriendShipGroupEntity insert = new ImFriendShipGroupEntity();
         insert.setAppId(req.getAppId());
         insert.setCreateTime(System.currentTimeMillis());
+        insert.setDelFlag(DelFlagEnum.NORMAL.getCode());
         insert.setGroupName(req.getGroupName());
         long seq = redisSeq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendshipGroup);
         insert.setSequence(seq);
@@ -114,12 +116,13 @@ public class ImFriendShipGroupServiceImpl extends MppServiceImpl<ImFriendShipGro
                 return ResponseVO.successResponse();
             }
         }catch (DuplicateKeyException e){
+            e.getStackTrace();
             return ResponseVO.errorResponse(FriendShipErrorCode.FRIEND_SHIP_GROUP_IS_EXIST);
         }
         //写入seq
         writeUserSeq.writeUserSeq(req.getAppId(),req.getFromId(),Constants.SeqConstants.FriendshipGroup,seq);
 
-        return ResponseVO.errorResponse();
+        return ResponseVO.successResponse();
     }
 
     @Override
@@ -140,7 +143,8 @@ public class ImFriendShipGroupServiceImpl extends MppServiceImpl<ImFriendShipGro
                 ImFriendShipGroupEntity update = new ImFriendShipGroupEntity();
                 update.setSequence(seq);
                 update.setGroupId(entity.getGroupId());
-                imFriendShipGroupMapper.updateById(entity);
+                update.setDelFlag(DelFlagEnum.DELETE.getCode());
+                imFriendShipGroupMapper.updateById(update);
                 imFriendShipGroupMemberService.clearGroupMember(entity.getGroupId());
 
                 DeleteFriendGroupPack deleteFriendGroupPack = new DeleteFriendGroupPack();
@@ -163,6 +167,7 @@ public class ImFriendShipGroupServiceImpl extends MppServiceImpl<ImFriendShipGro
         query.eq("group_name", groupName);
         query.eq("app_id",appId);
         query.eq("from_id",fromId);
+        query.eq("del_flag",DelFlagEnum.NORMAL.getCode());
 
         ImFriendShipGroupEntity entity = imFriendShipGroupMapper.selectOne(query);
         if(entity == null){

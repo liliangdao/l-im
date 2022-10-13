@@ -19,7 +19,7 @@ import lombok.Data;
 @AutoMap
 public class ImFriendShipGroupEntity {
 
-    @TableId(value = "group_id" , type = IdType.AUTO)
+    @TableId(value = "group_id",type = IdType.AUTO)
     private Long groupId;
 
     private String fromId;
@@ -35,5 +35,8 @@ public class ImFriendShipGroupEntity {
 
     /** 序列号*/
     private Long sequence;
+
+    private int delFlag;
+
 
 }
