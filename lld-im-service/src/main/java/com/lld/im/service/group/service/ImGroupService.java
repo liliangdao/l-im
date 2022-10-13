@@ -11,7 +11,7 @@ import com.lld.im.service.group.model.req.*;
  * @createDate: 2022/7/9
  * @version: 1.0
  */
-public interface GroupService {
+public interface ImGroupService {
 
     public ResponseVO importGroup(ImportGroupReq req);
 

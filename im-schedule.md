@@ -19,7 +19,6 @@
 | /friendship/update                      | 更新好友资料         |    |  100%  |
 | /friendship/getRelation                 | 获取单个好友关系信息 |                     |  100%   |
 | /friendship/checkFriend                       | 校验是否为好友,支持单向和双向校验       |                     |  100%   |
-| /friendship/get                         | 拉取好友             | 分页拉取，按照seq拉 |  0%   |
 | /friendship/addBlack                          | 添加黑名单           |                     |  100%   |
 | /friendship/deleteBlack                       | 删除黑名单           |                     |  100%   |
 | /friendshipRequest/getFriendRequest     | 获取好友请求列表     |                     | 100%  |
@@ -45,7 +44,7 @@
 | /group/destroyGroup       | 解散群                 | 需要发送tcp通知未完成                            |  100%  |
 | /group/getJoinedGroup     | 获取用户所加入的群组   | 支持群类型过滤，分页拉取，分页返回小问题日后修复 |  95%  |
 | /group/getRoleInGroup     | 查询用户在群组中的身份 | 支持批量拉取                                     |  0%   |
-| /group/forbidSendMsg      | 批量禁言/解禁          | ShutUpTime为0表示解禁言                          |  0%   |
+| /group/forbidSendMessage      | 批量禁言/解禁          | ShutUpTime为0表示解禁言                          |  0%   |
 | /group/getGroupShuttedUin | 获取被禁言群成员列表   | 单个群                                           |  0%   |
 | /group/transferGroup   | 转让群主               | 转让后的群主必须在群内                           |  100%   |
 | /group/import             | 导入群                 | 不会发tcp通知，不会触发回调                      |  100%   |

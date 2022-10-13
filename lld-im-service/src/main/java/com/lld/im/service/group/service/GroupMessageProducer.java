@@ -26,7 +26,7 @@ import java.util.List;
 public class GroupMessageProducer {
 
     @Autowired
-    GroupMemberService groupMemberService;
+    ImGroupMemberService groupMemberService;
 
     @Autowired
     MessageProducer messageProducer;

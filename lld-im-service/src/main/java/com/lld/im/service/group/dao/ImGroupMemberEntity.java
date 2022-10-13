@@ -31,6 +31,8 @@ public class ImGroupMemberEntity {
     //发言标识 1禁言
     private Integer speakFlag;
 
+    private Long speakDate;
+
     //群昵称
     private String alias;
 

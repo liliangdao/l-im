@@ -22,6 +22,8 @@ public class GroupMemberDto {
 
     private Integer speakFlag;
 
+    private Long speakDate;
+
     private String joinType;
 
     private Long joinTime;

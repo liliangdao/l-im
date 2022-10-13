@@ -24,9 +24,9 @@ import com.lld.im.service.group.model.req.*;
 import com.lld.im.service.group.model.resp.GetGroupResp;
 import com.lld.im.service.group.model.resp.GetJoinedGroupResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
-import com.lld.im.service.group.service.GroupMemberService;
 import com.lld.im.service.group.service.GroupMessageProducer;
-import com.lld.im.service.group.service.GroupService;
+import com.lld.im.service.group.service.ImGroupMemberService;
+import com.lld.im.service.group.service.ImGroupService;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.utils.CallbackService;
 import org.apache.commons.lang3.StringUtils;
@@ -48,13 +48,13 @@ import java.util.UUID;
  * @version: 1.0
  */
 @Service
-public class GroupServiceImpl implements GroupService {
+public class ImGroupServiceImpl implements ImGroupService {
 
     @Autowired
     ImGroupMapper imGroupDataMapper;
 
     @Autowired
-    GroupMemberService groupMemberService;
+    ImGroupMemberService groupMemberService;
 
     @Autowired
     AppConfig appConfig;
@@ -264,7 +264,7 @@ public class GroupServiceImpl implements GroupService {
     public ResponseVO getJoinedGroup(GetJoinedGroupReq req) {
 
         ResponseVO<Collection<String>> memberJoinedGroup = groupMemberService.getMemberJoinedGroup(req);
-        if (memberJoinedGroup.getCode() == 200) {
+        if (memberJoinedGroup.isOk()) {
 
             GetJoinedGroupResp resp = new GetJoinedGroupResp();
 

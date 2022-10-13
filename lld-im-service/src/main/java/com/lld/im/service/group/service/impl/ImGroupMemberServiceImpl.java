@@ -1,6 +1,5 @@
 package com.lld.im.service.group.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -15,7 +14,6 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.GroupErrorCode;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
 import com.lld.im.common.enums.GroupTypeEnum;
-import com.lld.im.common.enums.command.Command;
 import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.exception.ApplicationException;
 import com.lld.im.common.model.ClientInfo;
@@ -27,10 +25,9 @@ import com.lld.im.service.group.model.callback.AddMemberCallback;
 import com.lld.im.service.group.model.req.*;
 import com.lld.im.service.group.model.resp.AddMemberResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
-import com.lld.im.service.group.service.GroupMemberService;
 import com.lld.im.service.group.service.GroupMessageProducer;
-import com.lld.im.service.group.service.GroupService;
-import com.lld.im.service.message.service.MessageProducer;
+import com.lld.im.service.group.service.ImGroupMemberService;
+import com.lld.im.service.group.service.ImGroupService;
 import com.lld.im.service.utils.CallbackService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -48,16 +45,16 @@ import java.util.*;
  * @version: 1.0
  */
 @Service
-public class GroupMemberServiceImpl implements GroupMemberService {
+public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Autowired
     ImGroupMemberMapper imGroupMemberMapper;
 
     @Autowired
-    GroupService groupService;
+    ImGroupService groupService;
 
     @Autowired
-    GroupMemberService groupMemberService;
+    ImGroupMemberService groupMemberService;
 
     @Autowired
     CallbackService callbackService;

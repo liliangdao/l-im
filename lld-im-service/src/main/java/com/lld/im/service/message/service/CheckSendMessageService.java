@@ -8,8 +8,8 @@ import com.lld.im.service.friendship.model.req.GetRelationReq;
 import com.lld.im.service.friendship.service.ImFriendShipService;
 import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
-import com.lld.im.service.group.service.GroupMemberService;
-import com.lld.im.service.group.service.GroupService;
+import com.lld.im.service.group.service.ImGroupMemberService;
+import com.lld.im.service.group.service.ImGroupService;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.service.ImUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +33,10 @@ public class CheckSendMessageService {
     ImFriendShipService imFriendShipService;
 
     @Autowired
-    GroupService groupService;
+    ImGroupService groupService;
 
     @Autowired
-    GroupMemberService groupMemberService;
+    ImGroupMemberService groupMemberService;
 
 
     public ResponseVO checkSenderForbidAndMute(String from,Integer appId){

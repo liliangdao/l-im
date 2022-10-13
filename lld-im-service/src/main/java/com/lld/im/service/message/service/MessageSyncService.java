@@ -1,6 +1,5 @@
 package com.lld.im.service.message.service;
 
-import ch.qos.logback.core.net.server.Client;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.pack.MessageReadedAck;
@@ -21,8 +20,8 @@ import com.lld.im.common.model.msg.MessageReciveAckContent;
 import com.lld.im.common.model.msg.OfflineMessageContent;
 import com.lld.im.common.model.msg.RecallMessageContent;
 import com.lld.im.service.conversation.service.ConversationService;
-import com.lld.im.service.group.service.GroupMemberService;
 import com.lld.im.service.group.service.GroupMessageProducer;
+import com.lld.im.service.group.service.ImGroupMemberService;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
 import com.lld.im.service.service.seq.Seq;
@@ -32,16 +31,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.*;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author: Chackylee
@@ -77,7 +72,7 @@ public class MessageSyncService {
     GroupMessageProducer groupMessageProducer;
 
     @Autowired
-    GroupMemberService groupMemberService;
+    ImGroupMemberService groupMemberService;
 
 
     private static Logger logger = LoggerFactory.getLogger(MessageSyncService.class);

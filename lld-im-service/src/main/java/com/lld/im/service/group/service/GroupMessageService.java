@@ -59,7 +59,7 @@ public class GroupMessageService {
     CheckSendMessageService checkSendMessageService;
 
     @Autowired
-    GroupMemberService groupMemberService;
+    ImGroupMemberService groupMemberService;
 
     @Autowired
     MessageSyncService messageSyncService;

@@ -11,7 +11,7 @@ import com.lld.im.common.model.msg.*;
 import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.group.dao.ImGroupMessageHistoryEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMessageHistoryMapper;
-import com.lld.im.service.group.service.GroupMemberService;
+import com.lld.im.service.group.service.ImGroupMemberService;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.ImMessageHistoryEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
@@ -65,7 +65,7 @@ public class MessageStoreService {
     ImGroupMessageHistoryMapper imGroupMessageHistoryMapper;
 
     @Autowired
-    GroupMemberService groupMemberService;
+    ImGroupMemberService groupMemberService;
 
 
     /**

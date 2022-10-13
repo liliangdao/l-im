@@ -14,7 +14,7 @@ import java.util.List;
  * @createDate: 2022/7/10
  * @version: 1.0
  */
-public interface GroupMemberService {
+public interface ImGroupMemberService {
 
     public ResponseVO importGroupMember(ImportGroupMemberReq req);
 
