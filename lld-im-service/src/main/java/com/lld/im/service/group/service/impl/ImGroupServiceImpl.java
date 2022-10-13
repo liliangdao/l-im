@@ -464,10 +464,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         return ResponseVO.successResponse(resp);
     }
 
-
-
     @Override
-    public ResponseVO forbidSendMessageReq(ForbidSendMessageReq req) {
+    public ResponseVO muteGroup(MuteGroupReq req) {
 
         ResponseVO<ImGroupEntity> groupResp = getGroup(req.getGroupId(), req.getAppId());
         if(!groupResp.isOk()){
@@ -499,14 +497,16 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         ImGroupEntity update = new ImGroupEntity();
-        update.setMute(GroupMuteTypeEnum.MUTE.getCode());
+        update.setMute(req.getMute());
         update.setGroupId(group.getGroupId());
         update.setSequence(seq);
         imGroupDataMapper.updateById(update);
 
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("groupId",req.getGroupId());
 
+        groupMessageProducer.producer(req.getOperater(),GroupEventCommand.MUTE_GROUP,jsonObject,new ClientInfo(req.getAppId(),req.getClientType(),req.getImel()));
         return ResponseVO.successResponse();
     }
-
 
 }

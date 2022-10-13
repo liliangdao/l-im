@@ -75,10 +75,10 @@ public class ImGroupController {
     }
 
     @RequestMapping("/forbidSendMessage")
-    public ResponseVO forbidSendMessage(@RequestBody @Validated ForbidSendMessageReq req, Integer appId, String identifier)  {
+    public ResponseVO forbidSendMessage(@RequestBody @Validated MuteGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
         req.setOperater(identifier);
-        return groupService.forbidSendMessageReq(req);
+        return groupService.muteGroup(req);
     }
 
     @RequestMapping("/transferGroup")

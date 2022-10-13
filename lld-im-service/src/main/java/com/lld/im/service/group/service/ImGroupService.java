@@ -31,5 +31,5 @@ public interface ImGroupService {
 
     public ResponseVO getGroup(GetGroupReq req);
 
-    public ResponseVO forbidSendMessageReq(ForbidSendMessageReq req);
+    public ResponseVO muteGroup(MuteGroupReq req);
 }

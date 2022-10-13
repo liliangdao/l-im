@@ -49,6 +49,11 @@ public enum GroupEventCommand implements Command {
      */
     TRANSFER_GROUP(2008),
 
+    /**
+     * 禁言群 2009，通知所有人
+     */
+    MUTE_GROUP(2009),
+
     ;
 
     private Integer command;
