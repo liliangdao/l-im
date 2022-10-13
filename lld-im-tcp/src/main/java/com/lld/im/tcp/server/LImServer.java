@@ -57,7 +57,7 @@ public class LImServer {
                         //向pipeline加入编码器
                         pipeline.addLast("encoder", new MessageEncoder(Message.class));
                         //心跳检测Handler
-                        pipeline.addLast(new IdleStateHandler(8, 10, 12));
+                        pipeline.addLast(new IdleStateHandler(0, 0, 10));
                         // 自定义的空闲状态检测
                         pipeline.addLast(new HeartBeatHandler());
                         //加入自己的业务处理handler
