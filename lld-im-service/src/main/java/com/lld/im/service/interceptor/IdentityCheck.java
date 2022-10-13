@@ -74,7 +74,7 @@ public class IdentityCheck {
         String secretKey = appConfig.getPrivateKey();
 
         TLSSigAPI sigApi = new TLSSigAPI(Long.valueOf(appid), secretKey);
-        logger.error("sigApi:appId:" + appid +",secretKey=" + secretKey);
+//        logger.error("sigApi:appId:" + appid +",secretKey=" + secretKey);
         long expireSec = 0L;
 
         JSONObject sigDoc = sigApi.decodeUserSig(userSig); // 解密
