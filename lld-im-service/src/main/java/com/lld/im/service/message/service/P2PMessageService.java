@@ -268,9 +268,9 @@ public class P2PMessageService {
         P2PMessagePack p2PMessagePack = new P2PMessagePack();
         BeanUtils.copyProperties(messageContent, p2PMessagePack);
 
-        if (p2PMessagePack.getMessageLifeTime() != null && p2PMessagePack.getMessageLifeTime() != 0) {
-            p2PMessagePack.setMessageLifeTime(0L);
-        }
+//        if (p2PMessagePack.getMessageLifeTime() != null && p2PMessagePack.getMessageLifeTime() != 0) {
+//            p2PMessagePack.setMessageLifeTime(0L);
+//        }
 
         List<ClientInfo> successResults = messageProducer.sendToUser(toId, MessageCommand.MSG_P2P, p2PMessagePack,messageContent.getAppId());
 
