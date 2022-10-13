@@ -180,6 +180,10 @@ public class CheckSendMessageService {
             return ResponseVO.errorResponse(GroupErrorCode.THIS_GROUP_IS_MUTE);
         }
 
+        if(data.getSpeakDate() != null && data.getSpeakDate() > System.currentTimeMillis()){
+            return ResponseVO.errorResponse(GroupErrorCode.GROUP_MEMBER_IS_SPEAK);
+        }
+
         return ResponseVO.successResponse();
     }
 

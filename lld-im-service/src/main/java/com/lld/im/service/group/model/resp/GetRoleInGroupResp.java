@@ -16,4 +16,6 @@ public class GetRoleInGroupResp {
 
     private Integer role;
 
+    private Long speakDate;
+
 }

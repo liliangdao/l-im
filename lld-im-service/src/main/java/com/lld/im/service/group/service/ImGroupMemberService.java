@@ -42,5 +42,5 @@ public interface ImGroupMemberService {
 
     public ResponseVO transferGroupMember(String owner,String groupId,Integer appId);
 
-
+    public ResponseVO speak(SpeaMemberReq req);
 }

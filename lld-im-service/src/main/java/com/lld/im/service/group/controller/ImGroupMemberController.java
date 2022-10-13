@@ -53,5 +53,12 @@ public class ImGroupMemberController {
         return groupMemberService.updateGroupMember(req);
     }
 
+    @RequestMapping("/speak")
+    public ResponseVO speak(@RequestBody @Validated SpeaMemberReq req, Integer appId, String identifier)  {
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return groupMemberService.speak(req);
+    }
+
 
 }

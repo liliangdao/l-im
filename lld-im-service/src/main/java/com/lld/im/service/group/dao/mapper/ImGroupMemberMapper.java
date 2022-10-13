@@ -24,7 +24,7 @@ public interface ImGroupMemberMapper extends BaseMapper<ImGroupMemberEntity> {
 
     @Results({
             @Result(column = "member_id", property = "memberId"),
-            @Result(column = "speak_flag", property = "speakFlag"),
+//            @Result(column = "speak_flag", property = "speakFlag"),
             @Result(column = "speak_date", property = "speakDate"),
             @Result(column = "role", property = "role"),
             @Result(column = "alias", property = "alias"),
@@ -33,7 +33,7 @@ public interface ImGroupMemberMapper extends BaseMapper<ImGroupMemberEntity> {
     })
     @Select("select " +
             " member_id, " +
-            " speak_flag,  " +
+//            " speak_flag,  " +
             " speak_date,  " +
             " role, " +
             " alias, " +

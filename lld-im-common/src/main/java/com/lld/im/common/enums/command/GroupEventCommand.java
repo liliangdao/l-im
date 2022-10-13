@@ -54,6 +54,12 @@ public enum GroupEventCommand implements Command {
      */
     MUTE_GROUP(2009),
 
+
+    /**
+     * 禁言/解禁 群成员 2010，通知管理员和被操作人
+     */
+    SPEAK_GOUP_MEMBER(2010),
+
     ;
 
     private Integer command;

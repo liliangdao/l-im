@@ -42,6 +42,8 @@ public enum GroupErrorCode implements ApplicationExceptionEnum {
     PRIVATE_GROUP_CAN_NOT_DESTORY(40015,"私有群不允许解散"),
 
     PUBLIC_GROUP_MUST_HAVE_OWNER(40016,"公开群必须指定群主"),
+
+    GROUP_MEMBER_IS_SPEAK(40017,"群成员被禁言"),
     ;
 
     private int code;
