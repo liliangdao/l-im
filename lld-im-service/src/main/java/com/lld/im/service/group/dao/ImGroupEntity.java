@@ -1,5 +1,7 @@
 package com.lld.im.service.group.dao;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.lld.im.common.model.KeyValuesBase;
 import com.lld.im.service.group.model.req.GroupMemberDto;
@@ -17,6 +19,7 @@ import java.util.List;
 @TableName("im_group")
 public class ImGroupEntity {
 
+    @TableId(value = "group_id",type = IdType.AUTO)
     private String groupId;
 
     private Integer appId;

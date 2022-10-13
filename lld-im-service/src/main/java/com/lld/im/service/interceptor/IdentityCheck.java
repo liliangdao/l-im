@@ -77,16 +77,18 @@ public class IdentityCheck {
         logger.error("sigApi:appId:" + appid +",secretKey=" + secretKey);
         long expireSec = 0L;
 
-//		expireSec = appManager.getExpire(identifier);
         JSONObject sigDoc = sigApi.decodeUserSig(userSig); // 解密
         Long expireTime = 0L;
         String decodeAppId = "";
+        String signIdentifier = "";
         try {
             String expire = sigDoc.get("TLS.expire").toString();
             String expireTimeStr = sigDoc.get("TLS.expireTime").toString();
             expireSec = Long.valueOf(expire);
             decodeAppId = sigDoc.get("TLS.appId").toString();
             expireTime = Long.valueOf(expireTimeStr) + Long.valueOf(expire);
+            signIdentifier = sigDoc.getString("TLS.identifier");
+
         } catch (Exception ex){
             ex.printStackTrace();
             logger.error("checkUserSig-error:" + ex.getMessage());
@@ -98,6 +100,10 @@ public class IdentityCheck {
 
         if (expireSec == 0L)
             return GateWayErrorCode.USERSIGN_IS_EXPIRED;
+
+        if(!signIdentifier.equals(identifier)){
+            return GateWayErrorCode.USERSIGN_OPERATE_NOT_MATE;
+        }
 
         if (!decodeAppId.equals(appid))
             return GateWayErrorCode.APPID_NOT_EXIST;

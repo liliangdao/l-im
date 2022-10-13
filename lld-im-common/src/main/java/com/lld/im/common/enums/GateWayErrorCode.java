@@ -17,6 +17,8 @@ public enum GateWayErrorCode implements ApplicationExceptionEnum {
 
     USERSIGN_IS_ERROR(60003,"用户签名不正确"),
 
+    USERSIGN_OPERATE_NOT_MATE(60005,"用户签名与操作人不匹配"),
+
     USERSIGN_IS_EXPIRED(60004,"用户签名已过期"),
 
     ;

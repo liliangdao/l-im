@@ -60,5 +60,4 @@ public class ImGroupMemberController {
         return groupMemberService.speak(req);
     }
 
-
 }
