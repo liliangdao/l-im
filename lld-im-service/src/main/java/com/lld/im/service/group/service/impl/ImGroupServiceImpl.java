@@ -465,4 +465,48 @@ public class ImGroupServiceImpl implements ImGroupService {
     }
 
 
+
+    @Override
+    public ResponseVO forbidSendMessageReq(ForbidSendMessageReq req) {
+
+        ResponseVO<ImGroupEntity> groupResp = getGroup(req.getGroupId(), req.getAppId());
+        if(!groupResp.isOk()){
+            return groupResp;
+        }
+
+        boolean isadmin = false;
+
+        if(!isadmin){
+            //不是后台调用需要检查权限
+            ResponseVO<GetRoleInGroupResp> role = groupMemberService.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+
+            if (!role.isOk()) {
+                return role;
+            }
+
+            GetRoleInGroupResp data = role.getData();
+            Integer roleInfo = data.getRole();
+
+            boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
+
+            //公开群只能群主修改资料
+            if (!isManager) {
+                throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+            }
+        }
+
+        ImGroupEntity group = groupResp.getData();
+
+        long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
+        ImGroupEntity update = new ImGroupEntity();
+        update.setMute(GroupMuteTypeEnum.MUTE.getCode());
+        update.setGroupId(group.getGroupId());
+        update.setSequence(seq);
+        imGroupDataMapper.updateById(update);
+
+
+        return ResponseVO.successResponse();
+    }
+
+
 }

@@ -74,6 +74,13 @@ public class ImGroupController {
         return groupService.destroyGroup(req);
     }
 
+    @RequestMapping("/forbidSendMessage")
+    public ResponseVO forbidSendMessage(@RequestBody @Validated ForbidSendMessageReq req, Integer appId, String identifier)  {
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return groupService.forbidSendMessageReq(req);
+    }
+
     @RequestMapping("/transferGroup")
     public ResponseVO transferGroup(@RequestBody @Validated TransferGroupReq req, Integer appId, String identifier)  {
         req.setAppId(appId);
