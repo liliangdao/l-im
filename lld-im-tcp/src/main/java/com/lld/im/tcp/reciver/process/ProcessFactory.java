@@ -13,36 +13,18 @@ import java.io.IOException;
  **/
 public class ProcessFactory {
 
-    private static MessageProcess userEventMessageProcess;
-    private static MessageProcess chatMessageProcess;
     private static MessageProcess defatultProcess;
 
     static {
-        userEventMessageProcess = new UserEventMessageProcess();
-        chatMessageProcess = new ChatMessageProcess();
         defatultProcess = new MessageProcess() {
             @Override
-            protected void doProcess(MessagePack pack, AbstractChannel channel, Channel mqChannel) throws IOException {
-
+            public void process(MessagePack pack, Channel mqChannel) throws IOException {
+                super.process(pack, mqChannel);
             }
         };
     }
 
     public static MessageProcess getMessageProcess(Integer command){
-        if(command.toString().startsWith("4")){
-            //4开头表示是用户消息
-            return userEventMessageProcess;
-        }
-        if(command.toString().startsWith("1")){
-            //2开头表示是用户消息
-            return chatMessageProcess;
-        }
-
-        if(command.toString().startsWith("4")){
-            //2开头表示是用户消息
-            return chatMessageProcess;
-        }
-
         return defatultProcess;
     }
 

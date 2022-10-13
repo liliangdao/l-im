@@ -18,8 +18,6 @@ public abstract class MessageProcess {
         if(channel != null){
             channel.writeAndFlush(pack);
         }
-        doProcess(pack,channel,mqChannel);
     }
-    protected abstract void doProcess(MessagePack pack, AbstractChannel channel, Channel mqChannel) throws IOException;
 
 }
