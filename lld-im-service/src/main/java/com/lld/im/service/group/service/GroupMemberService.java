@@ -28,8 +28,6 @@ public interface GroupMemberService {
 
     public ResponseVO<GetRoleInGroupResp> getRoleInGroupOne(String groupId, String memberId, Integer appId);
 
-    public ResponseVO<List<GetRoleInGroupResp>> getRoleInGroup(GetRoleInGroupReq req);
-
     public ResponseVO<Collection<String>> getMemberJoinedGroup(GetJoinedGroupReq req);
 
     public ResponseVO<Collection<String>> syncMemberJoinedGroup(SyncReq req);

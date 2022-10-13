@@ -8,12 +8,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lld.im.codec.pack.AddGroupMemberPack;
 import com.lld.im.codec.pack.RemoveGroupMemberPack;
+import com.lld.im.codec.pack.UpdateGroupMemberPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.GroupErrorCode;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
 import com.lld.im.common.enums.GroupTypeEnum;
+import com.lld.im.common.enums.command.Command;
 import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.exception.ApplicationException;
 import com.lld.im.common.model.ClientInfo;
@@ -113,11 +115,6 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     @Transactional
     public ResponseVO addGroupMember(String groupId, Integer appId, GroupMemberDto dto) {
 
-        QueryWrapper<ImGroupMemberEntity> query = new QueryWrapper<>();
-        query.eq("group_id", groupId);
-        query.eq("app_id", appId);
-        query.eq("member_id", dto.getMemberId());
-
         if (dto.getRole() != null && GroupMemberRoleEnum.OWNER.getCode() == dto.getRole()) {
             QueryWrapper<ImGroupMemberEntity> queryOwner = new QueryWrapper<>();
             queryOwner.eq("group_id", groupId);
@@ -129,6 +126,10 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             }
         }
 
+        QueryWrapper<ImGroupMemberEntity> query = new QueryWrapper<>();
+        query.eq("group_id", groupId);
+        query.eq("app_id", appId);
+        query.eq("member_id", dto.getMemberId());
         ImGroupMemberEntity memberDto = imGroupMemberMapper.selectOne(query);
 
         long now = System.currentTimeMillis();
@@ -162,7 +163,17 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
     @Override
     public ResponseVO removeGroupMember(String groupId, Integer appId, String memberId) {
-        return null;
+        ResponseVO<GetRoleInGroupResp> roleInGroupOne = getRoleInGroupOne(groupId,memberId,appId);
+        if(!roleInGroupOne.isOk()){
+            return roleInGroupOne;
+        }
+
+        GetRoleInGroupResp data = roleInGroupOne.getData();
+        ImGroupMemberEntity imGroupMemberEntity = new ImGroupMemberEntity();
+        imGroupMemberEntity.setRole(GroupMemberRoleEnum.LEAVE.getCode());
+        imGroupMemberEntity.setGroupMemberId(data.getGroupMemberId());
+        imGroupMemberMapper.updateById(imGroupMemberEntity);
+        return ResponseVO.successResponse();
     }
 
     /**
@@ -187,14 +198,10 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             return ResponseVO.errorResponse(GroupErrorCode.MEMBER_IS_NOT_JOINED_GROUP);
         }
 
+        resp.setGroupMemberId(imGroupMemberEntity.getGroupMemberId());
         resp.setMemberId(imGroupMemberEntity.getMemberId());
         resp.setRole(imGroupMemberEntity.getRole());
         return ResponseVO.successResponse(resp);
-    }
-
-    @Override
-    public ResponseVO<List<GetRoleInGroupResp>> getRoleInGroup(GetRoleInGroupReq req) {
-        return null;
     }
 
     @Override
@@ -232,7 +239,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     }
 
     /**
-     * @description: 添加群成员，拉人入群的逻辑，直接进入群聊。如果是后台管理员，则直接拉入群，否则只有私有群可以调用本接口，并且群成员也可以拉人入群
+     * @description: 添加群成员，拉人入群的逻辑，直接进入群聊。如果是后台管理员，则直接拉入群，
+     *  否则只有私有群可以调用本接口，并且群成员也可以拉人入群.只有私有群可以调用本接口
      * @param
      * @return com.lld.im.common.ResponseVO
      * @author lld
@@ -255,33 +263,14 @@ public class GroupMemberServiceImpl implements GroupMemberService {
          * 私有群（private）	类似普通微信群，创建后仅支持已在群内的好友邀请加群，且无需被邀请方同意或群主审批
          * 公开群（Public）	类似 QQ 群，创建后群主可以指定群管理员，需要群主或管理员审批通过才能入群
          * 群类型 1私有群（类似微信） 2公开群(类似qq）
-         * 只有私有群可以调用本接口
+         *
          */
-//        if(!isAdmin){
-//             if(GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()){
-//                 //不是群成员无法拉人入群
-//                 ResponseVO<GetRoleInGroupResp> role = getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
-//                 if(!role.isOk()){
-//                     return role;
-//                 }
-//
-//                 GetRoleInGroupResp data = role.getData();
-//                 Integer roleInfo = data.getRole();
-//
-//                 boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode() || roleInfo == GroupMemberRoleEnum.OWNER.getCode();
-//                //公开群必须是管理员才能拉人
-//                 if(!isManager && GroupTypeEnum.PRIVATE.getCode() == group.getGroupType()){
-//                     throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
-//                 }
-//            }
-//        }
 
         if(!isAdmin && GroupTypeEnum.PUBLIC.getCode() == group.getGroupType()) {
             throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_APPMANAGER_ROLE);
         }
 
         List<String> successId = new ArrayList<>();
-//        if(CollectionUtil.isNotEmpty(req.getMembers())){
             for (GroupMemberDto memberId:
                     req.getMembers()) {
                 ResponseVO responseVO = null;
@@ -298,12 +287,13 @@ public class GroupMemberServiceImpl implements GroupMemberService {
                     addMemberResp.setResult(0);
                 }else if(responseVO.getCode() == GroupErrorCode.USER_IS_JOINED_GROUP.getCode()){
                     addMemberResp.setResult(2);
+                    addMemberResp.setResultMessage(responseVO.getMsg());
                 }else{
                     addMemberResp.setResult(1);
+                    addMemberResp.setResultMessage(responseVO.getMsg());
                 }
                 resp.add(addMemberResp);
             }
-//        }
 
         AddGroupMemberPack addGroupMemberPack = new AddGroupMemberPack();
         addGroupMemberPack.setGroupId(req.getGroupId());
@@ -438,9 +428,6 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         }
 
         ImGroupMemberEntity update = new ImGroupMemberEntity();
-        if(req.getRole() != null && GroupMemberRoleEnum.getItem(req.getRole()) != null ){
-            update.setRole(req.getRole());
-        }
 
         if(StringUtils.isNotBlank(req.getAlias())){
             update.setAlias(req.getAlias());
@@ -451,6 +438,11 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         objectUpdateWrapper.eq("member_id",req.getMemberId());
         objectUpdateWrapper.eq("group_id",req.getGroupId());
         imGroupMemberMapper.update(update, objectUpdateWrapper);
+
+        UpdateGroupMemberPack pack = new UpdateGroupMemberPack();
+        BeanUtils.copyProperties(req,pack);
+        groupMessageProducer.producer(req.getOperater(), GroupEventCommand.UPDATED_MEMBER,pack,new ClientInfo(req.getAppId(),req.getClientType(),req.getImel()));
+
         return ResponseVO.successResponse();
     }
 

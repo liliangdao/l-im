@@ -11,6 +11,7 @@ import com.lld.im.common.model.msg.*;
 import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.group.dao.ImGroupMessageHistoryEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMessageHistoryMapper;
+import com.lld.im.service.group.service.GroupMemberService;
 import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.ImMessageHistoryEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
@@ -62,6 +63,9 @@ public class MessageStoreService {
 
     @Autowired
     ImGroupMessageHistoryMapper imGroupMessageHistoryMapper;
+
+    @Autowired
+    GroupMemberService groupMemberService;
 
 
     /**
@@ -165,6 +169,9 @@ public class MessageStoreService {
         offlineMessageContent.setConversationId(conversationService.convertConversationId(ConversationTypeEnum.GROUP.getCode(),
                 offlineMessageContent.getFromId(), offlineMessageContent.getToId()));
         offlineMessageContent.setMessageKey(offlineMessageContent.getMessageKey());
+
+        List<String> groupMemberId = groupMemberService.getGroupMemberId(offlineMessageContent.getToId(), offlineMessageContent.getAppId());
+        offlineMessageContent.setMembers(groupMemberId);
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
 

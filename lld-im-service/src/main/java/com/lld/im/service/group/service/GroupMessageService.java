@@ -101,7 +101,8 @@ public class GroupMessageService {
         sendMessageResp.setMessageKey(messageKey);
         sendMessageResp.setMessageTime(System.currentTimeMillis());
 
-        dispatchMessage(message,null);
+        dispatchMessage(message,req.getOfflinePushInfo());
+        syncToSender(message,message,req.getOfflinePushInfo());
 
         return sendMessageResp;
     }
@@ -185,10 +186,6 @@ public class GroupMessageService {
 
         GroupMessagePack groupMessageContent = new GroupMessagePack();
         BeanUtils.copyProperties(messageContent, groupMessageContent);
-
-        if (groupMessageContent.getMessageLifeTime() != null && groupMessageContent.getMessageLifeTime() != 0) {
-            groupMessageContent.setMessageLifeTime(0L);
-        }
 
         ResponseVO<List<GroupMemberDto>> groupMember = groupMemberService.getGroupMember(groupId, messageContent.getAppId());
         if(groupMember.isOk()){

@@ -160,7 +160,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
         } else if (command == MessageCommand.MSG_P2P.getCommand()) {
             try {
-                MqMessageProducer.sendMessageToMessageService(msg.getMessagePack(),command);
+                MqMessageProducer.sendMessageByCommand(msg.getMessagePack(),command);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -176,7 +176,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                 content.setAppId(pack.getAppId());
                 content.setImei(pack.getImei());
                 content.setClientType(pack.getClientType());
-                MqMessageProducer.sendMessageToMessageService(content,command);
+                MqMessageProducer.sendMessageByCommand(content,command);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -3,6 +3,7 @@ package com.lld.im.service.group.service;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.pack.AddGroupMemberPack;
 import com.lld.im.codec.pack.RemoveGroupMemberPack;
+import com.lld.im.codec.pack.UpdateGroupMemberPack;
 import com.lld.im.common.ClientType;
 import com.lld.im.common.enums.command.Command;
 import com.lld.im.common.enums.command.GroupEventCommand;
@@ -64,6 +65,20 @@ public class GroupMessageProducer {
                     messageProducer.sendToUserExceptClient(e,command,data,clientInfo);
                 }else{
                     messageProducer.sendToUser(e,command,data,clientInfo.getAppId());
+                }
+            });
+
+        }else if(command.equals(GroupEventCommand.UPDATED_MEMBER.getCommand())){
+            UpdateGroupMemberPack pack = o.toJavaObject(UpdateGroupMemberPack.class);
+            List<GroupMemberDto> groupManager = groupMemberService.getGroupManager(groupId, appId);
+            GroupMemberDto groupMemberDto = new GroupMemberDto();
+            groupMemberDto.setMemberId(pack.getMemberId());
+            groupManager.add(groupMemberDto);
+            groupManager.forEach(e->{
+                if(clientInfo.getClientType() != ClientType.WEBAPI.getCode() && !e.equals(userId)){
+                    messageProducer.sendToUserExceptClient(e.getMemberId(),command,data,clientInfo);
+                }else{
+                    messageProducer.sendToUser(e.getMemberId(),command,data,clientInfo.getAppId());
                 }
             });
 

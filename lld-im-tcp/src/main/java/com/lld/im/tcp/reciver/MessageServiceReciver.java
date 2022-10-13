@@ -21,7 +21,7 @@ import java.io.IOException;
  **/
 public class MessageServiceReciver {
 
-    private static Logger log = LoggerFactory.getLogger(WebSocketMessageEncoder.class);
+    private static Logger log = LoggerFactory.getLogger(MessageServiceReciver.class);
 
     private static String brokerId;
 
@@ -37,15 +37,14 @@ public class MessageServiceReciver {
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                     String msgStr = new String(body);
                     System.out.println("收到消息：" + msgStr);
+                    log.info("收到消息：{}", msgStr);
                     MessagePack messagePack = JSONObject.parseObject(msgStr, MessagePack.class);
                     try {
                         MessageProcess messageProcess = ProcessFactory.getMessageProcess(messagePack.getCommand());
-                        if(messageProcess == null){
-
-                        }
                         messageProcess.process(messagePack,channel);
                         channel.basicAck(envelope.getDeliveryTag() , false);
                     } catch (Exception e){
+                        e.printStackTrace();
                         channel.basicNack(envelope.getDeliveryTag(),false,false);
                     }
                 }
