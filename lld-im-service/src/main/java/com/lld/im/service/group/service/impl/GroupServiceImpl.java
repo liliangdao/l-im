@@ -455,6 +455,7 @@ public class GroupServiceImpl implements GroupService {
                 if (groupMember.isOk()) {
                     getGroupResp.setMemberList(groupMember.getData());
                 }
+                resp.add(getGroupResp);
             } catch (Exception e) {
 
             }

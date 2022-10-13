@@ -1,5 +1,11 @@
 package com.lld.im.tcp.reciver.process;
 
+import com.lld.im.codec.proto.MessagePack;
+import com.rabbitmq.client.Channel;
+import io.netty.channel.AbstractChannel;
+
+import java.io.IOException;
+
 /**
  * @author: Chackylee
  * @description:
@@ -7,24 +13,37 @@ package com.lld.im.tcp.reciver.process;
  **/
 public class ProcessFactory {
 
-    public static MessageProcess userEventMessageProcess;
-    public static MessageProcess chatMessageProcess;
+    private static MessageProcess userEventMessageProcess;
+    private static MessageProcess chatMessageProcess;
+    private static MessageProcess defatultProcess;
 
     static {
         userEventMessageProcess = new UserEventMessageProcess();
         chatMessageProcess = new ChatMessageProcess();
+        defatultProcess = new MessageProcess() {
+            @Override
+            protected void doProcess(MessagePack pack, AbstractChannel channel, Channel mqChannel) throws IOException {
+
+            }
+        };
     }
 
     public static MessageProcess getMessageProcess(Integer command){
         if(command.toString().startsWith("4")){
-            //2开头表示是用户消息
+            //4开头表示是用户消息
             return userEventMessageProcess;
         }
         if(command.toString().startsWith("1")){
             //2开头表示是用户消息
             return chatMessageProcess;
         }
-        return null;
+
+        if(command.toString().startsWith("4")){
+            //2开头表示是用户消息
+            return chatMessageProcess;
+        }
+
+        return defatultProcess;
     }
 
 }

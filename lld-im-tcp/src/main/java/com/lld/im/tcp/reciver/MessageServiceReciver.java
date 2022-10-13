@@ -40,6 +40,9 @@ public class MessageServiceReciver {
                     MessagePack messagePack = JSONObject.parseObject(msgStr, MessagePack.class);
                     try {
                         MessageProcess messageProcess = ProcessFactory.getMessageProcess(messagePack.getCommand());
+                        if(messageProcess == null){
+
+                        }
                         messageProcess.process(messagePack,channel);
                         channel.basicAck(envelope.getDeliveryTag() , false);
                     } catch (Exception e){

@@ -47,9 +47,9 @@ public class GroupController {
     }
 
     @RequestMapping("/getGroupInfo")
-    public ResponseVO getGroupInfo(@RequestBody @Validated CreateGroupReq req,Integer appId)  {
+    public ResponseVO getGroupInfo(@RequestBody @Validated GetGroupReq req,Integer appId)  {
         req.setAppId(appId);
-        return groupService.createGroup(req);
+        return groupService.getGroup(req);
     }
 
     @RequestMapping("/update")
