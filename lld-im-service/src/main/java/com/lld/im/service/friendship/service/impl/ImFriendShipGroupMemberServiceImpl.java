@@ -119,7 +119,7 @@ public class ImFriendShipGroupMemberServiceImpl extends MppServiceImpl<ImFriendS
                 }
             }
         }
-        return null;
+        return ResponseVO.successResponse();
     }
 
     @Override
