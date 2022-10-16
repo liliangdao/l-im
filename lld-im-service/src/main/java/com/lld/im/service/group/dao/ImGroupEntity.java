@@ -19,7 +19,7 @@ import java.util.List;
 @TableName("im_group")
 public class ImGroupEntity {
 
-    @TableId(value = "group_id",type = IdType.AUTO)
+    @TableId(value = "group_id")
     private String groupId;
 
     private Integer appId;
