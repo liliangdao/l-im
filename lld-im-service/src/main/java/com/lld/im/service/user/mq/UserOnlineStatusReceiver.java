@@ -8,6 +8,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.service.message.mq.ChatOperateReceiver;
 import com.lld.im.service.user.model.UserOnlineStatusSubscribeContent;
+import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
 import com.lld.im.service.user.service.UserStatusService;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
@@ -72,14 +73,11 @@ public class UserOnlineStatusReceiver {
                 UserOnlineStatusSubscribeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusSubscribeContent>() {
                 }.getType());
                 userStatusServicel.processUserSubscribeNotify(content);
+            }
+            //用户在线状态变更通知。
+            else if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand())) {
 
-            }//拉取在线状态信息
-//            else if (Objects.equals(command, UserEventCommand.PULL_USER_ONLINE_STATUS.getCommand())) {
-//                PullUserOnlineStatusContent content = JSON.parseObject(msg, new TypeReference<PullUserOnlineStatusContent>() {
-//                }.getType());
-//                List<List<UserSession>> lists = userStatusServicel.pullAllUserOnlineStatus(content);
-//
-//            }
+            }
 
             channel.basicAck(deliveryTag,false);
 

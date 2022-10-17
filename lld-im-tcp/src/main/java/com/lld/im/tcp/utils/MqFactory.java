@@ -16,7 +16,7 @@ import java.util.concurrent.TimeoutException;
  * @description:
  * @create: 2022-07-27 10:36
  **/
-public class MqFactoryUtils {
+public class MqFactory {
 
     private static ConnectionFactory factory = null;
 

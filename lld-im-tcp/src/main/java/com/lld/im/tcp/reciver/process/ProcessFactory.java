@@ -2,7 +2,6 @@ package com.lld.im.tcp.reciver.process;
 
 import com.lld.im.codec.proto.MessagePack;
 import com.rabbitmq.client.Channel;
-import io.netty.channel.AbstractChannel;
 
 import java.io.IOException;
 
@@ -13,10 +12,10 @@ import java.io.IOException;
  **/
 public class ProcessFactory {
 
-    private static MessageProcess defatultProcess;
+    private static BaseProcess defatultProcess;
 
     static {
-        defatultProcess = new MessageProcess() {
+        defatultProcess = new BaseProcess() {
             @Override
             public void process(MessagePack pack, Channel mqChannel) throws IOException {
                 super.process(pack, mqChannel);
@@ -24,7 +23,7 @@ public class ProcessFactory {
         };
     }
 
-    public static MessageProcess getMessageProcess(Integer command){
+    public static BaseProcess getMessageProcess(Integer command){
         return defatultProcess;
     }
 

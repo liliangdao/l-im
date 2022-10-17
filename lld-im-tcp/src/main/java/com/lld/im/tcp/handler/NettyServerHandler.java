@@ -122,7 +122,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             topic.publish(JSON.toJSONString(dto));
 //            stringRedisTemplate.convertAndSend(Constants.RedisConstants.UserLoginChannel, JSON.toJSONString(dto));
 
-
             JSONObject loginSuccessPack = new JSONObject();
             loginSuccessPack.put("code",200);
 //            loginSuccessPack.put("command",SystemCommand.LOGIN.getCommand());
@@ -130,9 +129,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             loginSuccess.setData(loginSuccessPack);
             loginSuccess.setCommand(SystemCommand.LOGIN.getCommand());
             ctx.writeAndFlush(loginSuccess);
-            //发送mq
 
-            MqMessageProducer.sendMessageByCommand(msg.getMessagePack(), UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+            //发送mq,用户在线状态修改
+            MqMessageProducer.sendMessageByCommand(msg.getMessagePack(), UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand());
+
             UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
             Collection<Object> values = map.values();
             List<UserSession> userSessions = new ArrayList<>();
@@ -147,7 +147,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             pack.setCustomStatus(loginPack.getCustomStatus());
             pack.setCustomText(loginPack.getCustomText());
             pack.setStatus(UserPipelineConnectState.ONLINE.getCommand());
-            //发送在线状态信息
+
+            //发送在线状态修改信息-》通知用户
             MqMessageProducer.sendMessageByCommand(pack,UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
 
         } else if (command == SystemCommand.LOGOUT.getCommand()) {

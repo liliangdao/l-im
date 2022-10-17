@@ -1,12 +1,11 @@
 package com.lld.im.tcp.reciver;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.WebSocketMessageEncoder;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.tcp.reciver.process.MessageProcess;
+import com.lld.im.tcp.reciver.process.BaseProcess;
 import com.lld.im.tcp.reciver.process.ProcessFactory;
-import com.lld.im.tcp.utils.MqFactoryUtils;
+import com.lld.im.tcp.utils.MqFactory;
 import com.rabbitmq.client.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ public class MessageServiceReciver {
 
     public static void startReciverMessage() {
         try {
-            final Channel channel = MqFactoryUtils.getChannel(Constants.RabbitConstants.MessageService2Im);
+            final Channel channel = MqFactory.getChannel(Constants.RabbitConstants.MessageService2Im);
             channel.queueDeclare(Constants.RabbitConstants.MessageService2Im + brokerId, true, false, false, null);
             channel.queueBind(Constants.RabbitConstants.MessageService2Im + brokerId, Constants.RabbitConstants.MessageService2Im
                     , brokerId);
@@ -40,7 +39,7 @@ public class MessageServiceReciver {
                     log.info("收到消息：{}", msgStr);
                     MessagePack messagePack = JSONObject.parseObject(msgStr, MessagePack.class);
                     try {
-                        MessageProcess messageProcess = ProcessFactory.getMessageProcess(messagePack.getCommand());
+                        BaseProcess messageProcess = ProcessFactory.getMessageProcess(messagePack.getCommand());
                         messageProcess.process(messagePack,channel);
                         channel.basicAck(envelope.getDeliveryTag() , false);
                     } catch (Exception e){

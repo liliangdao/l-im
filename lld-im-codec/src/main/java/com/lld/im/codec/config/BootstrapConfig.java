@@ -13,11 +13,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class BootstrapConfig {
 
-    public BootstrapConfig defaultConfig() {
-        return null;
-    }
-
-    //    @JsonProperty("lim")
     private TcpConfig lim;
 
     @Data

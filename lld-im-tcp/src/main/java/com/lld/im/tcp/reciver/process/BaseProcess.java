@@ -10,7 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.io.IOException;
 
-public abstract class MessageProcess {
+public abstract class BaseProcess {
 
     public void process(MessagePack pack,Channel mqChannel) throws IOException {
         NioSocketChannel channel = SessionSocketHolder

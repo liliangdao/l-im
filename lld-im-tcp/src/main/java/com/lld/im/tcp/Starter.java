@@ -8,7 +8,7 @@ import com.lld.im.tcp.redis.RedisManager;
 import com.lld.im.tcp.register.RegistryZK;
 import com.lld.im.tcp.server.LImServer;
 import com.lld.im.tcp.server.LImWebSocketServer;
-import com.lld.im.tcp.utils.MqFactoryUtils;
+import com.lld.im.tcp.utils.MqFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.ZkClient;
 import org.yaml.snakeyaml.Yaml;
@@ -62,7 +62,7 @@ public class Starter {
             RedisManager.init(appConfig);
 
             // 初始化mq工厂
-            MqFactoryUtils.init(appConfig.getLim().getRabbitmq());
+            MqFactory.init(appConfig.getLim().getRabbitmq());
             // 启动mq监听消息服务消息
             MessageServiceReciver.init(appConfig.getLim().getBrokerId());
             //注册zk

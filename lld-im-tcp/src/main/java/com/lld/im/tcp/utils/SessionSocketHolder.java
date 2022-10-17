@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.UserPipelineConnectState;
+import com.lld.im.common.model.ChannelInfo;
+import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.UserSession;
 import com.lld.im.tcp.redis.RedisManager;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -22,7 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since JDK 1.8
  */
 public class SessionSocketHolder {
-    private static final Map<String, NioSocketChannel> CHANNEL_MAP = new ConcurrentHashMap<>(16);
+//    private static final Map<String, NioSocketChannel> CHANNEL_MAP = new ConcurrentHashMap<>(16);
+    private static final Map<ChannelInfo, NioSocketChannel> CHANNELS = new ConcurrentHashMap<>(16);
     /**
      * Save the relationship between the userId and the channel.
      *
@@ -30,35 +33,41 @@ public class SessionSocketHolder {
      * @param socketChannel
      */
     public static void put(Integer appId ,String id,Integer client,String imel, NioSocketChannel socketChannel) {
-        CHANNEL_MAP.put(appId + ":" +id+":"+client + ":" + imel, socketChannel);
+        ChannelInfo channelInfo = new ChannelInfo(id, appId, client, imel);
+        CHANNELS.put(channelInfo,socketChannel);
     }
 
     public static NioSocketChannel get(Integer appId ,String id,Integer client,String imel) {
-        String s = appId + ":" + id + ":" + client + ":" + imel;
-        return CHANNEL_MAP.get(s);
+        ChannelInfo channelInfo = new ChannelInfo(id, appId, client, imel);
+        return CHANNELS.get(channelInfo);
     }
 
     public static List<NioSocketChannel> get(Integer appId , String id) {
 
-        Set<String> keys = CHANNEL_MAP.keySet();
+        Set<ChannelInfo> channelInfos = CHANNELS.keySet();
+
         List<NioSocketChannel> channels = new ArrayList<>();
 
-        keys.forEach(key ->{
-
-            if(key.startsWith(appId+":"+id)){
-                channels.add(CHANNEL_MAP.get(key));
+        channelInfos.forEach(channel ->{
+            if(channel.getAppId().equals(appId) && id.equals(channel.getUserId())){
+                channels.add(CHANNELS.get(channel));
             }
         });
 
         return channels;
     }
 
-    public static Map<String, NioSocketChannel> getRelationShip() {
-        return CHANNEL_MAP;
+    public static Map<ChannelInfo, NioSocketChannel> getRelationShip() {
+        return CHANNELS;
     }
 
     public static void remove(NioSocketChannel nioSocketChannel) {
-        CHANNEL_MAP.entrySet().stream().filter(entry -> entry.getValue() == nioSocketChannel).forEach(entry -> CHANNEL_MAP.remove(entry.getKey()));
+        CHANNELS.entrySet().stream().filter(entry -> entry.getValue() == nioSocketChannel).forEach(entry -> CHANNELS.remove(entry.getKey()));
+    }
+
+    public static void remove(Integer appId ,String id,Integer client,String imel) {
+        ChannelInfo channelInfo = new ChannelInfo(id, appId, client, imel);
+        CHANNELS.remove(channelInfo);
     }
 
 
