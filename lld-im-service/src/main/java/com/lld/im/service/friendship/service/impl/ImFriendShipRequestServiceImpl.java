@@ -169,7 +169,6 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
 
         ReadAllFriendRequestPack readAllFriendRequestPack = new ReadAllFriendRequestPack();
         readAllFriendRequestPack.setFromId(req.getFromId());
-        readAllFriendRequestPack.setAppId(req.getAppId());
         //TCP通知
         messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(),FriendshipEventCommand
                 .FRIEND_REQUEST_READ,readAllFriendRequestPack,req.getAppId());

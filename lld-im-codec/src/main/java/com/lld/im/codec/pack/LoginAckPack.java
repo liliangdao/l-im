@@ -5,10 +5,12 @@ import lombok.Data;
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-09-09 10:15
+ * @create: 2022-05-05 09:26
  **/
 @Data
-public class ReadAllFriendRequestPack {
+public class LoginAckPack {
 
-    private String fromId;
+    private String userId;
+
+
 }

@@ -3,6 +3,7 @@ package com.lld.im.tcp.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.lld.im.codec.pack.LoginAckPack;
 import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
 import com.lld.im.codec.proto.Message;
@@ -120,14 +121,16 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             dto.setUserId(loginPack.getUserId());
             RTopic topic = redissonClient.getTopic(Constants.RedisConstants.UserLoginChannel);
             topic.publish(JSON.toJSONString(dto));
-//            stringRedisTemplate.convertAndSend(Constants.RedisConstants.UserLoginChannel, JSON.toJSONString(dto));
 
-            JSONObject loginSuccessPack = new JSONObject();
-            loginSuccessPack.put("code",200);
-//            loginSuccessPack.put("command",SystemCommand.LOGIN.getCommand());
-            MessagePack<JSONObject> loginSuccess = new MessagePack<>();
-            loginSuccess.setData(loginSuccessPack);
+
+            //返回给当前端登录成功 -> 仅代表和tcp服务连通
+            LoginAckPack loginSuccessPack = new LoginAckPack();
+            loginSuccessPack.setUserId(loginPack.getUserId());
+            MessagePack<LoginAckPack> loginSuccess = new MessagePack<>();
             loginSuccess.setCommand(SystemCommand.LOGIN.getCommand());
+            loginSuccess.setData(loginSuccessPack);
+            loginSuccess.setAppId(loginPack.getAppId());
+            loginSuccess.setToId(loginPack.getUserId());
             ctx.writeAndFlush(loginSuccess);
 
             //发送mq,用户在线状态修改
