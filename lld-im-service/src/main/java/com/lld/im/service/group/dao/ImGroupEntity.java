@@ -1,13 +1,9 @@
 package com.lld.im.service.group.dao;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.lld.im.common.model.KeyValuesBase;
-import com.lld.im.service.group.model.req.GroupMemberDto;
 import lombok.Data;
 
-import java.util.List;
 
 /**
  * @description:

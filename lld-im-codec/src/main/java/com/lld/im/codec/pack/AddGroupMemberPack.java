@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * @author: Chackylee
- * @description:
+ * @description: 群内添加群成员通知报文
  * @create: 2022-09-30 15:16
  **/
 @Data

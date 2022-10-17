@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author: Chackylee
- * @description:
+ * @description: 消息已读ack报文
  * @create: 2022-08-16 14:27
  **/
 @Data

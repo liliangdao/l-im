@@ -7,7 +7,7 @@ import sun.dc.pr.PRError;
 import java.util.List;
 
 /**
- * @description:
+ * @description: 用户状态变更通知报文
  * @author: lld
  * @createDate: 2022/9/25
  * @version: 1.0

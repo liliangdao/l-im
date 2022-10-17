@@ -1,6 +1,5 @@
 package com.lld.im.service.group.model.req;
 
-import com.lld.im.common.model.KeyValuesBase;
 import com.lld.im.common.model.RequestBase;
 import lombok.Data;
 
@@ -23,8 +22,6 @@ public class CreateGroupReq extends RequestBase {
     private Integer groupType;
 
     private String groupName;
-
-    private List<KeyValuesBase> groupExpand;
 
     private Integer mute;// 是否全员禁言，0 不禁言；1 全员禁言。
 

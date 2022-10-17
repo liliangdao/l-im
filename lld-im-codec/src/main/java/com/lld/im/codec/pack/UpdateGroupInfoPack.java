@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * @author: Chackylee
- * @description:
+ * @description: 修改群信息通知报文
  * @create: 2022-09-30 15:00
  **/
 @Data

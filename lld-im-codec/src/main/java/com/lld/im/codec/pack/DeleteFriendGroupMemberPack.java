@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * @author: Chackylee
- * @description:
+ * @description: 删除好友分组成员通知报文
  * @create: 2022-08-02 13:46
  **/
 @Data

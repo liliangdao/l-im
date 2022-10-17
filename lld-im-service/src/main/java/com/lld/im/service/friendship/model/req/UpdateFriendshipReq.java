@@ -1,6 +1,5 @@
 package com.lld.im.service.friendship.model.req;
 
-import com.lld.im.common.model.KeyValuesBase;
 import com.lld.im.common.model.RequestBase;
 import lombok.Data;
 
@@ -28,7 +27,6 @@ public class UpdateFriendshipReq extends RequestBase {
 
         private String remark;
 
-        private List<KeyValuesBase> customerItem;
 
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * @author: Chackylee
- * @description:
+ * @description: 好友分组添加成员通知包
  * @create: 2022-08-02 13:46
  **/
 @Data
