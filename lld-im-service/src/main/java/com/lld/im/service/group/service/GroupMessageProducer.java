@@ -10,6 +10,7 @@ import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.service.group.model.req.GroupMemberDto;
 import com.lld.im.service.message.service.MessageProducer;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.ReactiveStreamCommands;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,9 @@ public class GroupMessageProducer {
         JSONObject o = (JSONObject) JSONObject.toJSON(data);
         int appId = o.getIntValue("appId");
         String groupId = o.getString("groupId");
+        if(StringUtils.isBlank(groupId)){
+            groupId = o.getString("toId");
+        }
 
         if(command.equals(GroupEventCommand.ADDED_MEMBER.getCommand())){
             //申请入群 推送给管理员跟自己

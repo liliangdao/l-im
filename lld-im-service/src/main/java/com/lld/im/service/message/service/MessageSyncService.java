@@ -234,8 +234,7 @@ public class MessageSyncService {
                 offlineMessageContent.setMessageSequence(seq);
                 redisTemplate.opsForZSet().add(toKey,JSONObject.toJSONString(offlineMessageContent),seq);
 
-                //TODO groupMessageProducer
-//                groupMessageProducer.producer(1,pack);
+                groupMessageProducer.producer(content.getFromId(), MessageCommand.MSG_RECALL_NOTIFY, pack,content);
             }
 
         }
