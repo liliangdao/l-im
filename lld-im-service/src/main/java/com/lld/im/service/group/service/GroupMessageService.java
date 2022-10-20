@@ -114,7 +114,8 @@ public class GroupMessageService {
 
         ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
         if (responseVO.isOk()) {
-            long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" + Constants.SeqConstants.Message);
+            long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" +
+                    Constants.SeqConstants.Message + ":" + chatMessageData.getGroupId());
             chatMessageData.setMessageSequence(seq);
             //落库+回包+分发（发送给同步端和接收方的所有端）
             threadPoolExecutor.execute(() -> {
