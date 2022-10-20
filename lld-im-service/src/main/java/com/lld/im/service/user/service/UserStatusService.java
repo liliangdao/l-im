@@ -3,6 +3,7 @@ package com.lld.im.service.user.service;
 import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.UserEventCommand;
+import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.UserSession;
 import com.lld.im.service.friendship.service.ImFriendShipService;
 import com.lld.im.service.message.service.MessageProducer;
@@ -45,7 +46,7 @@ public class UserStatusService {
     /**
      * @param
      * @return void
-     * @description: 用户上线通知，通知给所有好友&&通知给订阅了这个用户的人
+     * @description: 用户上线通知。通知自己其他端本端上线，通知给所有好友&&通知给订阅了这个用户的人
      * @author lld
      * @since 2022/9/24
      */
@@ -58,6 +59,11 @@ public class UserStatusService {
         List<UserSession> userSession = userSessionUtils.getUserSession(pack.getUserId(), pack.getAppId());
         pack.setClient(userSession);
 
+        // 发送给自己的其他端
+        messageProducer.sendToUserExceptClient(pack.getUserId(),UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,pack,
+                new ClientInfo(pack.getAppId(),pack.getClientType(),pack.getImei()));
+
+        //发送给所有好友自己了
         List<String> allFriendId = imFriendShipService.getAllFriendId(pack.getUserId(), pack.getAppId());
         for (String fid :
                 allFriendId) {
@@ -65,6 +71,7 @@ public class UserStatusService {
                     pack, pack.getAppId());
         }
 
+        //发生给临时订阅自己的用户
         for (Object key :
                 keys) {
             String filed = (String) key;

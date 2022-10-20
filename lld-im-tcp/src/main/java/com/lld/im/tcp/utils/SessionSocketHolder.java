@@ -2,11 +2,14 @@ package com.lld.im.tcp.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.UserPipelineConnectState;
+import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.common.model.ChannelInfo;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.UserSession;
+import com.lld.im.tcp.publish.MqMessageProducer;
 import com.lld.im.tcp.redis.RedisManager;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
@@ -72,7 +75,7 @@ public class SessionSocketHolder {
 
 
     /**
-     * @description 设置用户离线，通常用于心跳超时
+     * @description 设置用户离线，通常用于心跳超时,切后台
      * @author chackylee
      * @date 2022/5/7 11:43
      * @param [nioSocketChannel]
@@ -83,6 +86,21 @@ public class SessionSocketHolder {
         String userId = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get();
         String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
         Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
+
+        UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
+        pack.setAppId(appId);
+        pack.setUserId(userId);
+        String[] split = clientInfo.split(":");
+        pack.setClientType(Integer.valueOf(split[0]));
+        pack.setImei(split[1]);
+        pack.setStatus(UserPipelineConnectState.OFFLINE.getCommand());
+
+        //发送在线状态修改信息-》通知用户
+        try {
+            MqMessageProducer.sendMessageByCommand(pack, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         RedissonClient redissonClient = RedisManager.getRedissonClient();
         RMap<String, String> map = redissonClient.getMap(appId + Constants.RedisConstants.UserSessionConstants  + userId);
@@ -108,6 +126,21 @@ public class SessionSocketHolder {
         String userId = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get();
         String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
         Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
+
+        UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
+        pack.setAppId(appId);
+        pack.setUserId(userId);
+        String[] split = clientInfo.split(":");
+        pack.setClientType(Integer.valueOf(split[0]));
+        pack.setImei(split[1]);
+        pack.setStatus(UserPipelineConnectState.OFFLINE.getCommand());
+
+        //发送在线状态修改信息-》通知用户
+        try {
+            MqMessageProducer.sendMessageByCommand(pack, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         RedissonClient redissonClient = RedisManager.getRedissonClient();
         RMap<Object, Object> map = redissonClient.getMap(appId + Constants.RedisConstants.UserSessionConstants + userId);

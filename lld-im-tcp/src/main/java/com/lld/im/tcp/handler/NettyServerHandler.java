@@ -122,33 +122,23 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             RTopic topic = redissonClient.getTopic(Constants.RedisConstants.UserLoginChannel);
             topic.publish(JSON.toJSONString(dto));
 
-
             //返回给当前端登录成功 -> 仅代表和tcp服务连通
+            MessagePack<LoginAckPack> loginSuccess = new MessagePack<>();
             LoginAckPack loginSuccessPack = new LoginAckPack();
             loginSuccessPack.setUserId(loginPack.getUserId());
-            MessagePack<LoginAckPack> loginSuccess = new MessagePack<>();
             loginSuccess.setCommand(SystemCommand.LOGINACK.getCommand());
             loginSuccess.setData(loginSuccessPack);
             loginSuccess.setAppId(loginPack.getAppId());
             loginSuccess.setToId(loginPack.getUserId());
             ctx.writeAndFlush(loginSuccess);
 
-            //发送mq,用户在线状态修改
-            MqMessageProducer.sendMessageByCommand(msg.getMessagePack(), UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand());
-
             UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
-            Collection<Object> values = map.values();
-            List<UserSession> userSessions = new ArrayList<>();
-            for (Object value : values) {
-                UserSession userSession = JSONObject.parseObject(value.toString(), UserSession.class);
-                userSessions.add(userSession);
-            }
-            pack.setClient(userSessions);
             pack.setAppId(loginPack.getAppId());
             pack.setUserId(loginPack.getUserId());
             pack.setClientType(loginPack.getClientType());
             pack.setCustomStatus(loginPack.getCustomStatus());
             pack.setCustomText(loginPack.getCustomText());
+            pack.setImei(loginPack.getImei());
             pack.setStatus(UserPipelineConnectState.ONLINE.getCommand());
 
             //发送在线状态修改信息-》通知用户

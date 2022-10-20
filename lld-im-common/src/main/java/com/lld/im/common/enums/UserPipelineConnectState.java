@@ -4,10 +4,10 @@ import com.lld.im.common.enums.command.Command;
 
 public enum UserPipelineConnectState implements Command {
 
-    //心跳  9998
+    //连接  9998
     ONLINE(1),
 
-    //登陸  1000
+    //离线  1000
     OFFLINE(2);
 
     private Integer command;
