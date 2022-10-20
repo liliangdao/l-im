@@ -466,7 +466,7 @@
     }
 
     //登录
-    function login(userId, toUser,clientType) {
+    function login(userId, toUser,clientType,imel) {
         if (!window.WebSocket) {
             return;
         }
@@ -483,10 +483,14 @@
 
             var messageType = 0x0;
 
+            if(imel == null){
+                imel = "web";
+            }
+
             var userId = userId;
             var toUser = toUser;
 
-            var data = {"userId": userId, "appId": 10000, "clientType": clientType, "imei": "web","customStatus":null,"customClientName":""};
+            var data = {"userId": userId, "appId": 10000, "clientType": clientType, "imei": imel,"customStatus":null,"customClientName":""};
             var jsonData = JSON.stringify(data);
 			console.log(jsonData);
 
@@ -510,7 +514,7 @@
     // *               4位表示数据长度
     // *               后续将解码方式加到数据头根据不同的解码方式解码，如pb，json，现在用json字符串
     //发消息
-    function sendMsg(userId, toId, command,msg,clientType) {
+    function sendMsg(userId, toId, command,msg,clientType,imel) {
         if (!window.WebSocket) {
             return;
         }
@@ -536,8 +540,10 @@
 			if(command == null || command == ''){
 				command = 1103;
 			}
-			
-            var imei = "web"
+
+			if(imel == null){
+                imel = "web"
+            }
             var data = {
                 "userId": userId,
                 "toId": toId,
@@ -611,18 +617,17 @@
     <textarea placeholder="输入登录id" id="userId" name="userId" style="width: 100px;height: 20px"></textarea>
     <textarea placeholder="你要发消息给谁" name="toUser" style="width: 100px;height: 20px"></textarea>
     <textarea placeholder="clientType" id="clientType" name="clientType" style="width: 100px;height: 20px"></textarea>
-    <input type="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value,this.form.clientType.value);">
+    <textarea placeholder="imel" id="imel" name="imel" style="width: 100px;height: 20px"></textarea>
+    <input type="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value,this.form.clientType.value
+    ,this.form.imel.value);">
 
 	<textarea placeholder="输入command" name="command" style="width: 200px;height: 20px"></textarea>
 
     <textarea placeholder="输入要发送的内容" name="message" style="width: 200px;height: 20px"></textarea>
-	
-	
-
 
     <input type="button" value="发送数据"
            onclick="sendMsg(this.form.userId.value,this.form.toUser.value,this.form.command.value,this.form.message.value
-           ,this.form.clientType.value);">
+           ,this.form.clientType.value,this.form.imel.value);">
 
     <h3>服务器输出：</h3>
 
