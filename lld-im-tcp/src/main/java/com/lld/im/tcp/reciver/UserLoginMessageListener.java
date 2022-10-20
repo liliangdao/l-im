@@ -67,16 +67,13 @@ public class UserLoginMessageListener {
                     if (loginModel == DeviceMultiLoginEnum.ONE.getLoginMode()) {
                         String ClientImei = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
                         if (!ClientImei.equals(userClientDto.getClientType() + ":" + userClientDto.getImei())) {
-                            Message sendMsg = new Message();
                             MessageHeader header = new MessageHeader();
                             MessagePack pack = new MessagePack();
                             pack.setToId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                             pack.setUserId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                             pack.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
-                            sendMsg.setMessagePack(pack);
-                            sendMsg.setMessageHeader(header);
                             header.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
-                            nioSocketChannel.writeAndFlush(sendMsg);
+                            nioSocketChannel.writeAndFlush(pack);
                         }
                     } else if (loginModel == DeviceMultiLoginEnum.TWO.getLoginMode()) {
                         String ClientImei = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
@@ -87,15 +84,13 @@ public class UserLoginMessageListener {
                         } else {
                             //踢掉除了本客户端imel的所有channel
                             if (!ClientImei.equals(userClientDto.getClientType() + ":" + userClientDto.getImei())) {
-                                Message sendMsg = new Message();
                                 MessageHeader header = new MessageHeader();
                                 MessagePack msgBody = new MessagePack();
                                 msgBody.setToId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setUserId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
-                                sendMsg.setMessagePack(msgBody);
                                 header.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
-                                nioSocketChannel.writeAndFlush(sendMsg);
+                                nioSocketChannel.writeAndFlush(msgBody);
                             }
                         }
 
@@ -119,15 +114,13 @@ public class UserLoginMessageListener {
                             //踢掉同端的其他连接
                             if (isSameClient &&
                                     !ClientImei.equals(userClientDto.getClientType() + ":" + userClientDto.getImei())) {
-                                Message sendMsg = new Message();
                                 MessageHeader header = new MessageHeader();
                                 MessagePack msgBody = new MessagePack();
                                 msgBody.setToId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setUserId((String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get());
                                 msgBody.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
-                                sendMsg.setMessagePack(msgBody);
                                 header.setCommand(SystemCommand.MUTUALLOGIN.getCommand());
-                                nioSocketChannel.writeAndFlush(sendMsg);
+                                nioSocketChannel.writeAndFlush(msgBody);
                             }
                         }
                     } else {

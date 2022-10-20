@@ -8,11 +8,14 @@ public enum SystemCommand implements Command {
     //登陸  9000
     LOGIN(9000),
 
+    //登陸  9000
+    LOGINACK(9001),
+
     //下线通知 用于多端互斥  9002
     MUTUALLOGIN(9002),
 
     //登出  9001
-    LOGOUT(9001),
+    LOGOUT(9003),
     ;
 
     private Integer command;

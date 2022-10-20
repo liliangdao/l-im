@@ -465,25 +465,8 @@
         alert("浏览器不支持WebSocket！");
     }
 
-    // private Integer appId;
-    // /**
-    //  * 端的标识
-    //  */
-    // private Integer clientType;
-    //
-    // private String imei;
-
-    // private String userId;
-    //
-    // //客户端状态由业务传递
-    // private int customStatus;
-    // //客户端状态字符串
-    // private String customText;
-    //
-    // //设备名称如 iphone11
-    // private String customClientName;
     //登录
-    function login(userId, toUser) {
+    function login(userId, toUser,clientType) {
         if (!window.WebSocket) {
             return;
         }
@@ -493,13 +476,17 @@
 
             var command = 9000;
             var version = 1;
-            var clientType = 1;
+            if(clientType == null){
+                clientType = 1;
+            }
+            clientType = parseInt(clientType);
+
             var messageType = 0x0;
 
             var userId = userId;
             var toUser = toUser;
 
-            var data = {"userId": userId, "appId": 10000, "clientType": 1, "imei": "web","customStatus":null,"customClientName":""};
+            var data = {"userId": userId, "appId": 10000, "clientType": clientType, "imei": "web","customStatus":null,"customClientName":""};
             var jsonData = JSON.stringify(data);
 			console.log(jsonData);
 
@@ -522,9 +509,8 @@
     // *               4位表示appId(待定)
     // *               4位表示数据长度
     // *               后续将解码方式加到数据头根据不同的解码方式解码，如pb，json，现在用json字符串
-
     //发消息
-    function sendMsg(userId, toId, command,msg) {
+    function sendMsg(userId, toId, command,msg,clientType) {
         if (!window.WebSocket) {
             return;
         }
@@ -537,7 +523,12 @@
 
             // var command = 9000;
             var version = 1;
-            var clientType = 1;
+            if(clientType == null ){
+                clientType = 1;
+            }
+
+            clientType = parseInt(clientType);
+
             var messageType = 0x0;
 
             var userId = userId;
@@ -567,7 +558,7 @@
 					"fromId": userId,
 					"toId": toId,
 					"appId": 10000,
-					"clientType": 1,
+					"clientType": clientType,
 					"imei": imei,
 					"messageBody": msg
 				}
@@ -577,7 +568,7 @@
                     "fromId": userId,
                     "groupId": toId,
                     "appId": 10000,
-                    "clientType": 1,
+                    "clientType": clientType,
                     "imei": imei,
                     "messageBody": msg
                 }
@@ -619,7 +610,8 @@
 
     <textarea placeholder="输入登录id" id="userId" name="userId" style="width: 100px;height: 20px"></textarea>
     <textarea placeholder="你要发消息给谁" name="toUser" style="width: 100px;height: 20px"></textarea>
-    <input type="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value);">
+    <textarea placeholder="clientType" id="clientType" name="clientType" style="width: 100px;height: 20px"></textarea>
+    <input type="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value,this.form.clientType.value);">
 
 	<textarea placeholder="输入command" name="command" style="width: 200px;height: 20px"></textarea>
 
@@ -629,7 +621,8 @@
 
 
     <input type="button" value="发送数据"
-           onclick="sendMsg(this.form.userId.value,this.form.toUser.value,this.form.command.value,this.form.message.value);">
+           onclick="sendMsg(this.form.userId.value,this.form.toUser.value,this.form.command.value,this.form.message.value
+           ,this.form.clientType.value);">
 
     <h3>服务器输出：</h3>
 

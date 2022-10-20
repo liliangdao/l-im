@@ -127,7 +127,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             LoginAckPack loginSuccessPack = new LoginAckPack();
             loginSuccessPack.setUserId(loginPack.getUserId());
             MessagePack<LoginAckPack> loginSuccess = new MessagePack<>();
-            loginSuccess.setCommand(SystemCommand.LOGIN.getCommand());
+            loginSuccess.setCommand(SystemCommand.LOGINACK.getCommand());
             loginSuccess.setData(loginSuccessPack);
             loginSuccess.setAppId(loginPack.getAppId());
             loginSuccess.setToId(loginPack.getUserId());
@@ -157,7 +157,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         } else if (command == SystemCommand.LOGOUT.getCommand()) {
             /** 登出事件 **/
             SessionSocketHolder.removeUserSession((NioSocketChannel) ctx.channel());
-            /** TODO 去推送服务删除掉推送信息 */
         }
         else if (command == SystemCommand.PING.getCommand()) {
             //PING
@@ -204,6 +203,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
         //关闭通道
         ctx.close();
     }

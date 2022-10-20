@@ -35,7 +35,6 @@ public class MessageServiceReciver {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                     String msgStr = new String(body);
-                    System.out.println("收到消息：" + msgStr);
                     log.info("收到消息：{}", msgStr);
                     MessagePack messagePack = JSONObject.parseObject(msgStr, MessagePack.class);
                     try {
