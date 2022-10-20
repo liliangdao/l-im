@@ -13,7 +13,6 @@ import org.redisson.config.SingleServerConfig;
 /**
  * 单机客户端策略
  *
- * @author zhaopeng
  */
 public class SingleClientStrategy implements ClientStrategy {
 

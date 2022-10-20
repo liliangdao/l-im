@@ -6,7 +6,6 @@ import org.redisson.api.RedissonClient;
 /**
  * redisson客户策略
  *
- * @author zhaopeng
  */
 public interface ClientStrategy {
 

@@ -6,7 +6,6 @@ import java.util.Map;
 /**
  * 客戶端公長類
  *
- * @author zhaopeng
  */
 public class ClientFactory {
 

@@ -422,7 +422,6 @@ public class ImFriendShipServiceImpl extends
             if (responseVO.isOk()) {
                 Long sequence = responseVO.getData().getFriendSequence();
                 UpdateFriendPack updateItem = new UpdateFriendPack();
-                updateItem.setCustomerItem(e.getCustomerItem());
                 updateItem.setRemark(e.getRemark());
                 updateItem.setToId(e.getToId());
                 updateItem.setSequence(sequence);

@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * 哨兵客户端策略
  *
- * @author zhaopeng
  */
 public class SentinelClientStrategy implements ClientStrategy {
 

@@ -60,7 +60,6 @@ public class Starter {
             }
 
             RedisManager.init(appConfig);
-
             // 初始化mq工厂
             MqFactory.init(appConfig.getLim().getRabbitmq());
             // 启动mq监听消息服务消息

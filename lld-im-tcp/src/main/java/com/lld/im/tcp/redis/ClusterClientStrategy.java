@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * redisson集群客户端策略
  *
- * @author zhaopeng
  */
 public class ClusterClientStrategy implements ClientStrategy {
 
