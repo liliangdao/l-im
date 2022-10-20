@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 public class OfflineMessageContent {
 
-    private String messageKey;
+    private Long messageKey;
 
     private List<String> members;
 

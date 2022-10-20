@@ -151,16 +151,18 @@ public class MessageStoreService {
             zSetOperations.removeRange(fromKey, 0, 0);
         }
 
-        zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageSequence());
+        zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageKey());
         //给接收方插入离线消息
-        String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + offlineMessageContent.getToId();
+        String toKey = offlineMessageContent.getAppId() + ":" +
+                Constants.RedisConstants.offlineMessage + ":" +
+                offlineMessageContent.getToId();
 
         Long toCount = zSetOperations.zCard(toKey);
 
         if (toCount > appConfig.getOfflineMessageCount()) {
             zSetOperations.removeRange(toKey, 0, 0);
         }
-        zSetOperations.add(toKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageSequence());
+        zSetOperations.add(toKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageKey());
 
     }
 

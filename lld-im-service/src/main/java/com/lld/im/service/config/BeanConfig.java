@@ -17,6 +17,7 @@ import com.lld.im.service.message.dao.mapper.ImMessageHistoryMapper;
 import com.lld.im.service.service.seq.AbstractSeq;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.service.seq.SnowflakeIdWorker;
+import com.lld.im.service.utils.MessageKeyGenerate;
 import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +108,13 @@ public class BeanConfig  {
         Method stringRedisMethod = abstractSeq.getClass().getMethod("setSnowflakeIdWorker", SnowflakeIdWorker.class);
         stringRedisMethod.invoke(abstractSeq, new SnowflakeIdWorker(1,1));
         return seq;
+    }
+
+    @Bean
+    public MessageKeyGenerate messageKeyGenerate() {
+        MessageKeyGenerate messageKeyGenerate = new MessageKeyGenerate();
+        messageKeyGenerate.setNodeId(0);
+        return messageKeyGenerate;
     }
 
     /**

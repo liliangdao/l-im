@@ -428,7 +428,7 @@
 
             if(command == 1046){
 
-            }else{
+            }else if(command == 9999){
                 var msg = eval("(" + msgBody + ")");
                 console.log(msg)
 
@@ -549,7 +549,7 @@
                 "toId": toId,
                 "appId": 10000,
                 "clientType": 1,
-                "imei": imei,
+                "imei": imel,
                 "command": command
             }
 
@@ -565,7 +565,7 @@
 					"toId": toId,
 					"appId": 10000,
 					"clientType": clientType,
-					"imei": imei,
+					"imei": imel,
 					"messageBody": msg
 				}
 			}else if (command == 1104){
@@ -575,7 +575,7 @@
                     "groupId": toId,
                     "appId": 10000,
                     "clientType": clientType,
-                    "imei": imei,
+                    "imei": imel,
                     "messageBody": msg
                 }
             }else{

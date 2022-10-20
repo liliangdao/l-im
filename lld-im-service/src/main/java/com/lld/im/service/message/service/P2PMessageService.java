@@ -15,6 +15,7 @@ import com.lld.im.service.message.model.req.SendMessageReq;
 import com.lld.im.service.message.model.resp.SendMessageResp;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
+import com.lld.im.service.utils.ConversationIdGenerate;
 import com.lld.im.service.utils.UserSessionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -113,7 +114,9 @@ public class P2PMessageService {
         ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
 
         if (responseVO.isOk()) {
-            long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" + Constants.SeqConstants.Message);
+            long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" +
+                    Constants.SeqConstants.Message + ":" +
+                    ConversationIdGenerate.generateP2PId(chatMessageData.getFromId(),chatMessageData.getToId()));
             chatMessageData.setMessageSequence(seq);
             //落库+回包+分发（发送给同步端和接收方的所有端）
             threadPoolExecutor.execute(() -> {
