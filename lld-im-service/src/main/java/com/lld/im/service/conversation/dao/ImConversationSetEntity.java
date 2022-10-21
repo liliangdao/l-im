@@ -30,5 +30,7 @@ public class ImConversationSetEntity {
 
     private Long readedSequence;
 
+    private Long revicerSequence;
+
     private Integer appId;
 }

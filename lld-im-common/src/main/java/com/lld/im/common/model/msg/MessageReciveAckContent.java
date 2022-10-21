@@ -11,7 +11,13 @@ import lombok.Data;
 @Data
 public class MessageReciveAckContent extends ClientInfo {
 
+    private String conversationId;
+
+    private int conversationType;
+
     //原消息的发送方
+    private String fromId;
+
     private String toId;
 
     private Long messageKey;

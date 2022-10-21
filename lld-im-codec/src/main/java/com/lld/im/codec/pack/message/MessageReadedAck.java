@@ -1,11 +1,11 @@
-package com.lld.im.codec.pack;
+package com.lld.im.codec.pack.message;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
  * @author: Chackylee
- * @description: 消息已读ack报文
+ * @description: 客户端发给服务端，消息已读ack报文
  * @create: 2022-08-16 14:27
  **/
 @Data

@@ -1,6 +1,6 @@
 package com.lld.im.service.user.service;
 
-import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
+import com.lld.im.codec.pack.user.UserStatusChangeNotifyPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.common.model.ClientInfo;
@@ -8,6 +8,7 @@ import com.lld.im.common.model.UserSession;
 import com.lld.im.service.friendship.service.ImFriendShipService;
 import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.user.model.UserOnlineStatusSubscribeContent;
+import com.lld.im.service.user.model.UserStatusChangeNotifyContent;
 import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
 import com.lld.im.service.utils.UserSessionUtils;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class UserStatusService {
      * @author lld
      * @since 2022/9/24
      */
-    public void processUserLoginNotify(UserStatusChangeNotifyPack pack) {
+    public void processUserLoginNotify(UserStatusChangeNotifyContent pack) {
 
         String userKey = pack.getAppId()
                 + ":" + Constants.RedisConstants.subscribe + ":" + pack.getUserId();

@@ -2,34 +2,28 @@ package com.lld.im.service.friendship.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
-import com.lld.im.codec.pack.AddFriendGroupMemberPack;
-import com.lld.im.codec.pack.DeleteFriendGroupMemberPack;
+import com.lld.im.codec.pack.friendship.AddFriendGroupMemberPack;
+import com.lld.im.codec.pack.friendship.DeleteFriendGroupMemberPack;
 import com.lld.im.common.ResponseVO;
-import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.service.friendship.dao.ImFriendShipGroupEntity;
 import com.lld.im.service.friendship.dao.ImFriendShipGroupMemberEntity;
-import com.lld.im.service.friendship.dao.mapper.ImFriendShipGroupMapper;
 import com.lld.im.service.friendship.dao.mapper.ImFriendShipGroupMemberMapper;
 import com.lld.im.service.friendship.model.req.AddFriendShipGroupMemberReq;
 import com.lld.im.service.friendship.model.req.DeleteFriendShipGroupMemberReq;
 import com.lld.im.service.friendship.service.ImFriendShipGroupMemberService;
 import com.lld.im.service.friendship.service.ImFriendShipGroupService;
-import com.lld.im.service.friendship.service.ImFriendShipService;
 import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.service.ImUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author: Chackylee

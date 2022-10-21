@@ -1,4 +1,4 @@
-package com.lld.im.codec.pack;
+package com.lld.im.codec.pack.friendship;
 
 import lombok.Data;
 

@@ -3,11 +3,10 @@ package com.lld.im.tcp.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.lld.im.codec.pack.LoginAckPack;
-import com.lld.im.codec.pack.MessageReadedPack;
-import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
+import com.lld.im.codec.pack.user.LoginAckPack;
+import com.lld.im.codec.pack.user.UserStatusChangeNotifyPack;
 import com.lld.im.codec.proto.Message;
-import com.lld.im.codec.pack.LoginPack;
+import com.lld.im.codec.pack.user.LoginPack;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ImConnectStatusEnum;
@@ -17,14 +16,12 @@ import com.lld.im.common.enums.command.SystemCommand;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.common.model.UserClientDto;
 import com.lld.im.common.model.UserSession;
-import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.tcp.publish.MqMessageProducer;
 import com.lld.im.tcp.redis.RedisManager;
 import com.lld.im.tcp.utils.SessionSocketHolder;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
-import jodd.bean.BeanUtil;
 import org.redisson.api.RMap;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
@@ -32,11 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -87,17 +80,17 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             String userId = loginPack.getUserId();
             /** 为channel设置用户id **/
             ctx.channel().attr(AttributeKey.valueOf(Constants.UserId)).set(userId);
-            String hashKey = loginPack.getClientType() + ":" + loginPack.getImei();
+            String hashKey = msg.getMessageHeader().getClientType() + ":" + msg.getMessageHeader().getImei();
             /** 为channel设置client和imel **/
             ctx.channel().attr(AttributeKey.valueOf(Constants.ClientImei)).set(hashKey);
             /** 为channel设置appId **/
-            ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).set(loginPack.getAppId());
+            ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).set(msg.getMessageHeader().getAppId());
 
             // 设置userSession到redis
             UserSession session = new UserSession();
-            session.setAppId(loginPack.getAppId());
-            session.setClientType(loginPack.getClientType());
-            session.setImei(loginPack.getImei());
+            session.setAppId(msg.getMessageHeader().getAppId());
+            session.setClientType(msg.getMessageHeader().getClientType());
+            session.setImei(msg.getMessageHeader().getImei());
             session.setUserId(loginPack.getUserId());
             session.setConnectState(ImConnectStatusEnum.ONLINE_STATUS.getCode());
             try {
@@ -109,15 +102,15 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             }
 
             RedissonClient redissonClient = RedisManager.getRedissonClient();
-            RMap<Object, Object> map = redissonClient.getMap(loginPack.getAppId() + Constants.RedisConstants.UserSessionConstants + userId);
+            RMap<Object, Object> map = redissonClient.getMap(msg.getMessageHeader().getAppId() + Constants.RedisConstants.UserSessionConstants + userId);
             map.put(hashKey, JSONObject.toJSONString(session));
-            SessionSocketHolder.put(loginPack.getAppId(), userId, loginPack.getClientType(), loginPack.getImei(), (NioSocketChannel) ctx.channel());
+            SessionSocketHolder.put(msg.getMessageHeader().getAppId(), userId, msg.getMessageHeader().getClientType(), msg.getMessageHeader().getImei(), (NioSocketChannel) ctx.channel());
 
             // 通知其他端下线,例如：安卓与ios互斥，windows和mac互斥，是否允许多设备登录
             UserClientDto dto = new UserClientDto();
-            dto.setAppId(loginPack.getAppId());
-            dto.setClientType(loginPack.getClientType());
-            dto.setImei(loginPack.getImei());
+            dto.setAppId(msg.getMessageHeader().getAppId());
+            dto.setClientType(msg.getMessageHeader().getClientType());
+            dto.setImei(msg.getMessageHeader().getImei());
             dto.setUserId(loginPack.getUserId());
             RTopic topic = redissonClient.getTopic(Constants.RedisConstants.UserLoginChannel);
             topic.publish(JSON.toJSONString(dto));
@@ -128,21 +121,19 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             loginSuccessPack.setUserId(loginPack.getUserId());
             loginSuccess.setCommand(SystemCommand.LOGINACK.getCommand());
             loginSuccess.setData(loginSuccessPack);
-            loginSuccess.setAppId(loginPack.getAppId());
+            loginSuccess.setAppId(msg.getMessageHeader().getAppId());
             loginSuccess.setToId(loginPack.getUserId());
             ctx.writeAndFlush(loginSuccess);
 
             UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
-            pack.setAppId(loginPack.getAppId());
+            pack.setAppId(msg.getMessageHeader().getAppId());
             pack.setUserId(loginPack.getUserId());
-            pack.setClientType(loginPack.getClientType());
             pack.setCustomStatus(loginPack.getCustomStatus());
             pack.setCustomText(loginPack.getCustomText());
-            pack.setImei(loginPack.getImei());
             pack.setStatus(UserPipelineConnectState.ONLINE.getCommand());
 
             //发送在线状态修改信息-》通知用户
-            MqMessageProducer.sendMessageByCommand(pack,UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+            MqMessageProducer.sendMessageByCommand(pack,msg.getMessageHeader(),UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
 
         } else if (command == SystemCommand.LOGOUT.getCommand()) {
             /** 登出事件 **/
@@ -153,30 +144,20 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
         } else if (command == MessageCommand.MSG_P2P.getCommand()) {
             try {
-                MqMessageProducer.sendMessageByCommand(msg.getMessagePack(),command);
+                MqMessageProducer.sendMessageByCommand(msg,command);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }else if (command == MessageCommand.MSG_READED.getCommand()) {
             try {
-                MessageReadedPack pack = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()), new TypeReference<MessageReadedPack>() {
-                }.getType());
-                MessageReadedContent content = new MessageReadedContent();
-                content.setConversationType(pack.getConversationType());
-                content.setFromId(pack.getFromId());
-                content.setMessageSequence(pack.getMessageSequence());
-                content.setToId(pack.getToId());
-                content.setAppId(pack.getAppId());
-                content.setImei(pack.getImei());
-                content.setClientType(pack.getClientType());
-                MqMessageProducer.sendMessageByCommand(content,command);
+                MqMessageProducer.sendMessageByCommand(msg,command);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             //全往mq丢
             try{
-                MqMessageProducer.sendMessageByCommand(msg.getMessagePack(),command);
+                MqMessageProducer.sendMessageByCommand(msg,command);
             }catch (Exception e){
                 e.printStackTrace();
             }

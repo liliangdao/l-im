@@ -1,12 +1,11 @@
 package com.lld.im.service.message.service;
 
-import com.lld.im.codec.pack.ChatMessageAck;
-import com.lld.im.codec.pack.P2PMessagePack;
-import com.lld.im.codec.proto.Message;
+import com.lld.im.codec.pack.message.ChatMessageAck;
+import com.lld.im.codec.pack.message.MessageReadedAck;
+import com.lld.im.codec.pack.message.P2PMessagePack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ConversationTypeEnum;
-import com.lld.im.common.enums.command.Command;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.*;
@@ -17,16 +16,13 @@ import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
 import com.lld.im.service.utils.ConversationIdGenerate;
 import com.lld.im.service.utils.UserSessionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -205,7 +201,7 @@ public class P2PMessageService {
     }
 
     /**
-     * @description ack，接收方发送给发送方
+     * @description 消息接收确认ack，服务端发给发送方
      * @author chackylee
      * @date 2022/9/26 11:16
      * @param content, result, command
@@ -213,28 +209,15 @@ public class P2PMessageService {
     */
     public void revicerAck(MessageContent content,Boolean serverSend) {
         logger.info("msg revicerAck,msgId = {},msgSeq ={}", content.getMessageId(), content.getMessageSequence());
-        ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence());
-        ackData.setServerSend(true);
         MessageReciveAckContent messageReciveAckContent = new MessageReciveAckContent();
         messageReciveAckContent.setToId(content.getFromId());
         messageReciveAckContent.setMessageSequence(content.getMessageSequence());
         messageReciveAckContent.setMessageKey(content.getMessageKey());
         messageReciveAckContent.setMessageId(content.getMessageId());
         messageReciveAckContent.setServerSend(serverSend);
-        messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.MSG_RECIVE_ACK, ackData, content);
+        messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.MSG_RECIVE_ACK, messageReciveAckContent, content);
     }
 
-    /**
-     * @description ack，接收方发送给发送方
-     * @author chackylee
-     * @date 2022/9/26 11:16
-     * @param [content, result, command]
-     * @return void
-     */
-    public void revicerAck(MessageReciveAckContent content) {
-        logger.info("msg revicerAck,msgId = {},msgSeq ={}", content.getMessageId(), content.getMessageSequence());
-        messageProducer.sendToUserAppointedClient(content.getToId(), MessageCommand.MSG_RECIVE_ACK, content, content);
-    }
 
 
     /**

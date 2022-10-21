@@ -2,8 +2,7 @@ package com.lld.im.service.message.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.pack.ChatMessageAck;
-import com.lld.im.codec.pack.MessageReadedPack;
+import com.lld.im.codec.pack.message.ChatMessageAck;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.ClientType;
 import com.lld.im.common.ResponseVO;

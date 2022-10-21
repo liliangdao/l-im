@@ -2,18 +2,15 @@ package com.lld.im.service.conversation.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.Update;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.lld.im.codec.pack.MessageReadedPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.model.SyncReq;
 import com.lld.im.common.model.SyncResp;
 import com.lld.im.common.model.msg.MessageReadedContent;
+import com.lld.im.common.model.msg.MessageReciveAckContent;
 import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import com.lld.im.service.conversation.dao.mapper.ImConversationSetMapper;
-import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.utils.WriteUserSeq;
 import org.springframework.beans.BeanUtils;
@@ -85,8 +82,19 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
         conversationSet.setSequence(seq);
         conversationSet.setReadedSequence(messageReaded.getMessageSequence());
         imConversationSetMapper.markConversation(conversationSet);
-//        cacheManager.refreshUserSyncSeqCache(messageReaded.getFromId(), SyncKeyEnum.syncConversationSetSequence.name(), String.valueOf(conversationSequence),messageReaded.getAppId());
         writeUserSeq.writeUserSeq(messageReaded.getAppId(),messageReaded.getFromId(),Constants.SeqConstants.Conversation,seq);
+    }
+
+    @Transactional
+    public void messageMarkRecive(MessageReciveAckContent content) {
+        long seq = this.seq.getSeq(content.getAppId() + ":" + Constants.SeqConstants.Conversation);
+        ImConversationSetEntity conversationSet = new ImConversationSetEntity();
+        conversationSet.setConversationId(content.getConversationId());
+        conversationSet.setSequence(seq);
+        conversationSet.setRevicerSequence(content.getMessageSequence());
+        BeanUtils.copyProperties(content,conversationSet);
+        imConversationSetMapper.markRevicerConversation(conversationSet);
+        writeUserSeq.writeUserSeq(content.getAppId(),content.getToId(),Constants.SeqConstants.Conversation,seq);
     }
 
 }

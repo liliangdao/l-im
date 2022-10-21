@@ -1,7 +1,7 @@
 package com.lld.im.service.group.service;
 
-import com.lld.im.codec.pack.ChatMessageAck;
-import com.lld.im.codec.pack.GroupMessagePack;
+import com.lld.im.codec.pack.message.ChatMessageAck;
+import com.lld.im.codec.pack.group.GroupMessagePack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ConversationTypeEnum;
@@ -12,7 +12,6 @@ import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.*;
 import com.lld.im.service.group.model.req.GroupMemberDto;
 import com.lld.im.service.group.model.req.SendGroupMessageReq;
-import com.lld.im.service.message.model.req.SendMessageReq;
 import com.lld.im.service.message.model.resp.SendMessageResp;
 import com.lld.im.service.message.service.*;
 import com.lld.im.service.service.seq.Seq;

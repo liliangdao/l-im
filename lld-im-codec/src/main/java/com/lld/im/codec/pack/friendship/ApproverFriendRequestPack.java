@@ -1,5 +1,6 @@
-package com.lld.im.codec.pack;
+package com.lld.im.codec.pack.friendship;
 
+import com.lld.im.codec.pack.BasePack;
 import lombok.Data;
 
 /**
@@ -8,7 +9,7 @@ import lombok.Data;
  * @create: 2022-09-09 10:19
  **/
 @Data
-public class ApproverFriendRequestPack extends BasePack {
+public class ApproverFriendRequestPack {
 
     private Long id;
 

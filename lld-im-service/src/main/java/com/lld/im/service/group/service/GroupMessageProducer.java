@@ -1,9 +1,9 @@
 package com.lld.im.service.group.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.pack.AddGroupMemberPack;
-import com.lld.im.codec.pack.RemoveGroupMemberPack;
-import com.lld.im.codec.pack.UpdateGroupMemberPack;
+import com.lld.im.codec.pack.group.AddGroupMemberPack;
+import com.lld.im.codec.pack.group.RemoveGroupMemberPack;
+import com.lld.im.codec.pack.group.UpdateGroupMemberPack;
 import com.lld.im.common.ClientType;
 import com.lld.im.common.enums.command.Command;
 import com.lld.im.common.enums.command.GroupEventCommand;
@@ -12,7 +12,6 @@ import com.lld.im.service.group.model.req.GroupMemberDto;
 import com.lld.im.service.message.service.MessageProducer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.ReactiveStreamCommands;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

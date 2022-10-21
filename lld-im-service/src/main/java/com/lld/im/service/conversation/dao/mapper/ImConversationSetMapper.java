@@ -28,6 +28,16 @@ public interface ImConversationSetMapper extends BaseMapper<ImConversationSetEnt
             "  readed_sequence = VALUES (readed_sequence) ")
     public int markConversation(ImConversationSetEntity entity);
 
+    @Insert(" insert into im_conversation_set " +
+            "(conversation_id , conversation_type , from_id , to_id ,is_mute,is_top,sequence,readed_sequence,revicer_sequence,app_id)" +
+            " values(#{conversationId},#{conversationType}" +
+            " ,#{fromId},#{toId},#{isMute},#{isTop},#{sequence} " +
+            " ,#{readedSequence},#{revicerSequence},#{appId} ) " +
+            " ON DUPLICATE KEY UPDATE " +
+            "  sequence = VALUES (sequence) , " +
+            "  revicer_sequence = VALUES (revicer_sequence) ")
+    public int markRevicerConversation(ImConversationSetEntity entity);
+
 
 
 

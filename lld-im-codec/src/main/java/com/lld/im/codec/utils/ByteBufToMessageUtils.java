@@ -15,8 +15,11 @@ import java.io.UnsupportedEncodingException;
  *               4位表示version
  *               4位表示clientType
  *               4位表示messageType
- *               4位表示appId(待定)
+ *               4位表示appId
+ *               4位表示imei长度
+ *               imei
  *               4位表示数据长度
+ *               data
  *               后续将解码方式加到数据头根据不同的解码方式解码，如pb，json，现在用json字符串
  * @create: 2022-05-10 10:22
  **/
@@ -37,20 +40,26 @@ public class ByteBufToMessageUtils {
         int messageType = byteBuf.readInt();
 
         /** appid*/
-//        int appId = byteBuf.readInt();
+        int appId = byteBuf.readInt();
 
-        /** 获取数据长度*/
+        /** imei Length*/
+        int imeiLength = byteBuf.readInt();
+        byte[] imeiData = new byte[imeiLength];
+        byteBuf.readBytes(imeiData);
+
+        /** data Length*/
         int dataLength = byteBuf.readInt();
-
         byte[] data = new byte[dataLength];
         byteBuf.readBytes(data);
 
         /** 填充数据头*/
         MessageHeader msgHeader = new MessageHeader();
         msgHeader.setCommand(command);
+        msgHeader.setAppId(appId);
         msgHeader.setVersion(version);
         msgHeader.setClientType(clientType);
         msgHeader.setLength(dataLength);
+        msgHeader.setImei(new String(imeiData));
         msgHeader.setMessageType(messageType);
 
         Object body = null;

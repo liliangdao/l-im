@@ -1,10 +1,10 @@
-package com.lld.im.codec.pack;
+package com.lld.im.codec.pack.user;
 
 import lombok.Data;
 
 /**
  * @author: Chackylee
- * @description: 用户信息变更通知报文
+ * @description: 服务端发给客户端，用户信息变更通知报文
  * @create: 2022-08-02 10:26
  **/
 @Data

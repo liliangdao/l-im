@@ -2,9 +2,9 @@ package com.lld.im.service.message.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.pack.MessageReadedAck;
-import com.lld.im.codec.pack.MessageReadedPack;
-import com.lld.im.codec.pack.RecallMessageNotifyPack;
+import com.lld.im.codec.pack.message.MessageReadedAck;
+import com.lld.im.codec.pack.message.MessageReadedPack;
+import com.lld.im.codec.pack.message.RecallMessageNotifyPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
@@ -107,15 +107,8 @@ public class MessageSyncService {
      * @since 2022/9/18
      */
     public void receiveMark(MessageReciveAckContent message) {
-
         shareThreadPool.submit(() -> {
-//            conversationService.messageMarkRead(messageReaded);
-//            MessageReadedAck ack = new MessageReadedAck();
-//            BeanUtils.copyProperties(messageReaded, ack);
-//            ack(messageReaded, ack, messageReaded.getFromId());
-////            //同步给其他端
-//
-//            syncToSender(messageReaded);
+            conversationService.messageMarkRecive(message);
             messageProducer.sendToUser(message.getToId(),MessageCommand.MSG_READED_ACK,message,message.getAppId());
         });
     }

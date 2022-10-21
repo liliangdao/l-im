@@ -5,10 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lld.im.codec.pack.AddGroupMemberPack;
-import com.lld.im.codec.pack.GroupMemberSpeakPack;
-import com.lld.im.codec.pack.RemoveGroupMemberPack;
-import com.lld.im.codec.pack.UpdateGroupMemberPack;
+import com.lld.im.codec.pack.group.AddGroupMemberPack;
+import com.lld.im.codec.pack.group.GroupMemberSpeakPack;
+import com.lld.im.codec.pack.group.RemoveGroupMemberPack;
+import com.lld.im.codec.pack.group.UpdateGroupMemberPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
@@ -36,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.security.auth.login.Configuration;
 import java.util.*;
 
 /**

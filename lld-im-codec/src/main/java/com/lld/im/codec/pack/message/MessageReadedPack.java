@@ -1,5 +1,6 @@
-package com.lld.im.codec.pack;
+package com.lld.im.codec.pack.message;
 
+import com.lld.im.codec.pack.BasePack;
 import lombok.Data;
 
 /**
@@ -8,7 +9,7 @@ import lombok.Data;
  * @create: 2022-07-29 16:24
  **/
 @Data
-public class MessageReadedPack extends BasePack {
+public class MessageReadedPack  {
 
     private String fromId;
 

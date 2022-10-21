@@ -1,19 +1,22 @@
-package com.lld.im.codec.pack;
+package com.lld.im.codec.pack.message;
 
+import com.lld.im.codec.pack.BasePack;
+import com.lld.im.common.enums.SyncFromEnum;
+import com.lld.im.common.model.msg.OfflinePushInfo;
 import lombok.Data;
 
 /**
  * @author: Chackylee
- * @description: 单聊消息分发报文
- * @create: 2022-10-12 10:15
+ * @description:
+ * @create: 2022-10-21 09:36
  **/
 @Data
-public class P2PMessagePack {
+public class ChatMessagePack {
 
     //客户端传的messageId
     private String messageId;
 
-    private String messageKey;
+    private Long messageKey;
 
     private String fromId;
 
@@ -33,5 +36,10 @@ public class P2PMessagePack {
 
     private Long messageLifeTime;
 
+    private int syncFromId = SyncFromEnum.BOTH.getCode();
+
     private Integer appId;
+
+    private OfflinePushInfo offlinePushInfo;
+
 }

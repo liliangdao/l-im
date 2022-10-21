@@ -1,23 +1,23 @@
-package com.lld.im.codec.pack;
+package com.lld.im.codec.pack.message;
 
 import lombok.Data;
 
 /**
  * @author: Chackylee
- * @description: 群聊消息分发报文
- * @create: 2022-07-22 15:52
+ * @description: 单聊消息分发报文
+ * @create: 2022-10-12 10:15
  **/
 @Data
-public class GroupMessagePack {
+public class P2PMessagePack {
 
     //客户端传的messageId
     private String messageId;
 
-    private String messageKey;
+    private Long messageKey;
 
     private String fromId;
 
-    private String groupId;
+    private String toId;
 
     private int messageRandom;
 
@@ -34,5 +34,4 @@ public class GroupMessagePack {
     private Long messageLifeTime;
 
     private Integer appId;
-
 }

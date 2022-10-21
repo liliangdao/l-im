@@ -21,7 +21,7 @@ public class WebSocketMessageDecoder extends MessageToMessageDecoder<BinaryWebSo
     protected void decode(ChannelHandlerContext ctx, BinaryWebSocketFrame frame, List<Object> out) throws Exception {
 
         ByteBuf in = frame.content();
-        if (in.readableBytes() < 20) {
+        if (in.readableBytes() < 24) {
             return;
         }
         out.add(ByteBufToMessageUtils.transition(in));

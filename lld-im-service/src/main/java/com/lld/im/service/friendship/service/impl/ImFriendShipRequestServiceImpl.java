@@ -1,10 +1,9 @@
 package com.lld.im.service.friendship.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.lld.im.codec.pack.ApproverFriendRequestPack;
-import com.lld.im.codec.pack.ReadAllFriendRequestPack;
+import com.lld.im.codec.pack.friendship.ApproverFriendRequestPack;
+import com.lld.im.codec.pack.friendship.ReadAllFriendRequestPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ApproverFriendRequestStatusEnum;
@@ -13,7 +12,6 @@ import com.lld.im.common.enums.command.FriendshipEventCommand;
 import com.lld.im.common.exception.ApplicationException;
 import com.lld.im.common.model.SyncReq;
 import com.lld.im.common.model.SyncResp;
-import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.dao.ImFriendShipRequestEntity;
 import com.lld.im.service.friendship.dao.mapper.ImFriendShipRequestMapper;
 import com.lld.im.common.enums.FriendShipErrorCode;
@@ -34,12 +32,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author: Chackylee
@@ -226,7 +222,6 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         ApproverFriendRequestPack approverFriendRequestPack = new ApproverFriendRequestPack();
         approverFriendRequestPack.setId(req.getId());
         approverFriendRequestPack.setStatus(req.getStatus());
-        approverFriendRequestPack.setAppId(req.getAppId());
         messageProducer.sendToUser(imFriendShipRequestEntity.getToId(),req.getClientType(),req.getImel(),FriendshipEventCommand
         .FRIEND_REQUEST_APPROVER,approverFriendRequestPack,req.getAppId());
 

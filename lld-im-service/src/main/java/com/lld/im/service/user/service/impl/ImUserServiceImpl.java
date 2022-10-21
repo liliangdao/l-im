@@ -1,7 +1,7 @@
 package com.lld.im.service.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.lld.im.codec.pack.UserModifyPack;
+import com.lld.im.codec.pack.user.UserModifyPack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.command.UserEventCommand;
@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

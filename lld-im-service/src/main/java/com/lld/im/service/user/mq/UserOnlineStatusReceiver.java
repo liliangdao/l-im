@@ -3,12 +3,12 @@ package com.lld.im.service.user.mq;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
+import com.lld.im.codec.pack.user.UserStatusChangeNotifyPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.service.message.mq.ChatOperateReceiver;
 import com.lld.im.service.user.model.UserOnlineStatusSubscribeContent;
-import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
+import com.lld.im.service.user.model.UserStatusChangeNotifyContent;
 import com.lld.im.service.user.service.UserStatusService;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
@@ -64,7 +64,7 @@ public class UserOnlineStatusReceiver {
 
             //1.用户上下线通知，由管道服务发起
             if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand())) {
-                UserStatusChangeNotifyPack content = JSON.parseObject(msg, new TypeReference<UserStatusChangeNotifyPack>() {
+                UserStatusChangeNotifyContent content = JSON.parseObject(msg, new TypeReference<UserStatusChangeNotifyContent>() {
                 }.getType());
                 userStatusServicel.processUserLoginNotify(content);
             }

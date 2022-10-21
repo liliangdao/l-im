@@ -423,11 +423,30 @@
             let command = byteBuffer[1];
             let unpack = bytebuf.vstring(null, bodyLen).unpack();
             let msgBody = unpack[2];
+            var version = 1;
+
+            var clientType = document.getElementById("clientType").value;
+            clientType = parseInt(clientType);
+            var messageType = 0x0;
+            var appId = document.getElementById("appId").value;
+            appId = parseInt(appId)
+
+            var imei = document.getElementById("imei").value;
+            var imeiLen = getLen(imei);
 
             console.log("收到服务端发来的消息: " + msgBody);
 
-            if(command == 1046){
-
+            if(command == 1103){
+                var d = JSON.parse(msgBody)
+                var data = d.data;
+                data.conversationId = "0_" + data.toId + "_" + data.fromId;
+                data.conversationType = 0;
+                let messageReciver = new ByteBuffer();
+                var jsonData = JSON.stringify(data);
+                let bodyLen = jsonData.length;
+                messageReciver.int32(1107).int32(version)
+                    .int32(clientType).int32(messageType).int32(appId).int32(imeiLen).vstring(imei,imeiLen).int32(bodyLen).vstring(jsonData, bodyLen);
+                socket.send(messageReciver.pack());
             }else if(command == 9999){
                 var msg = eval("(" + msgBody + ")");
                 console.log(msg)
@@ -466,7 +485,7 @@
     }
 
     //登录
-    function login(userId, toUser,clientType,imel) {
+    function login(userId, toUser,clientType,imei,appId) {
         if (!window.WebSocket) {
             return;
         }
@@ -483,22 +502,26 @@
 
             var messageType = 0x0;
 
-            if(imel == null){
-                imel = "web";
+            if(imei == null){
+                imei = "web";
             }
 
-            var userId = userId;
-            var toUser = toUser;
+            if(appId == null){
+                appId = '10000'
+            }
+            appId = parseInt(appId);
 
-            var data = {"userId": userId, "appId": 10000, "clientType": clientType, "imei": imel,"customStatus":null,"customClientName":""};
+            var userId = userId;
+
+            var data = {"userId": userId, "appId": 10000, "clientType": clientType, "imei": imei,"customStatus":null,"customClientName":""};
             var jsonData = JSON.stringify(data);
 			console.log(jsonData);
 
             var bodyLen = jsonData.length;
-
+            var imeiLen = getLen(imei);
             let loginMsg = new ByteBuffer();
             loginMsg.int32(command).int32(version)
-                .int32(clientType).int32(messageType).int32(bodyLen).vstring(jsonData, bodyLen);
+                .int32(clientType).int32(messageType).int32(appId).int32(imeiLen).vstring(imei,imeiLen).int32(bodyLen).vstring(jsonData, bodyLen);
             socket.send(loginMsg.pack());
         } else {
             alert("连接没有开启");
@@ -514,7 +537,7 @@
     // *               4位表示数据长度
     // *               后续将解码方式加到数据头根据不同的解码方式解码，如pb，json，现在用json字符串
     //发消息
-    function sendMsg(userId, toId, command,msg,clientType,imel) {
+    function sendMsg(userId, toId, command,msg,clientType,imei,appId) {
         if (!window.WebSocket) {
             return;
         }
@@ -541,15 +564,19 @@
 				command = 1103;
 			}
 
-			if(imel == null){
-                imel = "web"
+			if(imei == null){
+                imei = "web"
             }
+			if(appId == null){
+                appId = '10000'
+            }
+            appId = parseInt(appId);
             var data = {
                 "userId": userId,
                 "toId": toId,
-                "appId": 10000,
+                "appId": appId,
                 "clientType": 1,
-                "imei": imel,
+                "imei": imei,
                 "command": command
             }
 
@@ -563,9 +590,9 @@
 					"messageId": messageId,
 					"fromId": userId,
 					"toId": toId,
-					"appId": 10000,
+					"appId": appId,
 					"clientType": clientType,
-					"imei": imel,
+					"imei": imei,
 					"messageBody": msg
 				}
 			}else if (command == 1104){
@@ -573,9 +600,9 @@
                     "messageId": messageId,
                     "fromId": userId,
                     "groupId": toId,
-                    "appId": 10000,
+                    "appId": appId,
                     "clientType": clientType,
-                    "imei": imel,
+                    "imei": imei,
                     "messageBody": msg
                 }
             }else{
@@ -586,9 +613,10 @@
             var jsonData = JSON.stringify(messageData);
             console.log(jsonData)
             var bodyLen = getLen(jsonData);
+            var imeiLen = getLen(imei);
             let sendMsg = new ByteBuffer();
             sendMsg.int32(command).int32(version)
-                .int32(clientType).int32(messageType).int32(bodyLen).vstring(jsonData, bodyLen);
+                .int32(clientType).int32(messageType).int32(appId).int32(imeiLen).vstring(imei,imeiLen).int32(bodyLen).vstring(jsonData, bodyLen);
             console.log(sendMsg.pack());
             socket.send(sendMsg.pack());
         } else {
@@ -616,10 +644,11 @@
 
     <textarea placeholder="输入登录id" id="userId" name="userId" style="width: 100px;height: 20px"></textarea>
     <textarea placeholder="你要发消息给谁" name="toUser" style="width: 100px;height: 20px"></textarea>
+    <textarea placeholder="appId" id="appId" name="appId" style="width: 100px;height: 20px"></textarea>
     <textarea placeholder="clientType" id="clientType" name="clientType" style="width: 100px;height: 20px"></textarea>
-    <textarea placeholder="imel" id="imel" name="imel" style="width: 100px;height: 20px"></textarea>
+    <textarea placeholder="imei" id="imei" name="imei" style="width: 100px;height: 20px"></textarea>
     <input type="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value,this.form.clientType.value
-    ,this.form.imel.value);">
+    ,this.form.imei.value,this.form.appId.value);">
 
 	<textarea placeholder="输入command" name="command" style="width: 200px;height: 20px"></textarea>
 
@@ -627,7 +656,7 @@
 
     <input type="button" value="发送数据"
            onclick="sendMsg(this.form.userId.value,this.form.toUser.value,this.form.command.value,this.form.message.value
-           ,this.form.clientType.value,this.form.imel.value);">
+           ,this.form.clientType.value,this.form.imei.value,this.form.appId.value);">
 
     <h3>服务器输出：</h3>
 

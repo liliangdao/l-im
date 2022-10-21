@@ -32,7 +32,7 @@ public class Constants {
         /**
          * 用户session
          */
-        public static final String UserSessionConstants = ":accountSession:";
+        public static final String UserSessionConstants = ":userSession:";
 
         /**
          * 用户上线通知channel

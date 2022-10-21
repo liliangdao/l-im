@@ -1,5 +1,6 @@
 package com.lld.im.service.user.model;
 
+import com.lld.im.common.model.ClientInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.Set;
  * @version: 1.0
  */
 @Data
-public class UserOnlineStatusSubscribeContent {
+public class UserOnlineStatusSubscribeContent extends ClientInfo {
 
     private Integer appId;
 

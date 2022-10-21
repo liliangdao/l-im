@@ -1,4 +1,4 @@
-package com.lld.im.codec.pack;
+package com.lld.im.codec.pack.message;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

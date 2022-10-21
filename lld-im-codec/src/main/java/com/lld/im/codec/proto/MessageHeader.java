@@ -22,8 +22,8 @@ public class MessageHeader {
     /**
      * 应用ID
      */
-    //4字节 appId 1
-//    private Integer appId;
+//    4字节 appId 1
+    private Integer appId;
 
     /**
      * 数据解析类型 和具体业务无关，后续根据解析类型解析data数据 0x0:Json,0x1:ProtoBuf,0x2:Xml,默认:0x0
@@ -31,6 +31,13 @@ public class MessageHeader {
     //4字节 解析类型 1
     private Integer messageType = 0x0;
 
+    //4字节 解析类型 1
+    private Integer imeiLength;
+
+    //imei号
+    private String imei;
+
     //4字节 包体长度
     private int length;
+
 }

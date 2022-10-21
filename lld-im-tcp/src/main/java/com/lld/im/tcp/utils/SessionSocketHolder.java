@@ -2,12 +2,12 @@ package com.lld.im.tcp.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.lld.im.codec.pack.UserStatusChangeNotifyPack;
+import com.lld.im.codec.pack.user.UserStatusChangeNotifyPack;
+import com.lld.im.codec.proto.MessageHeader;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.UserPipelineConnectState;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.common.model.ChannelInfo;
-import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.UserSession;
 import com.lld.im.tcp.publish.MqMessageProducer;
 import com.lld.im.tcp.redis.RedisManager;
@@ -91,13 +91,16 @@ public class SessionSocketHolder {
         pack.setAppId(appId);
         pack.setUserId(userId);
         String[] split = clientInfo.split(":");
-        pack.setClientType(Integer.valueOf(split[0]));
-        pack.setImei(split[1]);
         pack.setStatus(UserPipelineConnectState.OFFLINE.getCommand());
+
+        MessageHeader header = new MessageHeader();
+        header.setAppId(appId);
+        header.setImei(split[1]);
+        header.setClientType(Integer.valueOf(split[0]));
 
         //发送在线状态修改信息-》通知用户
         try {
-            MqMessageProducer.sendMessageByCommand(pack, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+            MqMessageProducer.sendMessageByCommand(pack,header, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -131,13 +134,16 @@ public class SessionSocketHolder {
         pack.setAppId(appId);
         pack.setUserId(userId);
         String[] split = clientInfo.split(":");
-        pack.setClientType(Integer.valueOf(split[0]));
-        pack.setImei(split[1]);
         pack.setStatus(UserPipelineConnectState.OFFLINE.getCommand());
+
+        MessageHeader header = new MessageHeader();
+        header.setAppId(appId);
+        header.setImei(split[1]);
+        header.setClientType(Integer.valueOf(split[0]));
 
         //发送在线状态修改信息-》通知用户
         try {
-            MqMessageProducer.sendMessageByCommand(pack, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+            MqMessageProducer.sendMessageByCommand(pack,header, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
         }catch (Exception e){
             e.printStackTrace();
         }

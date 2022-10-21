@@ -1,14 +1,15 @@
-package com.lld.im.codec.pack;
+package com.lld.im.codec.pack.user;
 
+import com.lld.im.codec.pack.BasePack;
 import lombok.Data;
 
 /**
  * @author: Chackylee
- * @description: 登录报文
+ * @description: 客户端发给服务端，登录报文
  * @create: 2022-05-05 09:26
  **/
 @Data
-public class LoginPack extends BasePack {
+public class LoginPack {
 
     private String userId;
 
