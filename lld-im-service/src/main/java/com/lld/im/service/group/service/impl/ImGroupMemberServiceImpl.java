@@ -545,5 +545,30 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         return ResponseVO.successResponse();
     }
 
+    @Override
+    @Transactional
+    public ResponseVO exitGroup(ExitGroupReq req) {
+
+        ResponseVO<ImGroupEntity> group = groupService.getGroup(req.getGroupId(), req.getAppId());
+        if(!group.isOk()){
+            return group;
+        }
+
+        ResponseVO<GetRoleInGroupResp> roleInGroupOne = getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+        if(!roleInGroupOne.isOk()){
+            return roleInGroupOne;
+        }
+
+        ImGroupMemberEntity update = new ImGroupMemberEntity();
+        update.setRole(GroupMemberRoleEnum.LEAVE.getCode());
+        UpdateWrapper<ImGroupMemberEntity> wrapper = new UpdateWrapper<>();
+        wrapper.eq("app_id",req.getAppId());
+        wrapper.eq("group_id",req.getGroupId());
+        wrapper.eq("member_id",req.getOperater());
+        imGroupMemberMapper.update(update,wrapper);
+
+        return ResponseVO.successResponse();
+    }
+
 
 }
