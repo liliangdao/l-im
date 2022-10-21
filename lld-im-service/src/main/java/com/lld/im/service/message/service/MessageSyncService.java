@@ -109,7 +109,7 @@ public class MessageSyncService {
     public void receiveMark(MessageReciveAckContent message) {
         shareThreadPool.submit(() -> {
             conversationService.messageMarkRecive(message);
-            messageProducer.sendToUser(message.getToId(),MessageCommand.MSG_READED_ACK,message,message.getAppId());
+            messageProducer.sendToUser(message.getFromId(),MessageCommand.MSG_READED_ACK,message,message.getAppId());
         });
     }
 

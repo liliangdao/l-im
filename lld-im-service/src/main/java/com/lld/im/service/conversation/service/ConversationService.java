@@ -94,7 +94,7 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
         conversationSet.setRevicerSequence(content.getMessageSequence());
         BeanUtils.copyProperties(content,conversationSet);
         imConversationSetMapper.markRevicerConversation(conversationSet);
-        writeUserSeq.writeUserSeq(content.getAppId(),content.getToId(),Constants.SeqConstants.Conversation,seq);
+        writeUserSeq.writeUserSeq(content.getAppId(),content.getFromId(),Constants.SeqConstants.Conversation,seq);
     }
 
 }

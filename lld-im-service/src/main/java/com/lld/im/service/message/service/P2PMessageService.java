@@ -210,7 +210,7 @@ public class P2PMessageService {
     public void revicerAck(MessageContent content,Boolean serverSend) {
         logger.info("msg revicerAck,msgId = {},msgSeq ={}", content.getMessageId(), content.getMessageSequence());
         MessageReciveAckContent messageReciveAckContent = new MessageReciveAckContent();
-        messageReciveAckContent.setToId(content.getFromId());
+        messageReciveAckContent.setFromId(content.getFromId());
         messageReciveAckContent.setMessageSequence(content.getMessageSequence());
         messageReciveAckContent.setMessageKey(content.getMessageKey());
         messageReciveAckContent.setMessageId(content.getMessageId());

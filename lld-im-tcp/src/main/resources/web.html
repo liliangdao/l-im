@@ -439,6 +439,14 @@
             if(command == 1103){
                 var d = JSON.parse(msgBody)
                 var data = d.data;
+                let userId = document.getElementById('userId').value;
+                if(data.fromId == userId){
+                    ta.value = ta.value + "\n" + "自己：" + data.messageBody;
+                }else if(data.fromId != userId){
+                    ta.value = ta.value + "\n" + data.fromId + "：" + data.messageBody;
+                }
+
+                data.fromId = data.toId;
                 data.conversationId = "0_" + data.toId + "_" + data.fromId;
                 data.conversationType = 0;
                 let messageReciver = new ByteBuffer();
@@ -451,7 +459,7 @@
                 var msg = eval("(" + msgBody + ")");
                 console.log(msg)
 
-                let userId = document.getElementById('userId').value;
+
                 console.log(userId)
 
                 if (msg["userId"] == "system") {
