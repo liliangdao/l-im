@@ -498,9 +498,12 @@ public class ImGroupServiceImpl implements ImGroupService {
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         ImGroupEntity update = new ImGroupEntity();
         update.setMute(req.getMute());
-        update.setGroupId(group.getGroupId());
         update.setSequence(seq);
-        imGroupDataMapper.updateById(update);
+
+        UpdateWrapper<ImGroupEntity> wrapper = new UpdateWrapper<>();
+        wrapper.eq("group_id",req.getGroupId());
+        wrapper.eq("app_id",req.getAppId());
+        imGroupDataMapper.update(update,wrapper);
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("groupId",req.getGroupId());
