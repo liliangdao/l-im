@@ -339,7 +339,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     /**
      * @param [req]
      * @return com.lld.im.common.ResponseVO
-     * @description 解散群组，只支持后台管理员和群主解散，需发送tcp通知 + 回调
+     * @description 解散群组，只支持后台管理员和群主解散，私有群只允许app管理员解散，需发送tcp通知 + 回调
      * @author chackylee
      * @date 2022/7/14 11:45
      */
@@ -358,7 +358,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
 
         if (!isAdmin) {
-            if(imGroupEntity.getGroupType() == GroupTypeEnum.PUBLIC.getCode()){
+            if(imGroupEntity.getGroupType() == GroupTypeEnum.PRIVATE.getCode()){
                 throw new ApplicationException(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
             }
 
@@ -498,9 +498,12 @@ public class ImGroupServiceImpl implements ImGroupService {
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         ImGroupEntity update = new ImGroupEntity();
         update.setMute(req.getMute());
-        update.setGroupId(group.getGroupId());
         update.setSequence(seq);
-        imGroupDataMapper.updateById(update);
+
+        UpdateWrapper<ImGroupEntity> wrapper = new UpdateWrapper<>();
+        wrapper.eq("group_id",req.getGroupId());
+        wrapper.eq("app_id",req.getAppId());
+        imGroupDataMapper.update(update,wrapper);
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("groupId",req.getGroupId());

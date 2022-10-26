@@ -415,14 +415,42 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
         if (isadmin) {
             //昵称只能自己修改 权限只能群主或管理员修改
-            if (StringUtils.isBlank(req.getAlias()) && isMeOperate) {
+            if (StringUtils.isBlank(req.getAlias()) && !isMeOperate) {
                 return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_ONESELF);
             }
             //私有群不能设置管理员
             if (groupData.getGroupType() == GroupTypeEnum.PRIVATE.getCode() &&
-                    req.getRole() != null && GroupMemberRoleEnum.getItem(req.getRole()) != null) {
+                    req.getRole() != null && (req.getRole() == GroupMemberRoleEnum.MAMAGER.getCode() ||
+                    req.getRole() == GroupMemberRoleEnum.OWNER.getCode())) {
                 return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
             }
+
+            ResponseVO<GetRoleInGroupResp> roleInGroupOne = this.getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+            if(!roleInGroupOne.isOk()){
+                return roleInGroupOne;
+            }
+            GetRoleInGroupResp data = roleInGroupOne.getData();
+            Integer roleInfo = data.getRole();
+            boolean isOwner = roleInfo == GroupMemberRoleEnum.OWNER.getCode();
+            boolean isManager = roleInfo == GroupMemberRoleEnum.MAMAGER.getCode();
+
+            //不是管理员或群主不能修改权限
+            if(req.getRole() != null && !isOwner && !isManager){
+                return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_MANAGER_ROLE);
+            }
+            //管理员权限只有群主能够设置
+            if(req.getRole() != null &&
+                    req.getRole() == GroupMemberRoleEnum.MAMAGER.getCode() &&
+                    !isOwner){
+                return ResponseVO.errorResponse(GroupErrorCode.THIS_OPERATE_NEED_OWNER_ROLE);
+            }
+
+            //不能将role直接改为群主
+            if(req.getRole() != null &&
+                    req.getRole() == GroupMemberRoleEnum.OWNER.getCode()){
+                return ResponseVO.errorResponse(GroupErrorCode.GROUP_OWNER_IS_NOT_REMOVE);
+            }
+
         }
 
         ImGroupMemberEntity update = new ImGroupMemberEntity();
@@ -541,6 +569,31 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             groupMessageProducer.producer(req.getOperater(),GroupEventCommand.SPEAK_GOUP_MEMBER,pack,
                     new ClientInfo(req.getAppId(),req.getClientType(),req.getImel()));
         }
+
+        return ResponseVO.successResponse();
+    }
+
+    @Override
+    @Transactional
+    public ResponseVO exitGroup(ExitGroupReq req) {
+
+        ResponseVO<ImGroupEntity> group = groupService.getGroup(req.getGroupId(), req.getAppId());
+        if(!group.isOk()){
+            return group;
+        }
+
+        ResponseVO<GetRoleInGroupResp> roleInGroupOne = getRoleInGroupOne(req.getGroupId(), req.getOperater(), req.getAppId());
+        if(!roleInGroupOne.isOk()){
+            return roleInGroupOne;
+        }
+
+        ImGroupMemberEntity update = new ImGroupMemberEntity();
+        update.setRole(GroupMemberRoleEnum.LEAVE.getCode());
+        UpdateWrapper<ImGroupMemberEntity> wrapper = new UpdateWrapper<>();
+        wrapper.eq("app_id",req.getAppId());
+        wrapper.eq("group_id",req.getGroupId());
+        wrapper.eq("member_id",req.getOperater());
+        imGroupMemberMapper.update(update,wrapper);
 
         return ResponseVO.successResponse();
     }
