@@ -44,11 +44,21 @@ public class ByteBufToMessageUtils {
 
         /** imei Length*/
         int imeiLength = byteBuf.readInt();
+
+        if(byteBuf.readableBytes() < imeiLength){
+            byteBuf.resetReaderIndex();
+            return null;
+        }
+
         byte[] imeiData = new byte[imeiLength];
         byteBuf.readBytes(imeiData);
 
         /** data Length*/
         int dataLength = byteBuf.readInt();
+        if(byteBuf.readableBytes() < dataLength){
+            byteBuf.resetReaderIndex();
+            return null;
+        }
         byte[] data = new byte[dataLength];
         byteBuf.readBytes(data);
 
@@ -78,6 +88,8 @@ public class ByteBufToMessageUtils {
         Message message = new Message();
         message.setMessageHeader(msgHeader);
         message.setMessagePack(body);
+
+        byteBuf.markReaderIndex();
         return message;
     }
 
