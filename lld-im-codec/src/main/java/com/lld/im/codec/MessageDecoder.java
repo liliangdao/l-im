@@ -1,5 +1,6 @@
 package com.lld.im.codec;
 
+import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.utils.ByteBufToMessageUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,8 +23,11 @@ public class MessageDecoder extends ByteToMessageDecoder {
         if (in.readableBytes() < 24) {
             return;
         }
-
-        out.add(ByteBufToMessageUtils.transition(in));
+        Message message = ByteBufToMessageUtils.transition(in);
+        if(message == null){
+            return;
+        }
+        out.add(message);
     }
 
 }
