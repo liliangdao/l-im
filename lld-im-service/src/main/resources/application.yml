@@ -6,7 +6,7 @@ spring:
     active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: 123456
+    password: frfr46467979+
     url: jdbc:mysql://43.139.108.123:3306/im-core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
     username: root
 

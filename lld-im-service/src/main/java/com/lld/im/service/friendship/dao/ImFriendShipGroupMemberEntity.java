@@ -2,7 +2,7 @@ package com.lld.im.service.friendship.dao;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.jeffreyning.mybatisplus.anno.AutoMap;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 import lombok.Data;
 
 /**
@@ -13,7 +13,6 @@ import lombok.Data;
 
 @Data
 @TableName("im_friendship_group_member")
-@AutoMap
 public class ImFriendShipGroupMemberEntity {
 
     @TableId(value = "group_id")

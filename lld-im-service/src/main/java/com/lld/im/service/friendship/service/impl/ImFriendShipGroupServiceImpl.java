@@ -2,7 +2,6 @@ package com.lld.im.service.friendship.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
 import com.lld.im.codec.pack.friendship.AddFriendGroupPack;
 import com.lld.im.codec.pack.friendship.DeleteFriendGroupPack;
 import com.lld.im.common.ResponseVO;
@@ -33,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @create: 2022-08-25 11:01
  **/
 @Service
-public class ImFriendShipGroupServiceImpl extends MppServiceImpl<ImFriendShipGroupMapper, ImFriendShipGroupEntity>
+public class ImFriendShipGroupServiceImpl
         implements ImFriendShipGroupService {
 
     @Autowired

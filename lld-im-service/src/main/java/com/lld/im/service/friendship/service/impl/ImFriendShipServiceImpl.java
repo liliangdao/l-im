@@ -4,8 +4,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
-import com.lld.im.codec.pack.friendship.AddFriendBlackPack;
 import com.lld.im.codec.pack.friendship.AddFriendPack;
 import com.lld.im.codec.pack.friendship.DeleteFriendPack;
 import com.lld.im.codec.pack.friendship.UpdateFriendPack;
@@ -60,8 +58,7 @@ import java.util.stream.Collectors;
  * @create: 2022-05-19 09:23
  **/
 @Service
-public class ImFriendShipServiceImpl extends
-        MppServiceImpl<ImFriendShipMapper, ImFriendShipEntity> implements ImFriendShipService {
+public class ImFriendShipServiceImpl implements ImFriendShipService {
 
     @Autowired
     ImFriendShipMapper imFriendShipMapper;
@@ -475,64 +472,64 @@ public class ImFriendShipServiceImpl extends
 
     @Override
     public ResponseVO addBlack(AddFriendShipBlackReq req) {
-        List<AddFriendShipResp> result = new ArrayList<>();
-
-        ResponseVO fromInfo = imUserService.getSingleUserInfo(req.getFromId(), req.getAppId());
-        if (fromInfo.getCode() != BaseErrorCode.SUCCESS.getCode()) {
-            return ResponseVO.errorResponse(fromInfo.getCode(), fromInfo.getMsg());
-        }
-
-        for (String toId : req.getAddItems()) {
-            AddFriendShipResp resp = new AddFriendShipResp();
-            ResponseVO<ImUserDataEntity> userInfo = imUserService.getSingleUserInfo(toId, req.getAppId());
-            if (userInfo.getCode() != BaseErrorCode.SUCCESS.getCode()) {
-                //不成功
-                resp.setCode(userInfo.getCode());
-                resp.setMsg(userInfo.getMsg());
-                resp.setToId(toId);
-                result.add(resp);
-            } else {
-                ImFriendShipEntity entity = new ImFriendShipEntity();
-                entity.setFromId(req.getFromId());
-                entity.setToId(toId);
-                entity.setAppId(req.getAppId());
-                entity.setBlack(FriendShipStatusEnum.BLACK_STATUS_BLACKED.getStatus());
-                long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendshipBlack);
-                entity.setBlackSequence(seq);
-
-                final ImFriendShipEntity imFriendShipEntity = imFriendShipMapper.selectByMultiId(entity);
-                if (imFriendShipEntity == null) {
-                    entity.setCreateTime(System.currentTimeMillis());
-                    entity.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NO_FRIEND.getStatus());
-                }
-                boolean b = this.saveOrUpdateByMultiId(entity);
-                if (b) {
-                    resp.setCode(0);
-                    resp.setMsg("");
-                    resp.setToId(toId);
-                    result.add(resp);
-                    AddFriendBlackPack addFriendBlackPack = new AddFriendBlackPack();
-                    addFriendBlackPack.setFromId(req.getFromId());
-                    addFriendBlackPack.setToId(toId);
-                    addFriendBlackPack.setSequence(seq);
-                    writeUserSeq.writeUserSeq(req.getAppId(), req.getFromId(), Constants.SeqConstants.FriendshipBlack, seq);
-                    //发送tcp通知
-                    messageProducer.sendToUser(req.getFromId(), req.getClientType(), req.getImel(),
-                            FriendshipEventCommand.FRIEND_BLACK_ADD, addFriendBlackPack, req.getAppId());
-                } else {
-                    resp.setCode(500);
-                    resp.setMsg("error");
-                    resp.setToId(toId);
-                    result.add(resp);
-                }
-            }
-        }
-
-        //回调
-        if (appConfig.isAddFriendShipBlackCallback()) {
-            callbackService.callback(req.getAppId(), Constants.CallbackCommand.AddBlack, JSONObject.toJSONString(result));
-        }
-        return ResponseVO.successResponse(result);
+//        List<AddFriendShipResp> result = new ArrayList<>();
+//
+//        ResponseVO fromInfo = imUserService.getSingleUserInfo(req.getFromId(), req.getAppId());
+//        if (fromInfo.getCode() != BaseErrorCode.SUCCESS.getCode()) {
+//            return ResponseVO.errorResponse(fromInfo.getCode(), fromInfo.getMsg());
+//        }
+//
+//        for (String toId : req.getAddItems()) {
+//            AddFriendShipResp resp = new AddFriendShipResp();
+//            ResponseVO<ImUserDataEntity> userInfo = imUserService.getSingleUserInfo(toId, req.getAppId());
+//            if (userInfo.getCode() != BaseErrorCode.SUCCESS.getCode()) {
+//                //不成功
+//                resp.setCode(userInfo.getCode());
+//                resp.setMsg(userInfo.getMsg());
+//                resp.setToId(toId);
+//                result.add(resp);
+//            } else {
+//                ImFriendShipEntity entity = new ImFriendShipEntity();
+//                entity.setFromId(req.getFromId());
+//                entity.setToId(toId);
+//                entity.setAppId(req.getAppId());
+//                entity.setBlack(FriendShipStatusEnum.BLACK_STATUS_BLACKED.getStatus());
+//                long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.FriendshipBlack);
+//                entity.setBlackSequence(seq);
+//
+//                final ImFriendShipEntity imFriendShipEntity = imFriendShipMapper.selectByMultiId(entity);
+//                if (imFriendShipEntity == null) {
+//                    entity.setCreateTime(System.currentTimeMillis());
+//                    entity.setStatus(FriendShipStatusEnum.FRIEND_STATUS_NO_FRIEND.getStatus());
+//                }
+//                boolean b = this.saveOrUpdateByMultiId(entity);
+//                if (b) {
+//                    resp.setCode(0);
+//                    resp.setMsg("");
+//                    resp.setToId(toId);
+//                    result.add(resp);
+//                    AddFriendBlackPack addFriendBlackPack = new AddFriendBlackPack();
+//                    addFriendBlackPack.setFromId(req.getFromId());
+//                    addFriendBlackPack.setToId(toId);
+//                    addFriendBlackPack.setSequence(seq);
+//                    writeUserSeq.writeUserSeq(req.getAppId(), req.getFromId(), Constants.SeqConstants.FriendshipBlack, seq);
+//                    //发送tcp通知
+//                    messageProducer.sendToUser(req.getFromId(), req.getClientType(), req.getImel(),
+//                            FriendshipEventCommand.FRIEND_BLACK_ADD, addFriendBlackPack, req.getAppId());
+//                } else {
+//                    resp.setCode(500);
+//                    resp.setMsg("error");
+//                    resp.setToId(toId);
+//                    result.add(resp);
+//                }
+//            }
+//        }
+//
+//        //回调
+//        if (appConfig.isAddFriendShipBlackCallback()) {
+//            callbackService.callback(req.getAppId(), Constants.CallbackCommand.AddBlack, JSONObject.toJSONString(result));
+//        }result
+        return ResponseVO.successResponse();
     }
 
     /**

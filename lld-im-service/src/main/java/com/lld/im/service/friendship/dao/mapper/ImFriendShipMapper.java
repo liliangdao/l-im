@@ -1,19 +1,14 @@
 package com.lld.im.service.friendship.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.github.jeffreyning.mybatisplus.anno.AutoMap;
-import com.github.jeffreyning.mybatisplus.base.MppBaseMapper;
 import com.lld.im.service.friendship.dao.ImFriendShipEntity;
 import com.lld.im.service.friendship.model.req.CheckFriendShipReq;
 import com.lld.im.service.friendship.model.resp.CheckFriendShipResp;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-//@Repository
-//@AutoMap
-public interface ImFriendShipMapper extends MppBaseMapper<ImFriendShipEntity> {
+public interface ImFriendShipMapper extends BaseMapper<ImFriendShipEntity> {
 
     @Select(
             " select Max(friend_sequence) from im_friendship where app_id = #{appId} and from_id = #{userId} "

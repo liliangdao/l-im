@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import com.github.jeffreyning.mybatisplus.base.MppSqlInjector;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.enums.ImUrlRouteWayEnum;
 import com.lld.im.common.enums.RouteHashMethodEnum;
@@ -46,9 +45,6 @@ public class BeanConfig  {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
-
-    @Autowired
-    MppSqlInjector mppSqlInjector;
 
     @Bean
     public ZkClient buildZKClient() {

@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.jeffreyning.mybatisplus.anno.AutoMap;
-import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 import lombok.Data;
 
 /**
@@ -16,7 +15,6 @@ import lombok.Data;
 
 @Data
 @TableName("im_friendship_group")
-@AutoMap
 public class ImFriendShipGroupEntity {
 
     @TableId(value = "group_id",type = IdType.AUTO)

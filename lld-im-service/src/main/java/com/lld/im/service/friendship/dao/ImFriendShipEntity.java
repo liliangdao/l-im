@@ -3,8 +3,6 @@ package com.lld.im.service.friendship.dao;
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.jeffreyning.mybatisplus.anno.AutoMap;
-import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.Data;
 
 /**
@@ -15,18 +13,14 @@ import lombok.Data;
 
 @Data
 @TableName("im_friendship")
-@AutoMap
 public class ImFriendShipEntity {
 
-    @MppMultiId // 复合主键
     @TableField(value = "app_id")
     private Integer appId;
 
-    @MppMultiId
     @TableField(value = "from_id")
     private String fromId;
 
-    @MppMultiId
     @TableField(value = "to_id")
     private String toId;
     /** 备注*/

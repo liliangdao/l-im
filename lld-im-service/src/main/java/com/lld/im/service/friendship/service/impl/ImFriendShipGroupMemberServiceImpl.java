@@ -1,7 +1,6 @@
 package com.lld.im.service.friendship.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
 import com.lld.im.codec.pack.friendship.AddFriendGroupMemberPack;
 import com.lld.im.codec.pack.friendship.DeleteFriendGroupMemberPack;
 import com.lld.im.common.ResponseVO;
@@ -31,7 +30,7 @@ import java.util.List;
  * @create: 2022-08-25 11:24
  **/
 @Service
-public class ImFriendShipGroupMemberServiceImpl extends MppServiceImpl<ImFriendShipGroupMemberMapper, ImFriendShipGroupMemberEntity>
+public class ImFriendShipGroupMemberServiceImpl
         implements ImFriendShipGroupMemberService {
 
     @Autowired
