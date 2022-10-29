@@ -44,22 +44,18 @@ public class ByteBufToMessageUtils {
 
         /** imei Length*/
         int imeiLength = byteBuf.readInt();
-
-        if(byteBuf.readableBytes() < imeiLength){
-            byteBuf.resetReaderIndex();
-            return null;
-        }
-
         byte[] imeiData = new byte[imeiLength];
-        byteBuf.readBytes(imeiData);
 
         /** data Length*/
         int dataLength = byteBuf.readInt();
-        if(byteBuf.readableBytes() < dataLength){
+        byte[] data = new byte[dataLength];
+
+        if(byteBuf.readableBytes() < dataLength + imeiLength){
             byteBuf.resetReaderIndex();
             return null;
         }
-        byte[] data = new byte[dataLength];
+
+        byteBuf.readBytes(imeiData);
         byteBuf.readBytes(data);
 
         /** 填充数据头*/
