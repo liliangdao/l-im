@@ -2,7 +2,6 @@ package com.lld.im.service.friendship.dao;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 import lombok.Data;
 
 /**
