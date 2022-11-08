@@ -30,11 +30,6 @@ public class LImServer {
     private ServerBootstrap server;
     private ChannelFuture future;
 
-
-//    public static LImServer getInstance(BootstrapConfig.TcpConfig tcpConfig) {
-//        return SingletionLImServer.instance;
-//    }
-
     public LImServer(BootstrapConfig.TcpConfig tcpConfig){
         config = tcpConfig;
         mainGroup = new NioEventLoopGroup(tcpConfig.getBossThreadSize());// 处理客户端连接请求数

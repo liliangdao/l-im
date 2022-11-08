@@ -18,8 +18,6 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <mybatis-plus.version>3.3.0</mybatis-plus.version>
-        <hutool.version>5.0.6</hutool.version>
     </properties>
 
     <dependencies>

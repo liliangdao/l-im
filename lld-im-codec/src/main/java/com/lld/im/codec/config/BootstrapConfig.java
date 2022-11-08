@@ -27,9 +27,7 @@ public class BootstrapConfig {
 
         private Integer bossThreadSize; // boss线程 默认=1
 
-        private Integer workThreadSize; //work线程 默认=cpu核心数+1
-
-        private Integer businessThreadSize; // 业务线程数 默认=cpu核心数
+        private Integer businessThreadSize; // 业务线程数
 
         private boolean enableCluster;
 
