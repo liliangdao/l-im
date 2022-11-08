@@ -27,19 +27,6 @@ public class WebSocketMessageEncoder extends MessageToMessageEncoder<MessagePack
     protected void encode(ChannelHandlerContext ctx, MessagePack msg, List<Object> out)  {
 
         try {
-//            Message msgBody = (Message) msg;
-//            Integer command = msgBody.getMessageHeader().getCommand();
-//            MessagePack body = msgBody.getMessagePack();
-//
-//            String s = JSONObject.toJSONString(body);
-//            ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());
-//
-//            byte[] bytes = s.getBytes();
-//            byteBuf.writeInt(bytes.length);
-//            byteBuf.writeInt(command);
-//            byteBuf.writeBytes(bytes);
-//            out.add(new BinaryWebSocketFrame(byteBuf));
-
             String s = JSONObject.toJSONString(msg);
             ByteBuf byteBuf = Unpooled.directBuffer(8+s.length());
             byte[] bytes = s.getBytes();
