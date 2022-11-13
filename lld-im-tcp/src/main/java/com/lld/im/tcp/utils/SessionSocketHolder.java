@@ -27,8 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since JDK 1.8
  */
 public class SessionSocketHolder {
-//    private static final Map<String, NioSocketChannel> CHANNEL_MAP = new ConcurrentHashMap<>(16);
-    private static final Map<ChannelInfo, NioSocketChannel> CHANNELS = new ConcurrentHashMap<>(16);
+    private static final Map<ChannelInfo, NioSocketChannel>
+            CHANNELS = new ConcurrentHashMap<>(16);
     /**
      * Save the relationship between the userId and the channel.
      *
@@ -60,10 +60,6 @@ public class SessionSocketHolder {
         return channels;
     }
 
-    public static Map<ChannelInfo, NioSocketChannel> getRelationShip() {
-        return CHANNELS;
-    }
-
     public static void remove(NioSocketChannel nioSocketChannel) {
         CHANNELS.entrySet().stream().filter(entry -> entry.getValue() == nioSocketChannel).forEach(entry -> CHANNELS.remove(entry.getKey()));
     }
@@ -85,18 +81,19 @@ public class SessionSocketHolder {
 
         String userId = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get();
         String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
+        String imei = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.Imei)).get();
+        Integer clientType = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientType)).get();
         Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
 
         UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
         pack.setAppId(appId);
         pack.setUserId(userId);
-        String[] split = clientInfo.split(":");
         pack.setStatus(UserPipelineConnectState.OFFLINE.getCommand());
 
         MessageHeader header = new MessageHeader();
         header.setAppId(appId);
-        header.setImei(split[1]);
-        header.setClientType(Integer.valueOf(split[0]));
+        header.setImei(imei);
+        header.setClientType(clientType);
 
         //发送在线状态修改信息-》通知用户
         try {

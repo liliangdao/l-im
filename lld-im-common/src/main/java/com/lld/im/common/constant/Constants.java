@@ -13,6 +13,10 @@ public class Constants {
     /** channel绑定的userId Key*/
     public static final String AppId = "appId";
 
+    public static final String ClientType = "clientType";
+
+    public static final String Imei = "imei";
+
     /** channel绑定的clientType 和 imel Key*/
     public static final String ClientImei = "clientImei";
 

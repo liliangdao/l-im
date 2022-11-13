@@ -86,6 +86,14 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             /** 为channel设置appId **/
             ctx.channel().attr(AttributeKey.valueOf(Constants.AppId)).set(msg.getMessageHeader().getAppId());
 
+            /** 为channel设置ClientType **/
+            ctx.channel().attr(AttributeKey.valueOf(Constants.ClientType))
+                    .set(msg.getMessageHeader().getClientType());
+
+            /** 为channel设置Imei **/
+            ctx.channel().attr(AttributeKey.valueOf(Constants.Imei))
+                    .set(msg.getMessageHeader().getImei());
+
             // 设置userSession到redis
             UserSession session = new UserSession();
             session.setAppId(msg.getMessageHeader().getAppId());
