@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.tcp.reciver.process.BaseProcess;
+import com.lld.im.tcp.reciver.process.MessageProcess;
 import com.lld.im.tcp.reciver.process.ProcessFactory;
 import com.lld.im.tcp.utils.MqFactory;
 import com.rabbitmq.client.*;
@@ -38,7 +39,7 @@ public class MessageServiceReciver {
                     log.info("收到消息：{}", msgStr);
                     MessagePack messagePack = JSONObject.parseObject(msgStr, MessagePack.class);
                     try {
-                        BaseProcess messageProcess = ProcessFactory.getMessageProcess(messagePack.getCommand());
+                        MessageProcess messageProcess = ProcessFactory.getMessageProcess(messagePack.getCommand());
                         messageProcess.process(messagePack,channel);
                         channel.basicAck(envelope.getDeliveryTag() , false);
                     } catch (Exception e){
