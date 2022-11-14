@@ -15,14 +15,8 @@ public class ProcessFactory {
     private static BaseProcess defatultProcess;
 
     static {
-        defatultProcess = new BaseProcess() {
-            @Override
-            public void process(MessagePack pack, Channel mqChannel) throws IOException {
-                super.process(pack, mqChannel);
-            }
-        };
+        defatultProcess = new BaseProcess();
     }
-
     public static BaseProcess getMessageProcess(Integer command){
         return defatultProcess;
     }

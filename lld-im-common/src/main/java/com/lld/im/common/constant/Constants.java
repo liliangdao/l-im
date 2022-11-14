@@ -17,7 +17,7 @@ public class Constants {
 
     public static final String Imei = "imei";
 
-    /** channel绑定的userId Key*/
+    /** channel绑定的ReadTime Key*/
     public static final String ReadTime = "ReadTime";
 
     /** channel绑定的clientType 和 imel Key*/

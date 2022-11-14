@@ -2,7 +2,7 @@ package com.lld.im.common.enums.command;
 
 public enum SystemCommand implements Command {
 
-    //心跳
+    //心跳 9999
     PING(0x270f),
 
     //登陸  9000
