@@ -44,7 +44,7 @@ public class BootstrapConfig {
         private ZkConfig zkConfig;
 
         /**
-         * zk配置
+         * rabbitmq配置
          */
         private Rabbitmq rabbitmq;
     }
