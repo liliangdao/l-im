@@ -47,6 +47,11 @@ public class BootstrapConfig {
          * rabbitmq配置
          */
         private Rabbitmq rabbitmq;
+
+        /**
+         * rabbitmq配置
+         */
+        private Long heartBeatTime;
     }
 
 

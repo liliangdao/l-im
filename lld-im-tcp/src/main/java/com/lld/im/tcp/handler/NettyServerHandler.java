@@ -9,7 +9,6 @@ import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.pack.user.LoginPack;
 import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.common.enums.ImConnectStatusEnum;
 import com.lld.im.common.enums.UserPipelineConnectState;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.enums.command.SystemCommand;
@@ -100,7 +99,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             session.setClientType(msg.getMessageHeader().getClientType());
             session.setImei(msg.getMessageHeader().getImei());
             session.setUserId(loginPack.getUserId());
-            session.setConnectState(ImConnectStatusEnum.ONLINE_STATUS.getCode());
+            session.setConnectState(UserPipelineConnectState.ONLINE.getCommand());
             try {
                 InetAddress addr = InetAddress.getLocalHost();
                 session.setPipelineHost(addr.getHostAddress());
@@ -149,7 +148,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
         }
         else if (command == SystemCommand.PING.getCommand()) {
             //PING
-
+            ctx.channel().attr(AttributeKey.valueOf(Constants.ReadTime))
+                    .set(System.currentTimeMillis());
         } else if (command == MessageCommand.MSG_P2P.getCommand()) {
             try {
                 MqMessageProducer.sendMessageByCommand(msg,command);

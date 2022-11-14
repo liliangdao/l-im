@@ -80,7 +80,6 @@ public class Starter {
         ));
         thread.setName("registry-zk");
         thread.start();
-
     }
 
 }

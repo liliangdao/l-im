@@ -1,14 +1,12 @@
 package com.lld.im.service.utils;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.lld.im.common.ClientType;
 import com.lld.im.common.constant.Constants;
-import com.lld.im.common.enums.ImConnectStatusEnum;
+import com.lld.im.common.enums.UserPipelineConnectState;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.UserSession;
-import com.lld.im.common.model.msg.ChatMessageContent;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -47,7 +45,7 @@ public class UserSessionUtils {
             String str = (String) o;
             UserSession session = JSON.parseObject(str, new TypeReference<UserSession>() {
             }.getType());
-            if(ImConnectStatusEnum.ONLINE_STATUS.getCode().equals(session.getConnectState())){
+            if(UserPipelineConnectState.ONLINE.getCommand().equals(session.getConnectState())){
                 list.add(session);
             }
         }

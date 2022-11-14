@@ -12,6 +12,12 @@ import io.netty.handler.timeout.IdleStateEvent;
  **/
 public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
 
+    private Long heartBeatTime;
+
+    public HeartBeatHandler(Long heartBeatTime) {
+        this.heartBeatTime = heartBeatTime;
+    }
+
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         // 判断evt是否是IdleStateEvent（用于触发用户事件，包含 读空闲/写空闲/读写空闲 ）
@@ -22,7 +28,7 @@ public class HeartBeatHandler extends ChannelInboundHandlerAdapter {
             } else if (event.state() == IdleState.WRITER_IDLE) {
 //                System.out.println("进入写空闲...");
             } else if (event.state() == IdleState.ALL_IDLE) {
-                ServerHeartBeatHandler.process(ctx);
+                ServerHeartBeatHandler.process(heartBeatTime,ctx);
             }
         }
 

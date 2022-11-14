@@ -54,7 +54,7 @@ public class LImServer {
                         //心跳检测Handler
                         pipeline.addLast(new IdleStateHandler(0, 0, 10));
                         // 自定义的空闲状态检测
-                        pipeline.addLast(new HeartBeatHandler());
+                        pipeline.addLast(new HeartBeatHandler(config.getHeartBeatTime()));
                         //加入自己的业务处理handler
                         pipeline.addLast(new NettyServerHandler(tcpConfig.getBrokerId()));
                     }
