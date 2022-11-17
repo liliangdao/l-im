@@ -39,4 +39,9 @@ public class SortArrayMapConsistentHash extends AbstractConsistentHash {
         return sortArrayMap.firstNodeValue(hash);
     }
 
+    @Override
+    protected void processBefore() {
+        sortArrayMap.clear();
+    }
+
 }

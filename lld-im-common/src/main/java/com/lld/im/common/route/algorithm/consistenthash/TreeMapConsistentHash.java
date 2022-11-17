@@ -42,4 +42,9 @@ public class TreeMapConsistentHash extends AbstractConsistentHash {
         }
         return treeMap.firstEntry().getValue();
     }
+
+    @Override
+    protected void processBefore() {
+
+    }
 }
