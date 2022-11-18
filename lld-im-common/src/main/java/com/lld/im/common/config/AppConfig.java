@@ -53,25 +53,27 @@ public class AppConfig {
 
     private String callbackUrl;//回调地址
 
-    private boolean addFriendCallback; //添加好友之后回调开关
+    private boolean addFriendAfterCallback; //添加好友之后回调开关
 
-    private boolean modifyFriendCallback; //修改好友之后回调开关
+    private boolean addFriendBeforeCallback; //添加好友之前回调开关
 
-    private boolean deleteFriendCallback; //删除好友之后回调开关
+    private boolean modifyFriendAfterCallback; //修改好友之后回调开关
 
-    private boolean addFriendShipBlackCallback; //添加黑名单之后回调开关
+    private boolean deleteFriendAfterCallback; //删除好友之后回调开关
 
-    private boolean deleteFriendShipBlackCallback; //添加黑名单之后回调开关
+    private boolean addFriendShipBlackAfterCallback; //添加黑名单之后回调开关
 
-    private boolean createGroupCallback; //创建群聊之后回调开关
+    private boolean deleteFriendShipBlackAfterCallback; //添加黑名单之后回调开关
 
-    private boolean modifyGroupCallback; //修改群聊之后回调开关
+    private boolean createGroupAfterCallback; //创建群聊之后回调开关
 
-    private boolean destroyGroupCallback;//解散群聊之后回调开关
+    private boolean modifyGroupAfterCallback; //修改群聊之后回调开关
 
-    private boolean deleteGroupMemberCallback;//删除群成员之后回调
+    private boolean destroyGroupAfterCallback;//解散群聊之后回调开关
 
-    private boolean addGroupMemberCallback;//添加群成员之后回调
+    private boolean deleteGroupMemberAfterCallback;//删除群成员之后回调
+
+    private boolean addGroupMemberAfterCallback;//添加群成员之后回调
 
     private Integer offlineMessageCount;//离线消息存储条数
 

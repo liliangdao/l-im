@@ -173,8 +173,8 @@ public class ImGroupServiceImpl implements ImGroupService {
                 , new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
 
         //回调
-        if (appConfig.isCreateGroupCallback()) {
-            callbackService.callback(req.getAppId(), Constants.CallbackCommand.CreateGroup, JSONObject.toJSONString(imGroupEntity));
+        if (appConfig.isCreateGroupAfterCallback()) {
+            callbackService.callback(req.getAppId(), Constants.CallbackCommand.CreateGroupAfter, JSONObject.toJSONString(imGroupEntity));
         }
         return ResponseVO.successResponse();
     }
@@ -245,8 +245,8 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         groupMessageProducer.producer(req.getOperater(), GroupEventCommand.UPDATED_GROUP,
                 pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
-        if (appConfig.isModifyGroupCallback()) {
-            callbackService.callback(req.getAppId(), Constants.CallbackCommand.UpdateGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
+        if (appConfig.isModifyGroupAfterCallback()) {
+            callbackService.callback(req.getAppId(), Constants.CallbackCommand.UpdateGroupAfter, JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
 
         }
 
@@ -382,8 +382,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         groupMessageProducer.producer(req.getOperater(),
                 GroupEventCommand.DESTROY_GROUP, pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
 
-        if (appConfig.isDestroyGroupCallback()) {
-            callbackService.callback(req.getAppId(), Constants.CallbackCommand.DestoryGroup, JSONObject.toJSONString(imGroupDataMapper.selectOne(objectQueryWrapper)));
+        if (appConfig.isDestroyGroupAfterCallback()) {
+            callbackService.callback(req.getAppId(), Constants.CallbackCommand.DestoryGroupAfter, JSONObject.toJSONString(imGroupDataMapper.selectOne(objectQueryWrapper)));
         }
         return ResponseVO.successResponse();
     }

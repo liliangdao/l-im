@@ -299,13 +299,13 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         groupMessageProducer.producer(req.getOperater(), GroupEventCommand.ADDED_MEMBER, addGroupMemberPack
                 , new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
 
-        if (appConfig.isAddGroupMemberCallback()) {
+        if (appConfig.isAddGroupMemberAfterCallback()) {
             AddMemberCallback addMemberCallback = new AddMemberCallback();
             addMemberCallback.setGroupId(req.getGroupId());
             addMemberCallback.setGroupType(group.getGroupType());
             addMemberCallback.setMemberId(successId);
             addMemberCallback.setOperater(req.getOperater());
-            callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberAdd, JSONObject.toJSONString(addMemberCallback));
+            callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberAddAfter, JSONObject.toJSONString(addMemberCallback));
         }
 
         return ResponseVO.successResponse(resp);
@@ -375,8 +375,8 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             removeGroupMemberPack.setMember(req.getMemberId());
             groupMessageProducer.producer(req.getMemberId(), GroupEventCommand.DELETED_MEMBER, removeGroupMemberPack
                     , new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
-            if (appConfig.isDeleteGroupMemberCallback()) {
-                callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberDelete, JSONObject.toJSONString(req));
+            if (appConfig.isDeleteGroupMemberAfterCallback()) {
+                callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberDeleteAfter, JSONObject.toJSONString(req));
             }
         }
         return responseVO;

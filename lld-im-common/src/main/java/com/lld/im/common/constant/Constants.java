@@ -122,25 +122,27 @@ public class Constants {
 
     public static class CallbackCommand{
 
-        public static final String CreateGroup = "group.create";
+        public static final String CreateGroupAfter = "group.create.after";
 
-        public static final String UpdateGroup = "group.update";
+        public static final String UpdateGroupAfter = "group.update.after";
 
-        public static final String DestoryGroup = "group.destory";
+        public static final String DestoryGroupAfter = "group.destory.after";
 
-        public static final String TransferGroup = "group.transfer";
+        public static final String TransferGroupAfter = "group.transfer.after";
 
-        public static final String GroupMemberAdd = "group.member.add";
+        public static final String GroupMemberAddAfter = "group.member.add.after";
 
-        public static final String GroupMemberDelete = "group.member.delete";
+        public static final String GroupMemberDeleteAfter = "group.member.delete.after";
 
-        public static final String AddFriend = "friend.add";
+        public static final String AddFriendAfter = "friend.add.after";
 
-        public static final String UpdateFriend = "friend.update";
+        public static final String AddFriendBefore = "friend.add.before";
 
-        public static final String DeleteFriend = "friend.delete";
+        public static final String UpdateFriendAfter = "friend.update.after";
 
-        public static final String AddBlack = "black.add";
+        public static final String DeleteFriendAfter = "friend.delete.after";
+
+        public static final String AddBlackAfter = "black.add.after";
 
         public static final String DeleteBlack = "black.delete";
     }
