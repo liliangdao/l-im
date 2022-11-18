@@ -3,7 +3,6 @@ lim:
   enableWebSocket: true # 是否启用websocket
   webSocketPort: 19001 # webSocket端口号
   bossThreadSize: 1 # boss线程 默认=1
-  workThreadSize: 8 # work线程 默认=cpu核心数+1
   businessThreadSize: 8 # 业务线程数 默认=cpu核心数
   enableCluster: false # 是否启用集群
   brokerId: 10001 # 集群brokerId
