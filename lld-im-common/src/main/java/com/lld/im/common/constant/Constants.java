@@ -130,6 +130,8 @@ public class Constants {
 
         public static final String TransferGroupAfter = "group.transfer.after";
 
+        public static final String GroupMemberAddBefore = "group.member.add.before";
+
         public static final String GroupMemberAddAfter = "group.member.add.after";
 
         public static final String GroupMemberDeleteAfter = "group.member.delete.after";

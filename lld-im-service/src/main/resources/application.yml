@@ -11,7 +11,7 @@ spring:
     username: root
 
   redis:
-    host: 43.139.108.123
+    host: 127.0.0.1
     port: 6379
     jedis:
       pool:
@@ -19,7 +19,7 @@ spring:
         max-idle: 100
         max-wait: 1000
         min-idle: 10
-    password: 123456
+    password:
   rabbitmq:
     host: 43.139.108.123
     port: 5672
@@ -57,7 +57,7 @@ server:
 appConfig:
   appId: 10000
   privateKey: 123456
-  zkAddr: 43.139.108.123:2181 # zk连接地址
+  zkAddr: 127.0.0.1:2181 # zk连接地址
   zkConnectTimeOut: 50000 #zk超时时间
   imRouteWay: 1 # 路由策略1轮训 2随机 3hash
   consistentHashWay: 1 # 如果选用一致性hash的话具体hash算法 1 TreeMap 2 自定义Map
@@ -74,15 +74,16 @@ appConfig:
   sendMessageCheckFriend: true # 发送消息是否校验关系链
   sendMessageCheckBlack: true # 发送消息是否校验黑名单
   callbackUrl: http://127.0.0.1:8000/callback
-  addFriendCallback: false # 添加好友之后回调开关
-  modifyFriendCallback: false # 修改好友之后回调开关
-  deleteFriendCallback: false # 修改好友之后回调开关
-  addFriendShipBlackCallback: false #添加黑名单之后回调开关
-  deleteFriendShipBlackCallback: false #删除黑名单之后回调开关
-  createGroupCallback: false # 创建群聊之后回调开关
-  modifyGroupCallback: false # 修改群聊之后回调开关
-  deleteGroupMemberCallback: false # 删除群成员之后回调
-  addGroupMemberCallback: false # 添加群成员之后回调
+  addFriendAfterCallback: false # 添加好友之后回调开关
+  modifyFriendAfterCallback: false # 修改好友之后回调开关
+  deleteFriendAfterCallback: false # 修改好友之后回调开关
+  addFriendShipBlackAfterCallback: false #添加黑名单之后回调开关
+  deleteFriendShipBlackAfterCallback: false #删除黑名单之后回调开关
+  createGroupAfterCallback: false # 创建群聊之后回调开关
+  modifyGroupAfterCallback: false # 修改群聊之后回调开关
+  deleteGroupMemberAfterCallback: false # 删除群成员之后回调
+  addGroupMemberAfterCallback: false # 拉人入群之后回调
+  addGroupMemberBeforeCallback: false # 拉人入群之前回调
   offlineMessageCount: 10 #离线消息存储条数
 
 

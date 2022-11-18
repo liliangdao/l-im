@@ -22,7 +22,8 @@ import com.lld.im.common.model.SyncReq;
 import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.dao.ImGroupMemberEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMemberMapper;
-import com.lld.im.service.group.model.callback.AddMemberCallback;
+import com.lld.im.service.group.model.callback.AddMemberAfterCallback;
+import com.lld.im.service.group.model.callback.AddMemberBeforeCallback;
 import com.lld.im.service.group.model.req.*;
 import com.lld.im.service.group.model.resp.AddMemberResp;
 import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
@@ -272,6 +273,17 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         for (GroupMemberDto memberId :
                 req.getMembers()) {
             ResponseVO responseVO = null;
+
+            AddMemberBeforeCallback addMemberBeforeCallback = new AddMemberBeforeCallback();
+            addMemberBeforeCallback.setGroupId(req.getGroupId());
+            addMemberBeforeCallback.setGroupType(group.getGroupType());
+            addMemberBeforeCallback.setMemberId(memberId);
+            addMemberBeforeCallback.setOperater(req.getOperater());
+            ResponseVO callbackDto = callbackService.beforeCallback(req.getAppId(), Constants.CallbackCommand.GroupMemberAddBefore,
+                    JSONObject.toJSONString(addMemberBeforeCallback));
+            if(!callbackDto.isOk()){
+                continue;
+            }
             try {
                 responseVO = groupMemberService.addGroupMember(req.getGroupId(), req.getAppId(), memberId);
             } catch (Exception e) {
@@ -300,7 +312,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 , new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
 
         if (appConfig.isAddGroupMemberAfterCallback()) {
-            AddMemberCallback addMemberCallback = new AddMemberCallback();
+            AddMemberAfterCallback addMemberCallback = new AddMemberAfterCallback();
             addMemberCallback.setGroupId(req.getGroupId());
             addMemberCallback.setGroupType(group.getGroupType());
             addMemberCallback.setMemberId(successId);

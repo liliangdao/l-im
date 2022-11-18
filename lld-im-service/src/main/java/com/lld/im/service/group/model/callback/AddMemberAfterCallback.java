@@ -12,7 +12,7 @@ import java.util.List;
  * @version: 1.0
  */
 @Data
-public class AddMemberCallback {
+public class AddMemberAfterCallback {
     private String groupId;
     private Integer groupType;
     private String operater;

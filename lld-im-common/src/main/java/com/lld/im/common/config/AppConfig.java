@@ -73,7 +73,9 @@ public class AppConfig {
 
     private boolean deleteGroupMemberAfterCallback;//删除群成员之后回调
 
-    private boolean addGroupMemberAfterCallback;//添加群成员之后回调
+    private boolean addGroupMemberBeforeCallback;//拉人入群之前回调
+
+    private boolean addGroupMemberAfterCallback;//拉人入群之后回调
 
     private Integer offlineMessageCount;//离线消息存储条数
 
