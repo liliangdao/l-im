@@ -132,7 +132,7 @@ public class P2PMessageService {
      * @since 2022/9/18
      */
     public void doProcessMessage(ChatMessageContent chatMessageData){
-        //插入历史库和msgBody
+        //插入历史库和msgBody TODO 改为异步存储，这里只分配id
         Long messageKey = messageStoreService.storeP2PMessage(chatMessageData);
         chatMessageData.setMessageKey(messageKey);
         //回包

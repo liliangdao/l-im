@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -166,7 +167,6 @@ public class GroupMessageService {
      * @description 校验群聊发送限制
      * @author chackylee
      * @date 2022/8/17 14:33
-     * @param [fromId, toId, appId] 
      * @return com.lld.im.common.ResponseVO
     */
     private ResponseVO imServerpermissionCheck(String fromId, String groupId, Integer appId) {
@@ -200,15 +200,21 @@ public class GroupMessageService {
                     continue;
                 }
 
-                OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
-                BeanUtils.copyProperties(messageContent,offlineMessageContent);
-                offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
-                offlineMessageContent.setToId(messageContent.getGroupId());
-                offlineMessageContent.setFromId(d.getMemberId());
-                messageStoreService.storeOffLineMessage(offlineMessageContent);
+//                OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+//                BeanUtils.copyProperties(messageContent,offlineMessageContent);
+//                offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
+//                offlineMessageContent.setToId(messageContent.getGroupId());
+//                offlineMessageContent.setFromId(d.getMemberId());
+//                messageStoreService.storeOffLineMessage(offlineMessageContent);
 
-                List<ClientInfo> successResults = messageProducer.sendToUser(d.getMemberId()
-                        , MessageCommand.MSG_GROUP, groupMessageContent,messageContent.getAppId());
+                List<ClientInfo> successResults = new ArrayList<>();
+                if(messageContent.getFromId().equals(d.getMemberId())){
+                    messageProducer.sendToUserExceptClient(d.getMemberId(),MessageCommand.MSG_GROUP,
+                            groupMessageContent,messageContent);
+                }else{
+                     successResults = messageProducer.sendToUser(d.getMemberId()
+                            , MessageCommand.MSG_GROUP, groupMessageContent,messageContent.getAppId());
+                }
 
                 // 如果成功的session列表中不包括手机，则需要推送离线消息。
                 if (!UserSessionUtils.containMobile(successResults)) {

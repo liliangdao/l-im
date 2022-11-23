@@ -16,6 +16,8 @@ import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.ImMessageHistoryEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
 import com.lld.im.service.message.dao.mapper.ImMessageHistoryMapper;
+import com.lld.im.service.message.model.dto.DoStroeGroupMessageDto;
+import com.lld.im.service.message.model.dto.DoStroeP2PMessageDto;
 import com.lld.im.service.service.seq.Seq;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -87,17 +89,50 @@ public class MessageStoreService {
     /**
      * @param
      * @return void
+     * @description: 群聊消息持久化
+     * @author lld
+     * @since 2022/7/23
+     */
+    public void doStoreGroupMessage(DoStroeGroupMessageDto chatMessageContent) {
+        imMessageBodyMapper.insert(chatMessageContent.getImMessageBodyEntity());
+        ImGroupMessageHistoryEntity imGroupMessageHistoryEntity = extractToGroupMessageHistory(chatMessageContent.getChatMessageContent(), chatMessageContent.getImMessageBodyEntity());
+        imGroupMessageHistoryMapper.insert(imGroupMessageHistoryEntity);
+    }
+
+    /**
+     * @param
+     * @return void
      * @description: 消息持久化。插入messageHistory和messageBody库
      * @author lld
      * @since 2022/7/23
      */
     public Long storeP2PMessage(ChatMessageContent chatMessageContent) {
         ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
+
+        //TODO 发送mq消息异步存储
+        DoStroeP2PMessageDto doStroeP2PMessageDto = new DoStroeP2PMessageDto();
+        doStroeP2PMessageDto.setChatMessageContent(chatMessageContent);
+        doStroeP2PMessageDto.setImMessageBodyEntity(imMessageBodyEntity);
+
         imMessageBodyMapper.insert(imMessageBodyEntity);
         List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent, imMessageBodyEntity);
         imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
         return imMessageBodyEntity.getMessageKey();
     }
+
+    /**
+     * @param
+     * @return void
+     * @description: 消息持久化。
+     * @author lld
+     */
+    public void doStoreP2PMessage(DoStroeP2PMessageDto chatMessageContent) {
+        imMessageBodyMapper.insert(chatMessageContent.getImMessageBodyEntity());
+        List<ImMessageHistoryEntity> imMessageHistoryEntities
+                = extractToP2PMessageHistory(chatMessageContent.getChatMessageContent(), chatMessageContent.getImMessageBodyEntity());
+        imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
+    }
+
 
     /**
      * @param
