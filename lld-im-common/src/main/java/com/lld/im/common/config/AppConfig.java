@@ -47,6 +47,8 @@ public class AppConfig {
 
     private String callbackUrl;//回调地址
 
+    private boolean modifyUserAfterCallback; //用户资料变更之后回调开关
+
     private boolean addFriendAfterCallback; //添加好友之后回调开关
 
     private boolean addFriendBeforeCallback; //添加好友之前回调开关
@@ -57,7 +59,7 @@ public class AppConfig {
 
     private boolean addFriendShipBlackAfterCallback; //添加黑名单之后回调开关
 
-    private boolean deleteFriendShipBlackAfterCallback; //添加黑名单之后回调开关
+    private boolean deleteFriendShipBlackAfterCallback; //删除黑名单之后回调开关
 
     private boolean createGroupAfterCallback; //创建群聊之后回调开关
 

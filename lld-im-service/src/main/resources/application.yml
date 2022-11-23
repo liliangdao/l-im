@@ -74,13 +74,16 @@ appConfig:
   sendMessageCheckFriend: true # 发送消息是否校验关系链
   sendMessageCheckBlack: true # 发送消息是否校验黑名单
   callbackUrl: http://127.0.0.1:8000/callback
+  modifyUserAfterCallback: false # 用户资料变更之后回调开关
   addFriendAfterCallback: false # 添加好友之后回调开关
+  addFriendBeforeCallback: false # 添加好友之前回调开关
   modifyFriendAfterCallback: false # 修改好友之后回调开关
-  deleteFriendAfterCallback: false # 修改好友之后回调开关
+  deleteFriendAfterCallback: false # 删除好友之后回调开关
   addFriendShipBlackAfterCallback: false #添加黑名单之后回调开关
   deleteFriendShipBlackAfterCallback: false #删除黑名单之后回调开关
   createGroupAfterCallback: false # 创建群聊之后回调开关
   modifyGroupAfterCallback: false # 修改群聊之后回调开关
+  destroyGroupAfterCallback: false # 解散群聊之后回调开关
   deleteGroupMemberAfterCallback: false # 删除群成员之后回调
   addGroupMemberAfterCallback: false # 拉人入群之后回调
   addGroupMemberBeforeCallback: false # 拉人入群之前回调

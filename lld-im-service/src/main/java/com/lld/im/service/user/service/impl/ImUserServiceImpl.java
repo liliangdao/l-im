@@ -1,8 +1,11 @@
 package com.lld.im.service.user.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.codec.pack.user.UserModifyPack;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.config.AppConfig;
+import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.service.message.service.MessageProducer;
@@ -17,6 +20,7 @@ import com.lld.im.service.user.model.req.ModifyUserInfoReq;
 import com.lld.im.service.user.model.resp.GetUserInfoResp;
 import com.lld.im.service.user.model.resp.ImportUserResp;
 import com.lld.im.service.user.service.ImUserService;
+import com.lld.im.service.utils.CallbackService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -38,6 +42,12 @@ public class ImUserServiceImpl implements ImUserService {
 
     @Autowired
     ImUserDataMapper imUserDataMapper;
+
+    @Autowired
+    AppConfig appConfig;
+
+    @Autowired
+    CallbackService callbackService;
 
     @Autowired
     MessageProducer messageProducer;
@@ -219,12 +229,19 @@ public class ImUserServiceImpl implements ImUserService {
         update.setUserId(null);
         int update1 = imUserDataMapper.update(update, query);
         if(update1 == 1){
+            //tcp通知
             UserModifyPack pack = new UserModifyPack();
-            update.setAppId(req.getAppId());
-            update.setUserId(req.getUserId());
+            pack.setUserId(req.getUserId());
             BeanUtils.copyProperties(update,pack);
             messageProducer.sendToUser(req.getUserId(),req.getClientType(),req.getImel(), UserEventCommand.USER_MODIFY,
                     pack,req.getAppId());
+            //回调
+            if (appConfig.isModifyUserAfterCallback()) {
+                callbackService.callback(req.getAppId(),
+                        Constants.CallbackCommand.ModifyUserAfter,
+                        JSONObject.toJSONString(req));
+            }
+
             return ResponseVO.successResponse();
         }else{
             throw new ApplicationException(UserErrorCode.MODIFY_USER_ERROR);

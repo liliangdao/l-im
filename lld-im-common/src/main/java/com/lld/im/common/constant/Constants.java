@@ -122,6 +122,8 @@ public class Constants {
 
     public static class CallbackCommand{
 
+        public static final String ModifyUserAfter = "user.modify.after";
+
         public static final String CreateGroupAfter = "group.create.after";
 
         public static final String UpdateGroupAfter = "group.update.after";
