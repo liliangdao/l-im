@@ -312,7 +312,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         BeanUtils.copyProperties(fromItem, addFriendPack);
         if (requestBase != null) {
             //TCP通知给from
-            messageProducer.sendToUser(fromId, requestBase.getClientType(), requestBase.getImel(),
+            messageProducer.sendToUser(fromId, requestBase.getClientType(), requestBase.getImei(),
                     FriendshipEventCommand.FRIEND_ADD, addFriendPack, requestBase.getAppId());
         } else {
             messageProducer.sendToUser(fromId,
@@ -429,7 +429,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 updateItem.setSequence(sequence);
                 successItem.add(updateItem);
                 messageProducer.sendToUser(req.getFromId(), req.getClientType(),
-                        req.getImel(), FriendshipEventCommand.FRIEND_UPDATE, updateItem, req.getAppId());
+                        req.getImei(), FriendshipEventCommand.FRIEND_UPDATE, updateItem, req.getAppId());
                 if (appConfig.isModifyFriendAfterCallback()) {
                     callbackService.callback(req.getAppId(), Constants.CallbackCommand.UpdateFriendAfter, JSONObject.toJSONString(updateItem));
                 }
@@ -534,7 +534,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                     addFriendBlackPack.setSequence(seq);
                     writeUserSeq.writeUserSeq(req.getAppId(), req.getFromId(), Constants.SeqConstants.FriendshipBlack, seq);
                     //发送tcp通知
-                    messageProducer.sendToUser(req.getFromId(), req.getClientType(), req.getImel(),
+                    messageProducer.sendToUser(req.getFromId(), req.getClientType(), req.getImei(),
                             FriendshipEventCommand.FRIEND_BLACK_ADD, addFriendBlackPack, req.getAppId());
 
                     resp.setCode(0);
@@ -588,7 +588,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         deleteFriendPack.setToId(req.getToId());
         deleteFriendPack.setSequence(seq);
         writeUserSeq.writeUserSeq(req.getAppId(), req.getFromId(), Constants.SeqConstants.FriendshipBlack, seq);
-        messageProducer.sendToUser(req.getFromId(), req.getClientType(), req.getImel(), FriendshipEventCommand.FRIEND_BLACK_DELETE,
+        messageProducer.sendToUser(req.getFromId(), req.getClientType(), req.getImei(), FriendshipEventCommand.FRIEND_BLACK_DELETE,
                 deleteFriendPack, req.getAppId());
 
         //回调
@@ -706,7 +706,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
 
         writeUserSeq.writeUserSeq(req.getAppId(), req.getFromId(), Constants.SeqConstants.FriendshipBlack, seq);
 
-        messageProducer.sendToUser(req.getFromId(), req.getClientType(), req.getImel(), FriendshipEventCommand.FRIEND_DELETE,
+        messageProducer.sendToUser(req.getFromId(), req.getClientType(), req.getImei(), FriendshipEventCommand.FRIEND_DELETE,
                 deleteFriendPack, req.getAppId());
 
         //回调

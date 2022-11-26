@@ -81,7 +81,7 @@ public class ImFriendShipGroupMemberServiceImpl
         pack.setGroupName(req.getGroupName());
         pack.setToIds(successId);
         pack.setSequence(seq);
-        messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(), FriendshipEventCommand.FRIEND_GROUP_MEMBER_ADD,
+        messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImei(), FriendshipEventCommand.FRIEND_GROUP_MEMBER_ADD,
                 pack,req.getAppId());
         return ResponseVO.successResponse();
     }
@@ -107,7 +107,7 @@ public class ImFriendShipGroupMemberServiceImpl
                     pack.setGroupName(req.getGroupName());
                     pack.setToIds(successId);
                     pack.setSequence(seq);
-                    messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(), FriendshipEventCommand.FRIEND_GROUP_MEMBER_DELETE,
+                    messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImei(), FriendshipEventCommand.FRIEND_GROUP_MEMBER_DELETE,
                             pack,req.getAppId());
                 }
             }

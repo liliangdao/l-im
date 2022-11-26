@@ -328,7 +328,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         addGroupMemberPack.setGroupId(req.getGroupId());
         addGroupMemberPack.setMembers(successId);
         groupMessageProducer.producer(req.getOperater(), GroupEventCommand.ADDED_MEMBER, addGroupMemberPack
-                , new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
+                , new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
 
         if (appConfig.isAddGroupMemberAfterCallback()) {
             AddMemberAfterCallback addMemberCallback = new AddMemberAfterCallback();
@@ -405,7 +405,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             removeGroupMemberPack.setGroupId(req.getGroupId());
             removeGroupMemberPack.setMember(req.getMemberId());
             groupMessageProducer.producer(req.getMemberId(), GroupEventCommand.DELETED_MEMBER, removeGroupMemberPack
-                    , new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
+                    , new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
             if (appConfig.isDeleteGroupMemberAfterCallback()) {
                 callbackService.callback(req.getAppId(), Constants.CallbackCommand.GroupMemberDeleteAfter, JSONObject.toJSONString(req));
             }
@@ -498,7 +498,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
         UpdateGroupMemberPack pack = new UpdateGroupMemberPack();
         BeanUtils.copyProperties(req, pack);
-        groupMessageProducer.producer(req.getOperater(), GroupEventCommand.UPDATED_MEMBER, pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
+        groupMessageProducer.producer(req.getOperater(), GroupEventCommand.UPDATED_MEMBER, pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
 
         return ResponseVO.successResponse();
     }
@@ -598,7 +598,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             GroupMemberSpeakPack pack = new GroupMemberSpeakPack();
             BeanUtils.copyProperties(req,pack);
             groupMessageProducer.producer(req.getOperater(),GroupEventCommand.SPEAK_GOUP_MEMBER,pack,
-                    new ClientInfo(req.getAppId(),req.getClientType(),req.getImel()));
+                    new ClientInfo(req.getAppId(),req.getClientType(),req.getImei()));
         }
 
         return ResponseVO.successResponse();

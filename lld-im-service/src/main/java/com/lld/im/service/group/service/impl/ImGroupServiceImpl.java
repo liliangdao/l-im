@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.lld.im.codec.pack.group.CreateGroupPack;
-import com.lld.im.codec.pack.group.DestroyGroupPack;
-import com.lld.im.codec.pack.group.TransferGroupPack;
-import com.lld.im.codec.pack.group.UpdateGroupInfoPack;
+import com.lld.im.codec.pack.group.*;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
@@ -170,7 +167,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         CreateGroupPack createGroupPack = new CreateGroupPack();
         BeanUtils.copyProperties(imGroupEntity, createGroupPack);
         groupMessageProducer.producer(req.getOperater(), GroupEventCommand.CREATED_GROUP, createGroupPack
-                , new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
+                , new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
 
         //回调
         if (appConfig.isCreateGroupAfterCallback()) {
@@ -242,9 +239,8 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         UpdateGroupInfoPack pack = new UpdateGroupInfoPack();
         BeanUtils.copyProperties(req, pack);
-
         groupMessageProducer.producer(req.getOperater(), GroupEventCommand.UPDATED_GROUP,
-                pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
+                pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
         if (appConfig.isModifyGroupAfterCallback()) {
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.UpdateGroupAfter, JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
 
@@ -380,7 +376,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         DestroyGroupPack pack = new DestroyGroupPack();
         pack.setGroupId(req.getGroupId());
         groupMessageProducer.producer(req.getOperater(),
-                GroupEventCommand.DESTROY_GROUP, pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImel()));
+                GroupEventCommand.DESTROY_GROUP, pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
 
         if (appConfig.isDestroyGroupAfterCallback()) {
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.DestoryGroupAfter, JSONObject.toJSONString(imGroupDataMapper.selectOne(objectQueryWrapper)));
@@ -417,7 +413,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         TransferGroupPack pack = new TransferGroupPack();
         pack.setGroupId(req.getGroupId());
         pack.setOwnerId(req.getOwnerId());
-        groupMessageProducer.producer(req.getOperater(),GroupEventCommand.TRANSFER_GROUP,pack,new ClientInfo(req.getAppId(),req.getClientType(),req.getImel()));
+        groupMessageProducer.producer(req.getOperater(),GroupEventCommand.TRANSFER_GROUP,pack,new ClientInfo(req.getAppId(),req.getClientType(),req.getImei()));
 
         return ResponseVO.successResponse();
     }
@@ -493,8 +489,6 @@ public class ImGroupServiceImpl implements ImGroupService {
             }
         }
 
-        ImGroupEntity group = groupResp.getData();
-
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Group);
         ImGroupEntity update = new ImGroupEntity();
         update.setMute(req.getMute());
@@ -505,10 +499,11 @@ public class ImGroupServiceImpl implements ImGroupService {
         wrapper.eq("app_id",req.getAppId());
         imGroupDataMapper.update(update,wrapper);
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("groupId",req.getGroupId());
-
-        groupMessageProducer.producer(req.getOperater(),GroupEventCommand.MUTE_GROUP,jsonObject,new ClientInfo(req.getAppId(),req.getClientType(),req.getImel()));
+        MuteGroupPack pack = new MuteGroupPack();
+        pack.setGroupId(req.getGroupId());
+        groupMessageProducer.producer(req.getOperater()
+                ,GroupEventCommand.MUTE_GROUP,pack
+                ,new ClientInfo(req.getAppId(),req.getClientType(),req.getImei()));
         return ResponseVO.successResponse();
     }
 

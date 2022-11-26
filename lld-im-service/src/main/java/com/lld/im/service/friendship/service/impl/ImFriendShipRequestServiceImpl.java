@@ -166,7 +166,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         ReadAllFriendRequestPack readAllFriendRequestPack = new ReadAllFriendRequestPack();
         readAllFriendRequestPack.setFromId(req.getFromId());
         //TCP通知
-        messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(),FriendshipEventCommand
+        messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImei(),FriendshipEventCommand
                 .FRIEND_REQUEST_READ,readAllFriendRequestPack,req.getAppId());
 
         return ResponseVO.successResponse();
@@ -222,7 +222,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         ApproverFriendRequestPack approverFriendRequestPack = new ApproverFriendRequestPack();
         approverFriendRequestPack.setId(req.getId());
         approverFriendRequestPack.setStatus(req.getStatus());
-        messageProducer.sendToUser(imFriendShipRequestEntity.getToId(),req.getClientType(),req.getImel(),FriendshipEventCommand
+        messageProducer.sendToUser(imFriendShipRequestEntity.getToId(),req.getClientType(),req.getImei(),FriendshipEventCommand
         .FRIEND_REQUEST_APPROVER,approverFriendRequestPack,req.getAppId());
 
         return ResponseVO.successResponse();

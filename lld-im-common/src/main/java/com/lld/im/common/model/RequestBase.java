@@ -15,5 +15,5 @@ public class RequestBase {
 
     private String operater;
 
-    private String imel;
+    private String imei;
 }

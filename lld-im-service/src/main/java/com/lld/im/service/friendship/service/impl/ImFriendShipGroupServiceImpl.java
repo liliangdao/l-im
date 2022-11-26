@@ -94,7 +94,7 @@ public class ImFriendShipGroupServiceImpl
             addFriendGropPack.setFromId(req.getFromId());
             addFriendGropPack.setGroupName(req.getGroupName());
             addFriendGropPack.setSequence(seq);
-            messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(), FriendshipEventCommand.FRIEND_GROUP_ADD,
+            messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImei(), FriendshipEventCommand.FRIEND_GROUP_ADD,
                     addFriendGropPack,req.getAppId());
 
             if(insert1 == 1 && CollectionUtil.isNotEmpty(req.getToIds())){
@@ -104,7 +104,7 @@ public class ImFriendShipGroupServiceImpl
                     addFriendShipGroupMemberReq.setToIds(req.getToIds());
                     addFriendShipGroupMemberReq.setAppId(req.getAppId());
                     addFriendShipGroupMemberReq.setClientType(req.getClientType());
-                    addFriendShipGroupMemberReq.setImel(req.getImel());
+                    addFriendShipGroupMemberReq.setImel(req.getImei());
                     imFriendShipGroupMemberService.addGroupMember(addFriendShipGroupMemberReq);
 //                    req.getToIds().forEach(e ->{
 //                        ResponseVO<ImUserDataEntity> singleUserInfo = imUserService.getSingleUserInfo(e, req.getAppId());
@@ -151,7 +151,7 @@ public class ImFriendShipGroupServiceImpl
                 deleteFriendGroupPack.setGroupName(groupName);
                 deleteFriendGroupPack.setSequence(seq);
                 //TCP通知
-                messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImel(), FriendshipEventCommand.FRIEND_GROUP_DELETE,
+                messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImei(), FriendshipEventCommand.FRIEND_GROUP_DELETE,
                         deleteFriendGroupPack,req.getAppId());
                 //写入seq
                 writeUserSeq.writeUserSeq(req.getAppId(),req.getFromId(),Constants.SeqConstants.FriendshipGroup,seq);

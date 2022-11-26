@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * @author: Chackylee
  * @description: 添加好友，添加黑名单
- * @create: 2022-05-19 09:17
  **/
 @Data
 public class AddFriendShipReq extends RequestBase {

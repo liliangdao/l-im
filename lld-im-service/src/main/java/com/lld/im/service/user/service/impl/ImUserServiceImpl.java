@@ -233,7 +233,7 @@ public class ImUserServiceImpl implements ImUserService {
             UserModifyPack pack = new UserModifyPack();
             pack.setUserId(req.getUserId());
             BeanUtils.copyProperties(update,pack);
-            messageProducer.sendToUser(req.getUserId(),req.getClientType(),req.getImel(), UserEventCommand.USER_MODIFY,
+            messageProducer.sendToUser(req.getUserId(),req.getClientType(),req.getImei(), UserEventCommand.USER_MODIFY,
                     pack,req.getAppId());
             //回调
             if (appConfig.isModifyUserAfterCallback()) {
