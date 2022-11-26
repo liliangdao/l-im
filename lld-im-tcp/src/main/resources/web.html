@@ -528,6 +528,7 @@
             var bodyLen = jsonData.length;
             var imeiLen = getLen(imei);
             let loginMsg = new ByteBuffer();
+            debugger;
             loginMsg.int32(command).int32(version)
                 .int32(clientType).int32(messageType)
                 .int32(appId).int32(imeiLen)

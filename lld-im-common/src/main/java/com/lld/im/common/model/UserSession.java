@@ -1,11 +1,8 @@
 package com.lld.im.common.model;
 
-import com.lld.im.common.enums.UserPipelineConnectState;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * @author: Chackylee

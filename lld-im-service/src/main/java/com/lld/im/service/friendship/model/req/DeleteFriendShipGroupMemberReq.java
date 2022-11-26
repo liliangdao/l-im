@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-08-25 11:03
  **/
 @Data
 public class DeleteFriendShipGroupMemberReq extends RequestBase {

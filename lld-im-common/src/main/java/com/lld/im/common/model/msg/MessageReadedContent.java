@@ -6,7 +6,6 @@ import lombok.Data;
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-08-19 10:35
  **/
 @Data
 public class MessageReadedContent extends ClientInfo {

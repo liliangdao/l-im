@@ -6,7 +6,6 @@ import lombok.Data;
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-10-06 09:34
  **/
 @Data
 public class RecallMessageContent extends ClientInfo {

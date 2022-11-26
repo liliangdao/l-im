@@ -9,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-05-19 09:18
  **/
 @Data
 public class DeleteBlackReq extends RequestBase {

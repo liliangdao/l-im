@@ -1,5 +1,6 @@
 package com.lld.im.service.group.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -31,6 +32,7 @@ import com.lld.im.service.group.service.GroupMessageProducer;
 import com.lld.im.service.group.service.ImGroupMemberService;
 import com.lld.im.service.group.service.ImGroupService;
 import com.lld.im.service.utils.CallbackService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,7 @@ import java.util.*;
  * @version: 1.0
  */
 @Service
+@Slf4j
 public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
     @Autowired
@@ -256,6 +259,22 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             return groupResp;
         }
 
+        List<GroupMemberDto> members = req.getMembers();
+        if (appConfig.isAddGroupMemberBeforeCallback()) {
+            ResponseVO responseVO = callbackService.beforeCallback(req.getAppId(),
+                    Constants.CallbackCommand.GroupMemberAddAfter,
+                    JSONObject.toJSONString(req));
+            if(!responseVO.isOk()){
+                return responseVO;
+            }
+            try{
+                members = JSONArray.parseArray(JSONObject.toJSONString(responseVO.getData()), GroupMemberDto.class);
+            }catch (Exception e){
+                e.printStackTrace();
+                log.error("{} , GroupMemberAddAfter 回调返回数据异常：{}",req.getAppId(),responseVO.toString());
+            }
+        }
+
         ImGroupEntity group = groupResp.getData();
 
         /**
@@ -271,7 +290,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
         List<String> successId = new ArrayList<>();
         for (GroupMemberDto memberId :
-                req.getMembers()) {
+                members) {
             ResponseVO responseVO = null;
 
             AddMemberBeforeCallback addMemberBeforeCallback = new AddMemberBeforeCallback();
