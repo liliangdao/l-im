@@ -62,7 +62,6 @@ public class P2PMessageService {
     ConversationService conversationService;
 
     private final ThreadPoolExecutor threadPoolExecutor;
-
     {
         final AtomicInteger tNum = new AtomicInteger(0);
 

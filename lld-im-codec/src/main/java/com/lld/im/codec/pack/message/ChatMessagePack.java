@@ -1,8 +1,5 @@
 package com.lld.im.codec.pack.message;
 
-import com.lld.im.codec.pack.BasePack;
-import com.lld.im.common.enums.SyncFromEnum;
-import com.lld.im.common.model.msg.OfflinePushInfo;
 import lombok.Data;
 
 /**
@@ -36,10 +33,7 @@ public class ChatMessagePack {
 
     private Long messageLifeTime;
 
-    private int syncFromId = SyncFromEnum.BOTH.getCode();
-
     private Integer appId;
 
-    private OfflinePushInfo offlinePushInfo;
 
 }
