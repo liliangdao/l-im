@@ -77,6 +77,11 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
             /** 登陸事件 **/
             String userId = loginPack.getUserId();
+            if(userId == null){
+                ctx.channel().close();
+                return;
+            }
+
             /** 为channel设置用户id **/
             ctx.channel().attr(AttributeKey.valueOf(Constants.UserId)).set(userId);
             String hashKey = msg.getMessageHeader().getClientType() + ":" + msg.getMessageHeader().getImei();
