@@ -85,6 +85,11 @@ public class SessionSocketHolder {
         Integer clientType = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientType)).get();
         Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
 
+        if(StringUtils.isBlank(userId) || StringUtils.isBlank(clientInfo) || appId == null|| clientType == null){
+            remove(nioSocketChannel);
+            return;
+        }
+
         UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
         pack.setAppId(appId);
         pack.setUserId(userId);
@@ -111,7 +116,7 @@ public class SessionSocketHolder {
             UserSession.setConnectState(UserPipelineConnectState.OFFLINE.getCommand());
             map.put(clientInfo,JSON.toJSONString(UserSession));
         }
-        remove(nioSocketChannel);
+        remove(appId,userId,clientType,imei);
         nioSocketChannel.close();
     }
 
@@ -119,13 +124,20 @@ public class SessionSocketHolder {
      * @description 删除用户session，通常用于用户手动下线
      * @author chackylee
      * @date 2022/5/7 11:43
-     * @param [nioSocketChannel]
+     * @param nioSocketChannel
      * @return void
     */
     public static void removeUserSession(NioSocketChannel nioSocketChannel) {
         String userId = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.UserId)).get();
         String clientInfo = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientImei)).get();
         Integer appId = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.AppId)).get();
+        String imei = (String) nioSocketChannel.attr(AttributeKey.valueOf(Constants.Imei)).get();
+        Integer clientType = (Integer) nioSocketChannel.attr(AttributeKey.valueOf(Constants.ClientType)).get();
+
+        if(StringUtils.isBlank(userId) || StringUtils.isBlank(clientInfo) || appId == null){
+            remove(nioSocketChannel);
+            return;
+        }
 
         UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
         pack.setAppId(appId);
@@ -148,7 +160,7 @@ public class SessionSocketHolder {
         RedissonClient redissonClient = RedisManager.getRedissonClient();
         RMap<Object, Object> map = redissonClient.getMap(appId + Constants.RedisConstants.UserSessionConstants + userId);
         map.remove(clientInfo);
-        remove(nioSocketChannel);
+        remove(appId,userId,clientType,imei);
         nioSocketChannel.close();
     }
 

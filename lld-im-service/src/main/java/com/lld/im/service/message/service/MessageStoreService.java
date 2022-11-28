@@ -91,7 +91,6 @@ public class MessageStoreService {
      * @return void
      * @description: 群聊消息持久化
      * @author lld
-     * @since 2022/7/23
      */
     public void doStoreGroupMessage(DoStroeGroupMessageDto chatMessageContent) {
         imMessageBodyMapper.insert(chatMessageContent.getImMessageBodyEntity());

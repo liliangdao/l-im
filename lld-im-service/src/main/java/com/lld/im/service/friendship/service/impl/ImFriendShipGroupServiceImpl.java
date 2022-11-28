@@ -104,7 +104,7 @@ public class ImFriendShipGroupServiceImpl
                     addFriendShipGroupMemberReq.setToIds(req.getToIds());
                     addFriendShipGroupMemberReq.setAppId(req.getAppId());
                     addFriendShipGroupMemberReq.setClientType(req.getClientType());
-                    addFriendShipGroupMemberReq.setImel(req.getImei());
+                    addFriendShipGroupMemberReq.setImei(req.getImei());
                     imFriendShipGroupMemberService.addGroupMember(addFriendShipGroupMemberReq);
 //                    req.getToIds().forEach(e ->{
 //                        ResponseVO<ImUserDataEntity> singleUserInfo = imUserService.getSingleUserInfo(e, req.getAppId());
