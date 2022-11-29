@@ -87,6 +87,10 @@ appConfig:
   deleteGroupMemberAfterCallback: false # 删除群成员之后回调
   addGroupMemberAfterCallback: false # 拉人入群之后回调
   addGroupMemberBeforeCallback: false # 拉人入群之前回调
+  sendMessageAfterCallback: false # 发送单聊消息之后
+  sendMessageBeforeCallback: false # 发送单聊消息之前
+  sendGroupMessageAfterCallback: false # 发送群聊消息之后
+  sendGroupMessageBeforeCallback: false # 发送群聊消息之前
   offlineMessageCount: 10 #离线消息存储条数
 
 

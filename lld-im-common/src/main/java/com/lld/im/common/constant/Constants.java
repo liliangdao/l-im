@@ -149,6 +149,10 @@ public class Constants {
         public static final String AddBlackAfter = "black.add.after";
 
         public static final String DeleteBlack = "black.delete";
+
+        public static final String SendMessageAfter = "message.send.after";
+
+        public static final String SendMessageBefore = "message.send.before";
     }
 
 

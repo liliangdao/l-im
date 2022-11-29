@@ -1,5 +1,6 @@
 package com.lld.im.service.message.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.pack.message.ChatMessageAck;
 import com.lld.im.codec.pack.message.MessageReadedAck;
 import com.lld.im.codec.pack.message.P2PMessagePack;
@@ -14,6 +15,7 @@ import com.lld.im.service.message.model.req.SendMessageReq;
 import com.lld.im.service.message.model.resp.SendMessageResp;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.user.service.ImUserService;
+import com.lld.im.service.utils.CallbackService;
 import com.lld.im.service.utils.ConversationIdGenerate;
 import com.lld.im.service.utils.UserSessionUtils;
 import org.slf4j.Logger;
@@ -57,6 +59,9 @@ public class P2PMessageService {
 
     @Autowired
     MessageProducer messageProducer;
+
+    @Autowired
+    CallbackService callbackService;
 
     @Autowired
     ConversationService conversationService;
@@ -106,7 +111,15 @@ public class P2PMessageService {
             return;
         }
 
+        //校验权限
         ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
+        if(!responseVO.isOk()){
+            ack(chatMessageData, responseVO);
+            return;
+        }
+        //回调
+        responseVO = callbackService.beforeCallback(chatMessageData.getAppId(), Constants.CallbackCommand.SendMessageBefore
+                , JSONObject.toJSONString(chatMessageData));
 
         if (responseVO.isOk()) {
             long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" +
@@ -154,8 +167,10 @@ public class P2PMessageService {
             //服务端代替客户端发送消息确认ack给发送方
             revicerAck(chatMessageData,true);
         }
-    }
 
+        callbackService.callback(chatMessageData.getAppId(),Constants.CallbackCommand.SendMessageAfter,
+                JSONObject.toJSONString(chatMessageData));
+    }
 
     public SendMessageResp send(SendMessageReq req){
 

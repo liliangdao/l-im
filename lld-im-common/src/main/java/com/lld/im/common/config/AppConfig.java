@@ -73,8 +73,14 @@ public class AppConfig {
 
     private boolean addGroupMemberAfterCallback;//拉人入群之后回调
 
+    private boolean sendMessageAfterCallback;//发送单聊消息之后
+
+    private boolean sendMessageBeforeCallback;//发送单聊消息之前
+
+    private boolean sendGroupMessageAfterCallback;//发送群聊消息之后
+
+    private boolean sendGroupMessageBeforeCallback;//发送群聊消息之前
+
     private Integer offlineMessageCount;//离线消息存储条数
-
-
 
 }
