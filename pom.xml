@@ -4,6 +4,7 @@
 
     <groupId>com.lld</groupId>
     <artifactId>lld-im</artifactId>
+    <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <name>lld-im</name>
     <description>l-im project</description>
@@ -19,6 +20,7 @@
         <module>lld-im-tcp</module>
         <module>lld-im-common</module>
         <module>lld-im-codec</module>
+        <module>lld-im-message-store</module>
     </modules>
 
     <properties>

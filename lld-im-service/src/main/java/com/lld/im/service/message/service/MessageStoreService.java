@@ -20,6 +20,7 @@ import com.lld.im.service.message.model.dto.DoStroeGroupMessageDto;
 import com.lld.im.service.message.model.dto.DoStroeP2PMessageDto;
 import com.lld.im.service.service.seq.Seq;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,6 +70,9 @@ public class MessageStoreService {
     @Autowired
     ImGroupMemberService groupMemberService;
 
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
     /**
      * @param
      * @return void
@@ -112,11 +116,13 @@ public class MessageStoreService {
         DoStroeP2PMessageDto doStroeP2PMessageDto = new DoStroeP2PMessageDto();
         doStroeP2PMessageDto.setChatMessageContent(chatMessageContent);
         doStroeP2PMessageDto.setImMessageBodyEntity(imMessageBodyEntity);
+        rabbitTemplate.convertAndSend(Constants.RabbitConstants.StoreP2PMessage,"",
+                JSONObject.toJSONString(doStroeP2PMessageDto));
 
-        imMessageBodyMapper.insert(imMessageBodyEntity);
-        List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent, imMessageBodyEntity);
-        imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
-        chatMessageContent.setMessageKey(imMessageBodyEntity.getMessageKey());
+//        imMessageBodyMapper.insert(imMessageBodyEntity);
+//        List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent, imMessageBodyEntity);
+//        imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
+//        chatMessageContent.setMessageKey(imMessageBodyEntity.getMessageKey());
         return imMessageBodyEntity.getMessageKey();
     }
 

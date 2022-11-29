@@ -118,6 +118,9 @@ public class Constants {
 
         public static final String FriendShip2Im = "friendShip2Pipeline";
 
+
+        public static final String StoreP2PMessage = "storeP2PMessage";
+
     }
 
     public static class CallbackCommand{

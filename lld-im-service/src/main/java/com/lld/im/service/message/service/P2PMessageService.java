@@ -1,5 +1,6 @@
 package com.lld.im.service.message.service;
 
+import cn.hutool.cache.impl.TimedCache;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.pack.message.ChatMessageAck;
 import com.lld.im.codec.pack.message.MessageReadedAck;
@@ -70,6 +71,8 @@ public class P2PMessageService {
     @Autowired
     AppConfig appConfig;
 
+    TimedCache<String,ResponseVO> cache = new TimedCache<String,ResponseVO>(30000);
+
     private final ThreadPoolExecutor threadPoolExecutor;
     {
         final AtomicInteger tNum = new AtomicInteger(0);
@@ -132,10 +135,13 @@ public class P2PMessageService {
                     Constants.SeqConstants.Message + ":" +
                     ConversationIdGenerate.generateP2PId(chatMessageData.getFromId(),chatMessageData.getToId()));
             chatMessageData.setMessageSequence(seq);
+
             //落库+回包+分发（发送给同步端和接收方的所有端）
-            threadPoolExecutor.execute(() -> {
-                doProcessMessage(chatMessageData);
-            });
+//            threadPoolExecutor.execute(() -> {
+//                  doProcessMessage(chatMessageData);
+//            });
+            doProcessMessage(chatMessageData);
+            logger.info("消息處理完成：{}" , (chatMessageData.getMessageKey())  + ":" + chatMessageData.getMessageId());
         } else {
             ack(chatMessageData, responseVO);
         }
@@ -149,7 +155,7 @@ public class P2PMessageService {
      * @author lld
      * @since 2022/9/18
      */
-    public void doProcessMessage(ChatMessageContent chatMessageData){
+    public void     doProcessMessage(ChatMessageContent chatMessageData){
         //插入历史库和msgBody TODO 改为异步存储，这里只分配id
         Long messageKey = messageStoreService.storeP2PMessage(chatMessageData);
         chatMessageData.setMessageKey(messageKey);
@@ -252,15 +258,25 @@ public class P2PMessageService {
      */
     private ResponseVO imServerpermissionCheck(String fromId, String toId, Integer appId) {
 
-        ResponseVO checkForbidden = checkSendMessageService.checkUserForbidAndMute(fromId, toId, appId);
-        if (!checkForbidden.isOk()) {
-            return checkForbidden;
+        ResponseVO responseVO = cache.get(fromId + toId + appId + "checkUserForbidAndMute");
+        if(responseVO == null){
+            responseVO = checkSendMessageService.checkUserForbidAndMute(fromId, toId, appId);
+            if (!responseVO.isOk()) {
+                return responseVO;
+            }else{
+                cache.put(fromId + toId + appId + "checkUserForbidAndMute",responseVO);
+            }
         }
 
-        ResponseVO friendCheck = checkSendMessageService.checkFriendShip(fromId, toId, appId);
+        ResponseVO friendCheck = cache.get(fromId + toId + appId + "checkFriendShip");
+        if(friendCheck == null){
+            friendCheck = checkSendMessageService.checkFriendShip(fromId, toId, appId);
 
-        if (!friendCheck.isOk()) {
-            return friendCheck;
+            if (!friendCheck.isOk()) {
+                return friendCheck;
+            }else{
+                cache.put(fromId + toId + appId + "checkFriendShip",friendCheck);
+            }
         }
         return ResponseVO.successResponse();
     }
