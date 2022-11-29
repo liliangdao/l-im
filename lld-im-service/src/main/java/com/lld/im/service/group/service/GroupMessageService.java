@@ -100,6 +100,7 @@ public class GroupMessageService {
 
         sendMessageResp.setMessageKey(messageKey);
         sendMessageResp.setMessageTime(System.currentTimeMillis());
+        sendMessageResp.setMessageId(req.getMessageId());
 
         dispatchMessage(message,req.getOfflinePushInfo());
         syncToSender(message,message,req.getOfflinePushInfo());

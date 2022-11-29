@@ -82,6 +82,7 @@ public class MessageStoreService {
         ImGroupMessageHistoryEntity imGroupMessageHistoryEntity = extractToGroupMessageHistory(chatMessageContent, imMessageBodyEntity);
         extractToGroupMessageHistory(chatMessageContent, imMessageBodyEntity);
         imGroupMessageHistoryMapper.insert(imGroupMessageHistoryEntity);
+        chatMessageContent.setMessageKey(imMessageBodyEntity.getMessageKey());
         return imMessageBodyEntity.getMessageKey();
     }
 
@@ -115,6 +116,7 @@ public class MessageStoreService {
         imMessageBodyMapper.insert(imMessageBodyEntity);
         List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent, imMessageBodyEntity);
         imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
+        chatMessageContent.setMessageKey(imMessageBodyEntity.getMessageKey());
         return imMessageBodyEntity.getMessageKey();
     }
 

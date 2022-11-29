@@ -452,14 +452,15 @@
                 let messageReciver = new ByteBuffer();
                 var jsonData = JSON.stringify(data);
                 let bodyLen = jsonData.length;
-                messageReciver.int32(1107).int32(version)
-                    .int32(clientType).int32(messageType).int32(appId).int32(imeiLen).vstring(imei,imeiLen).int32(bodyLen).vstring(jsonData, bodyLen);
+                messageReciver.int32(1107)
+                    .int32(version).int32(clientType)
+                    .int32(messageType).int32(appId)
+                    .int32(imeiLen).int32(bodyLen).vstring(imei,imeiLen)
+                    .vstring(jsonData, bodyLen);
                 socket.send(messageReciver.pack());
             }else if(command == 9999){
                 var msg = eval("(" + msgBody + ")");
                 console.log(msg)
-
-
                 console.log(userId)
 
                 if (msg["userId"] == "system") {

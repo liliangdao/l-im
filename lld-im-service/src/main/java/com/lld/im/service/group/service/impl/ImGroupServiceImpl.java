@@ -24,6 +24,7 @@ import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
 import com.lld.im.service.group.service.GroupMessageProducer;
 import com.lld.im.service.group.service.ImGroupMemberService;
 import com.lld.im.service.group.service.ImGroupService;
+import com.lld.im.service.interceptor.RequestHolder;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.utils.CallbackService;
 import org.apache.commons.lang3.StringUtils;
@@ -113,7 +114,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Transactional
     public ResponseVO createGroup(CreateGroupReq req) {
 
-        boolean isAdmin = false;
+        boolean isAdmin = RequestHolder.get();
 
         if (!isAdmin) {
             req.setOwnerId(req.getOperater());
@@ -197,7 +198,7 @@ public class ImGroupServiceImpl implements ImGroupService {
             throw new ApplicationException(GroupErrorCode.GROUP_IS_EXIST);
         }
 
-        boolean isAdmin = false;
+        boolean isAdmin = RequestHolder.get();
 
         if (!isAdmin) {
             //不是后台调用需要检查权限
@@ -343,7 +344,7 @@ public class ImGroupServiceImpl implements ImGroupService {
     @Transactional
     public ResponseVO destroyGroup(DestroyGroupReq req) {
 
-        boolean isAdmin = false;
+        boolean isAdmin = RequestHolder.get();
 
         QueryWrapper<ImGroupEntity> objectQueryWrapper = new QueryWrapper<>();
         objectQueryWrapper.eq("group_id", req.getGroupId());
@@ -468,7 +469,7 @@ public class ImGroupServiceImpl implements ImGroupService {
             return groupResp;
         }
 
-        boolean isadmin = false;
+        boolean isadmin = RequestHolder.get();
 
         if(!isadmin){
             //不是后台调用需要检查权限

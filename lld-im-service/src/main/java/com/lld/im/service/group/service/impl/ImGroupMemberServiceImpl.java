@@ -31,6 +31,7 @@ import com.lld.im.service.group.model.resp.GetRoleInGroupResp;
 import com.lld.im.service.group.service.GroupMessageProducer;
 import com.lld.im.service.group.service.ImGroupMemberService;
 import com.lld.im.service.group.service.ImGroupService;
+import com.lld.im.service.interceptor.RequestHolder;
 import com.lld.im.service.utils.CallbackService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -253,7 +254,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
 
         List<AddMemberResp> resp = new ArrayList<>();
 
-        boolean isAdmin = false;
+        boolean isAdmin = RequestHolder.get();
         ResponseVO<ImGroupEntity> groupResp = groupService.getGroup(req.getGroupId(), req.getAppId());
         if (!groupResp.isOk()) {
             return groupResp;
@@ -346,7 +347,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     public ResponseVO removeMember(RemoveGroupMemberReq req) {
 
         List<AddMemberResp> resp = new ArrayList<>();
-        boolean isAdmin = false;
+        boolean isAdmin = RequestHolder.get();
         ResponseVO<ImGroupEntity> groupResp = groupService.getGroup(req.getGroupId(), req.getAppId());
         if (!groupResp.isOk()) {
             return groupResp;
@@ -432,7 +433,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     @Override
     public ResponseVO updateGroupMember(UpdateGroupMemberReq req) {
 
-        boolean isadmin = false;
+        boolean isadmin = RequestHolder.get();
 
         ResponseVO<ImGroupEntity> group = groupService.getGroup(req.getGroupId(), req.getAppId());
         if (!group.isOk()) {
@@ -536,7 +537,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
             return groupResp;
         }
 
-        boolean isadmin = false;
+        boolean isadmin = RequestHolder.get();
         boolean isOwner = false;
         boolean isManager = false;
         GetRoleInGroupResp memberRole = null;

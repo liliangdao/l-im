@@ -198,6 +198,7 @@ public class P2PMessageService {
         messageStoreService.storeOffLineMessage(offlineMessageContent);
 
         sendMessageResp.setMessageKey(messageKey);
+        sendMessageResp.setMessageId(req.getMessageId());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
 
         dispatchMessage(message, req.getOfflinePushInfo());

@@ -51,6 +51,8 @@ public class IdentityCheck {
         ResponseVO<ImUserDataEntity> singleUserInfo = imUserService.getSingleUserInfo(identifier, appId);
         if(singleUserInfo.isOk()){
             RequestHolder.set(singleUserInfo.getData().getUserType() == ImUserTypeEnum.APP_ADMIN.getCode());
+        }else{
+            RequestHolder.set(false);
         }
     }
 
@@ -67,6 +69,7 @@ public class IdentityCheck {
                 + Constants.RedisConstants.userSign + ":" + identifier + ":" + userSig);
         if (StringUtils.isNotBlank(cacheUserSig) &&
                 Long.valueOf(cacheUserSig) > System.currentTimeMillis() / 1000) {
+            this.setIsAdmin(identifier,Integer.valueOf(appid));
             return BaseErrorCode.SUCCESS;
         }
 

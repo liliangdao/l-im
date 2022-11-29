@@ -24,8 +24,8 @@ spring:
     host: 43.139.108.123
     port: 5672
     addresses: 43.139.108.123
-    username: guest
-    password: guest
+    username: admin
+    password: 123456
 #    virtual-host:
     listener:
       simple:
