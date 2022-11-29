@@ -419,8 +419,8 @@
             var bytebuf = new ByteBuffer(event.data);
             let byteBuffer = bytebuf.int32().int32().unpack();
 
-            let bodyLen = byteBuffer[0];
-            let command = byteBuffer[1];
+            let command = byteBuffer[0];
+            let bodyLen = byteBuffer[1];
             let unpack = bytebuf.vstring(null, bodyLen).unpack();
             let msgBody = unpack[2];
             var version = 1;

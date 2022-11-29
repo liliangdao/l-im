@@ -9,6 +9,18 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+public class EasySqlInjector extends DefaultSqlInjector {
+
+    @Override
+    public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
+        // TODO Auto-generated method stub
+        List<AbstractMethod> methodList = super.getMethodList(mapperClass);
+        methodList.add(new InsertBatchSomeColumn()); // 添加InsertBatchSomeColumn方法
+        return methodList;
+    }
+
+}
+
 /**
  * @description: spring 后置处理器，兼容mybatisplus联合主键插件和批量插入插件
  * @author: lld

@@ -128,7 +128,6 @@ public class GroupMessageService {
                 List<String> groupMemberId = groupMemberService.getGroupMemberId(toId, chatMessageData.getAppId());
                 chatMessageData.setMembers(groupMemberId);
 
-//                GroupMessageContent groupMessageContent = extractGroupMessage(chatMessageData);
                 //插入离线库
                 OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
                 offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());

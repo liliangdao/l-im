@@ -42,9 +42,9 @@ public class CallbackService {
         shareThreadPool.submit(() -> {
             try {
 //                    String url, Class<T> tClass, Map<String, Object> map, Map<String, Object> header, String jsonBody, String charSet
-                Object o = httpRequestUtils.doPost(appConfig.getCallbackUrl(), Object.class, builderUrlParams(appId,
+                httpRequestUtils.doPost(appConfig.getCallbackUrl(), Object.class, builderUrlParams(appId,
                         callbackCommand), jsonBody, null);
-                System.out.println(o);
+//                System.out.println(o);
             } catch (Exception e) {
                 logger.error("callback 回调{} : {}出现异常 ： {} ",callbackCommand , appId, e.getMessage());
             }

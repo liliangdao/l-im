@@ -69,7 +69,6 @@ public class MessageStoreService {
     @Autowired
     ImGroupMemberService groupMemberService;
 
-
     /**
      * @param
      * @return void

@@ -52,7 +52,7 @@ public class SessionSocketHolder {
         List<NioSocketChannel> channels = new ArrayList<>();
 
         channelInfos.forEach(channel ->{
-            if(channel.getAppId().equals(appId) && id.equals(channel.getUserId())){
+                if(channel.getAppId().equals(appId) && id.equals(channel.getUserId())){
                 channels.add(CHANNELS.get(channel));
             }
         });

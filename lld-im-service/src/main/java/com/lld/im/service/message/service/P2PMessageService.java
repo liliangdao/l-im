@@ -5,6 +5,7 @@ import com.lld.im.codec.pack.message.ChatMessageAck;
 import com.lld.im.codec.pack.message.MessageReadedAck;
 import com.lld.im.codec.pack.message.P2PMessagePack;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ConversationTypeEnum;
 import com.lld.im.common.enums.command.MessageCommand;
@@ -66,6 +67,9 @@ public class P2PMessageService {
     @Autowired
     ConversationService conversationService;
 
+    @Autowired
+    AppConfig appConfig;
+
     private final ThreadPoolExecutor threadPoolExecutor;
     {
         final AtomicInteger tNum = new AtomicInteger(0);
@@ -118,8 +122,10 @@ public class P2PMessageService {
             return;
         }
         //回调
-        responseVO = callbackService.beforeCallback(chatMessageData.getAppId(), Constants.CallbackCommand.SendMessageBefore
-                , JSONObject.toJSONString(chatMessageData));
+        if(appConfig.isSendMessageAfterCallback()){
+            responseVO = callbackService.beforeCallback(chatMessageData.getAppId(), Constants.CallbackCommand.SendMessageBefore
+                    , JSONObject.toJSONString(chatMessageData));
+        }
 
         if (responseVO.isOk()) {
             long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" +
@@ -168,8 +174,10 @@ public class P2PMessageService {
             revicerAck(chatMessageData,true);
         }
 
-        callbackService.callback(chatMessageData.getAppId(),Constants.CallbackCommand.SendMessageAfter,
-                JSONObject.toJSONString(chatMessageData));
+        if(appConfig.isSendMessageAfterCallback()){
+            callbackService.callback(chatMessageData.getAppId(),Constants.CallbackCommand.SendMessageAfter,
+                    JSONObject.toJSONString(chatMessageData));
+        }
     }
 
     public SendMessageResp send(SendMessageReq req){

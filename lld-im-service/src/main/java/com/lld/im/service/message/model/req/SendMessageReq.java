@@ -18,8 +18,6 @@ public class SendMessageReq extends RequestBase {
     //客户端传的messageId
         private String messageId;
 
-//    private Long messageKey;
-
     private String fromId;
 
     private String toId;
@@ -27,8 +25,6 @@ public class SendMessageReq extends RequestBase {
     private int messageRandom;
 
     private long messageTime;
-
-//    private long messageSequence;
 
     private String messageBody;
     /**
