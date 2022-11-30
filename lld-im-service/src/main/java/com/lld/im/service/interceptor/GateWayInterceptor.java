@@ -78,6 +78,13 @@ public class GateWayInterceptor implements HandlerInterceptor {
         PrintWriter writer = null;
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=utf-8");
+        // 支持跨域
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods",
+                "GET,POST,PUT,DELETE,OPTIONS");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Token");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         try {
             String resp = JSONObject.toJSONString(vo);
             writer = response.getWriter();

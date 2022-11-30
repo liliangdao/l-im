@@ -80,6 +80,9 @@ public class IdentityCheck {
         long expireSec = 0L;
 
         JSONObject sigDoc = sigApi.decodeUserSig(userSig); // 解密
+        if(sigDoc == null){
+            return GateWayErrorCode.USERSIGN_IS_ERROR;
+        }
         Long expireTime = 0L;
         String decodeAppId = "";
         String signIdentifier = "";
@@ -108,7 +111,7 @@ public class IdentityCheck {
         }
 
         if (!decodeAppId.equals(appid))
-            return GateWayErrorCode.APPID_NOT_EXIST;
+            return GateWayErrorCode.USERSIGN_IS_ERROR;
 
         Long etime = expireTime - System.currentTimeMillis()/1000;
         stringRedisTemplate.opsForValue().set(appid + ":"

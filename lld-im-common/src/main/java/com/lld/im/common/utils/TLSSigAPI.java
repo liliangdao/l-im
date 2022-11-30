@@ -30,8 +30,10 @@ public class TLSSigAPI {
     }
 
     public static void main(String[] args) {
-        TLSSigAPI asd = new TLSSigAPI(10000, "123456");
-        System.out.println(asd.genUserSig("lld",180000000));
+//        TLSSigAPI asd = new TLSSigAPI(10000, "123456");
+//        System.out.println(asd.genUserSig("lld",180000000));
+        JSONObject jsonObject = decodeUserSig("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NzAzOTE3MDksInVzZXJJZCI6ImxsZCIsImlhdCI6MTY2OTc4NjkwOX0.4qr5bxSqp8yI1JD-Y1Pjqgvek5hegxPjF8d-yr09s2o");
+        System.out.println(jsonObject.toJSONString());
     }
 
     /**
@@ -54,7 +56,8 @@ public class TLSSigAPI {
             }
 
         } catch (Exception ex) {
-
+            ex.printStackTrace();
+            return null;
         }
 
         return sigDoc;
