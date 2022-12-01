@@ -200,13 +200,6 @@ public class GroupMessageService {
                     continue;
                 }
 
-//                OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
-//                BeanUtils.copyProperties(messageContent,offlineMessageContent);
-//                offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
-//                offlineMessageContent.setToId(messageContent.getGroupId());
-//                offlineMessageContent.setFromId(d.getMemberId());
-//                messageStoreService.storeOffLineMessage(offlineMessageContent);
-
                 List<ClientInfo> successResults = new ArrayList<>();
                 if(messageContent.getFromId().equals(d.getMemberId())){
                     messageProducer.sendToUserExceptClient(d.getMemberId(),MessageCommand.MSG_GROUP,
@@ -229,12 +222,6 @@ public class GroupMessageService {
     private void syncToSender(GroupChatMessageContent content,ClientInfo clientInfo, OfflinePushInfo offlinePushInfo) {
         messageProducer.sendToUserExceptClient(content.getFromId(),MessageCommand.MSG_GROUP,content,clientInfo);
     }
-
-//    private GroupMessageContent extractGroupMessage(GroupChatMessageContent messageContent){
-//        GroupMessageContent groupMessagePack = new GroupMessageContent();
-//        BeanUtils.copyProperties(messageContent, groupMessagePack);
-//        return groupMessagePack;
-//    }
 
 
 }
