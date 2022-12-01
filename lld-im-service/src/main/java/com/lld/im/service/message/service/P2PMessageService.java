@@ -118,13 +118,14 @@ public class P2PMessageService {
             return;
         }
 
-        //校验权限
-        ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
-        if(!responseVO.isOk()){
-            ack(chatMessageData, responseVO);
-            return;
-        }
+//        //校验权限
+//        ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
+//        if(!responseVO.isOk()){
+//            ack(chatMessageData, responseVO);
+//            return;
+//        }
         //回调
+        ResponseVO responseVO = new ResponseVO();
         if(appConfig.isSendMessageAfterCallback()){
             responseVO = callbackService.beforeCallback(chatMessageData.getAppId(), Constants.CallbackCommand.SendMessageBefore
                     , JSONObject.toJSONString(chatMessageData));
@@ -155,7 +156,7 @@ public class P2PMessageService {
      * @author lld
      * @since 2022/9/18
      */
-    public void     doProcessMessage(ChatMessageContent chatMessageData){
+    public void  doProcessMessage(ChatMessageContent chatMessageData){
         //插入历史库和msgBody TODO 改为异步存储，这里只分配id
         Long messageKey = messageStoreService.storeP2PMessage(chatMessageData);
         chatMessageData.setMessageKey(messageKey);
@@ -256,7 +257,7 @@ public class P2PMessageService {
      * @author chackylee
      * @date 2022/7/22 16:01
      */
-    private ResponseVO imServerpermissionCheck(String fromId, String toId, Integer appId) {
+    public ResponseVO imServerpermissionCheck(String fromId, String toId, Integer appId) {
 
         ResponseVO responseVO = cache.get(fromId + toId + appId + "checkUserForbidAndMute");
         if(responseVO == null){

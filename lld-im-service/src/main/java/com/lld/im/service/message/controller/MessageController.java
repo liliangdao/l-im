@@ -2,6 +2,7 @@ package com.lld.im.service.message.controller;
 
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.model.SyncReq;
+import com.lld.im.common.model.msg.CheckSendMessageReq;
 import com.lld.im.service.group.model.req.CreateGroupReq;
 import com.lld.im.service.message.model.req.SendMessageReq;
 import com.lld.im.service.message.service.MessageSyncService;
@@ -38,6 +39,13 @@ public class MessageController {
     public ResponseVO send(@RequestBody @Validated SendMessageReq req, Integer appId)  {
         req.setAppId(appId);
         return ResponseVO.successResponse(p2PMessageService.send(req));
+    }
+
+    @RequestMapping("/checkSendP2P")
+    public ResponseVO checkSendP2P(@RequestBody CheckSendMessageReq req)  {
+        return ResponseVO.successResponse(p2PMessageService.imServerpermissionCheck(
+                req.getFromId(),req.getToId(),req.getAppId()
+        ));
     }
 
 

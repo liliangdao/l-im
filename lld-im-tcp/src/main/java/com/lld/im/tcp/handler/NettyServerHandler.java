@@ -8,6 +8,7 @@ import com.lld.im.codec.pack.user.UserStatusChangeNotifyPack;
 import com.lld.im.codec.proto.Message;
 import com.lld.im.codec.pack.user.LoginPack;
 import com.lld.im.codec.proto.MessagePack;
+import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.UserPipelineConnectState;
 import com.lld.im.common.enums.command.MessageCommand;
@@ -15,9 +16,15 @@ import com.lld.im.common.enums.command.SystemCommand;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.common.model.UserClientDto;
 import com.lld.im.common.model.UserSession;
+import com.lld.im.common.model.msg.CheckSendMessageReq;
+import com.lld.im.tcp.feign.FeignMessageService;
 import com.lld.im.tcp.publish.MqMessageProducer;
 import com.lld.im.tcp.redis.RedisManager;
 import com.lld.im.tcp.utils.SessionSocketHolder;
+import feign.Feign;
+import feign.Request;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
@@ -43,9 +50,19 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
     private String brokerId;
 
+    private FeignMessageService feignMessageService;
+
     public NettyServerHandler(String brokerId) {
         super();
         this.brokerId = brokerId;
+
+        feignMessageService = Feign.builder()
+                .encoder(new JacksonEncoder()) // 编码方式
+                .decoder(new JacksonDecoder())  // 解码方式
+                .options(new Request.Options(1000, 3500))//设置超时时间
+                //.retryer(new Retryer.Default(5000, 5000, 3))
+                .target(FeignMessageService.class,   //代理对象
+                        "http://localhost:8000/v1");//目标地址
     }
 
 //    /**
@@ -158,7 +175,17 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                     .set(System.currentTimeMillis());
         } else if (command == MessageCommand.MSG_P2P.getCommand()) {
             try {
-                MqMessageProducer.sendMessageByCommand(msg,command);
+                CheckSendMessageReq req = new CheckSendMessageReq();
+                req.setAppId(msg.getMessageHeader().getAppId());
+                JSONObject jsonObject = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()));
+                req.setFromId(jsonObject.getString("fromId"));
+                req.setToId(jsonObject.getString("toId"));
+                ResponseVO responseVO = feignMessageService.checkSendMessage(req);
+                if(responseVO.isOk()){
+                    MqMessageProducer.sendMessageByCommand(msg,command);
+                }else{
+                    System.out.println("失败");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
