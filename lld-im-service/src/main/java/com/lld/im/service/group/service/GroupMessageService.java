@@ -7,6 +7,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ConversationTypeEnum;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
+import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.*;
@@ -202,11 +203,11 @@ public class GroupMessageService {
 
                 List<ClientInfo> successResults = new ArrayList<>();
                 if(messageContent.getFromId().equals(d.getMemberId())){
-                    messageProducer.sendToUserExceptClient(d.getMemberId(),MessageCommand.MSG_GROUP,
+                    messageProducer.sendToUserExceptClient(d.getMemberId(),GroupEventCommand.MSG_GROUP,
                             groupMessageContent,messageContent);
                 }else{
                      successResults = messageProducer.sendToUser(d.getMemberId()
-                            , MessageCommand.MSG_GROUP, groupMessageContent,messageContent.getAppId());
+                            , GroupEventCommand.MSG_GROUP, groupMessageContent,messageContent.getAppId());
                 }
 
                 // 如果成功的session列表中不包括手机，则需要推送离线消息。
@@ -220,7 +221,7 @@ public class GroupMessageService {
     }
 
     private void syncToSender(GroupChatMessageContent content,ClientInfo clientInfo, OfflinePushInfo offlinePushInfo) {
-        messageProducer.sendToUserExceptClient(content.getFromId(),MessageCommand.MSG_GROUP,content,clientInfo);
+        messageProducer.sendToUserExceptClient(content.getFromId(),GroupEventCommand.MSG_GROUP,content,clientInfo);
     }
 
 

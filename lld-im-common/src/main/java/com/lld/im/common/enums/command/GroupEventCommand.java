@@ -60,6 +60,10 @@ public enum GroupEventCommand implements Command {
      */
     SPEAK_GOUP_MEMBER(2010),
 
+
+    //群聊消息收发 2104
+    MSG_GROUP(0x838),
+
     ;
 
     private Integer command;

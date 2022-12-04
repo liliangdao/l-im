@@ -8,9 +8,6 @@ public enum MessageCommand implements Command {
     //单聊消息收发  1103
     MSG_P2P(0x44F),
 
-    //群聊消息收发   1104
-    MSG_GROUP(0x450),
-
     //直播群聊消息下发  1018
     MSG_GROUP_LIVE(0x3FA),
 
