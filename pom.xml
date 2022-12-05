@@ -37,6 +37,7 @@
         <fastjson.version>1.2.51</fastjson.version>
         <springboot.version>2.3.2.RELEASE</springboot.version>
         <netty.version>4.1.35.Final</netty.version>
+        <feign.version>8.18.0</feign.version>
     </properties>
 
     <dependencies>
@@ -182,6 +183,18 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+
+            <!-- feign调用依赖 -->
+            <dependency>
+                <groupId>com.netflix.feign</groupId>
+                <artifactId>feign-core</artifactId>
+                <version>${feign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.netflix.feign</groupId>
+                <artifactId>feign-jackson</artifactId>
+                <version>${feign.version}</version>
             </dependency>
 
         </dependencies>

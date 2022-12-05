@@ -170,7 +170,7 @@ public class GroupMessageService {
      * @date 2022/8/17 14:33
      * @return com.lld.im.common.ResponseVO
      */
-    private ResponseVO imServerpermissionCheck(String fromId, String groupId, Integer appId) {
+    public ResponseVO imServerpermissionCheck(String fromId, String groupId, Integer appId) {
 
         ResponseVO checkForbidden = checkSendMessageService.checkGroup(fromId, groupId, appId);
         if (!checkForbidden.isOk()) {

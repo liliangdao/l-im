@@ -95,7 +95,8 @@ public class BeanConfig  {
 
     @Bean("snowflakeSeq")
     public Seq buildSnowflakeSeq() throws Exception {
-        Class<?> clazz = Class.forName("com.lld.im.service.service.seq.GenerateySeq");
+        Class<?> clazz = Class
+                .forName("com.lld.im.service.service.seq.GenerateySeq");
         Seq seq = (Seq) clazz.newInstance();
         Method method = clazz.getMethod("setAbstractSeq", AbstractSeq.class);
         AbstractSeq abstractSeq = (AbstractSeq)
