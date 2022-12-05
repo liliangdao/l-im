@@ -54,11 +54,19 @@ public enum GroupEventCommand implements Command {
      */
     MUTE_GROUP(2009),
 
-
     /**
      * 禁言/解禁 群成员 2010，通知管理员和被操作人
      */
     SPEAK_GOUP_MEMBER(2010),
+
+    //群聊消息收发   2104
+    MSG_GROUP(0x838),
+
+    //群聊消息收发同步消息   2105
+    MSG_GROUP_SYNC(0x839),
+
+    //群聊消息ACK 2047
+    GROUP_MSG_ACK(0x7ff),
 
     ;
 

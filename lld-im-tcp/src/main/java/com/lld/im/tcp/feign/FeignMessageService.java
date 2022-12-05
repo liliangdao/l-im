@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface FeignMessageService {
 
     @Headers({"Content-Type: application/json","Accept: application/json"})
-    @RequestLine("POST /message/checkSendP2P")
+    @RequestLine("POST /message/checkSend")
     public ResponseVO checkSendMessage(@RequestBody CheckSendMessageReq o);
 
 

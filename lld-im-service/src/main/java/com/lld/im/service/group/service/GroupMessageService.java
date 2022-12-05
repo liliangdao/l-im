@@ -7,6 +7,7 @@ import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.ConversationTypeEnum;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.GroupMemberRoleEnum;
+import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.msg.*;
@@ -113,8 +114,8 @@ public class GroupMessageService {
         String fromId = chatMessageData.getFromId();
         String toId = chatMessageData.getGroupId();
 
-        ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
-        if (responseVO.isOk()) {
+//        ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
+//        if (responseVO.isOk()) {
             long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" +
                     Constants.SeqConstants.Message + ":" + chatMessageData.getGroupId());
             chatMessageData.setMessageSequence(seq);
@@ -143,9 +144,9 @@ public class GroupMessageService {
                 //消息分发 给同步端和接收方
                 dispatchMessage(chatMessageData,chatMessageData.getOfflinePushInfo());
             });
-        } else {
-            ack(chatMessageData, responseVO);
-        }
+//        } else {
+//            ack(chatMessageData, responseVO);
+//        }
     }
 
     /**
@@ -169,7 +170,7 @@ public class GroupMessageService {
      * @date 2022/8/17 14:33
      * @return com.lld.im.common.ResponseVO
     */
-    private ResponseVO imServerpermissionCheck(String fromId, String groupId, Integer appId) {
+    public ResponseVO imServerpermissionCheck(String fromId, String groupId, Integer appId) {
 
         ResponseVO checkForbidden = checkSendMessageService.checkGroup(fromId, groupId, appId);
         if (!checkForbidden.isOk()) {
@@ -192,23 +193,9 @@ public class GroupMessageService {
             List<GroupMemberDto> data = groupMember.getData();
 
             for(GroupMemberDto d : data){
-                if(d.getMemberId().equals(messageContent.getFromId())){
-                    continue;
-                }
-
-                if(d.getRole() == GroupMemberRoleEnum.LEAVE.getCode()){
-                    continue;
-                }
-
                 List<ClientInfo> successResults = new ArrayList<>();
-                if(messageContent.getFromId().equals(d.getMemberId())){
-                    messageProducer.sendToUserExceptClient(d.getMemberId(),MessageCommand.MSG_GROUP,
-                            groupMessageContent,messageContent);
-                }else{
-                     successResults = messageProducer.sendToUser(d.getMemberId()
-                            , MessageCommand.MSG_GROUP, groupMessageContent,messageContent.getAppId());
-                }
-
+                successResults = messageProducer.sendToUser(d.getMemberId()
+                            , GroupEventCommand.MSG_GROUP, groupMessageContent,messageContent.getAppId());
                 // 如果成功的session列表中不包括手机，则需要推送离线消息。
                 if (!UserSessionUtils.containMobile(successResults)) {
                     //如果接收端没有手机，则推送离线消息
@@ -220,7 +207,7 @@ public class GroupMessageService {
     }
 
     private void syncToSender(GroupChatMessageContent content,ClientInfo clientInfo, OfflinePushInfo offlinePushInfo) {
-        messageProducer.sendToUserExceptClient(content.getFromId(),MessageCommand.MSG_GROUP,content,clientInfo);
+        messageProducer.sendToUserExceptClient(content.getFromId(),GroupEventCommand.MSG_GROUP_SYNC,content,clientInfo);
     }
 
 

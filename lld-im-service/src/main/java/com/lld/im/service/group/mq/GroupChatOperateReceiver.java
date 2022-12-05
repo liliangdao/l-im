@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.msg.GroupChatMessageContent;
 import com.lld.im.common.model.msg.MessageReadedContent;
@@ -66,7 +67,7 @@ public class GroupChatOperateReceiver {
             Integer command = jsonObject.getInteger("command");
 
             //1.接收到新的单聊消息--单聊消息收发  1103
-            if (Objects.equals(command, MessageCommand.MSG_GROUP.getCommand())) {
+            if (Objects.equals(command, GroupEventCommand.MSG_GROUP.getCommand())) {
                 GroupChatMessageContent messageContent = JSON.parseObject(msg, new TypeReference<GroupChatMessageContent>() {
                 }.getType());
                 groupMessageService.process(messageContent);

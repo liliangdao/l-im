@@ -3,6 +3,7 @@ package com.lld.im.tcp.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.lld.im.codec.pack.message.ChatMessageAck;
 import com.lld.im.codec.pack.user.LoginAckPack;
 import com.lld.im.codec.pack.user.UserStatusChangeNotifyPack;
 import com.lld.im.codec.proto.Message;
@@ -11,9 +12,7 @@ import com.lld.im.codec.proto.MessagePack;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.UserPipelineConnectState;
-import com.lld.im.common.enums.command.MessageCommand;
-import com.lld.im.common.enums.command.SystemCommand;
-import com.lld.im.common.enums.command.UserEventCommand;
+import com.lld.im.common.enums.command.*;
 import com.lld.im.common.model.UserClientDto;
 import com.lld.im.common.model.UserSession;
 import com.lld.im.common.model.msg.CheckSendMessageReq;
@@ -173,18 +172,36 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             //PING
             ctx.channel().attr(AttributeKey.valueOf(Constants.ReadTime))
                     .set(System.currentTimeMillis());
-        } else if (command == MessageCommand.MSG_P2P.getCommand()) {
+        } else if (command == MessageCommand.MSG_P2P.getCommand() || command == GroupEventCommand.MSG_GROUP.getCommand()) {
             try {
                 CheckSendMessageReq req = new CheckSendMessageReq();
+                req.setCommand(command);
                 req.setAppId(msg.getMessageHeader().getAppId());
                 JSONObject jsonObject = JSON.parseObject(JSONObject.toJSONString(msg.getMessagePack()));
                 req.setFromId(jsonObject.getString("fromId"));
-                req.setToId(jsonObject.getString("toId"));
+                if(command == MessageCommand.MSG_P2P.getCommand()){
+                    req.setToId(jsonObject.getString("toId"));
+                }else{
+                    req.setToId(jsonObject.getString("groupId"));
+                }
                 ResponseVO responseVO = feignMessageService.checkSendMessage(req);
+
                 if(responseVO.isOk()){
                     MqMessageProducer.sendMessageByCommand(msg,command);
                 }else{
-                    System.out.println("失败");
+                    Command cmd = null;
+                    if(command == MessageCommand.MSG_P2P.getCommand()){
+                        cmd = MessageCommand.MSG_ACK;
+                    }else{
+                        cmd = GroupEventCommand.GROUP_MSG_ACK;
+                    }
+                    ChatMessageAck ackData = new ChatMessageAck(jsonObject.getString("messageId"),
+                            0);
+                    MessagePack<ResponseVO> messageCheckAck = new MessagePack<>();
+                    messageCheckAck.setCommand(cmd.getCommand());
+                    messageCheckAck.setData(responseVO);
+                    responseVO.setData(ackData);
+                    ctx.channel().writeAndFlush(messageCheckAck);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

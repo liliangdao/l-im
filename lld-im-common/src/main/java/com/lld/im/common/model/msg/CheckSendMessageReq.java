@@ -14,4 +14,6 @@ public class CheckSendMessageReq {
     private String toId;
 
     private Integer appId;
+
+    private Integer command;
 }
