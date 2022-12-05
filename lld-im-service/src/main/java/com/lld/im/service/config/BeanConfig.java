@@ -103,7 +103,7 @@ public class BeanConfig  {
                 Class.forName(SeqMethodEnum.SNOWFLAKE.getClazz()).newInstance();
         method.invoke(seq, abstractSeq);
         Method stringRedisMethod = abstractSeq.getClass().getMethod("setSnowflakeIdWorker", SnowflakeIdWorker.class);
-        stringRedisMethod.invoke(abstractSeq, new SnowflakeIdWorker(1,1));
+        stringRedisMethod.invoke(abstractSeq, new SnowflakeIdWorker(1));
         return seq;
     }
 

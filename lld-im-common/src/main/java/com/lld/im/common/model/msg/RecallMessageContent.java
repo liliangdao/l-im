@@ -31,6 +31,7 @@ public class RecallMessageContent extends ClientInfo {
 //            "messageSequence":2,
 //            "appId": 10000,
 //            "clientType": 1,
-//            "imei": "web"
+//            "imei": "web",
+//    "conversationType":0
 //    }
 }

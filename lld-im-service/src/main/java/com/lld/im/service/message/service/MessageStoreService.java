@@ -147,7 +147,6 @@ public class MessageStoreService {
 
         offlineMessageContent.setConversationId(conversationService.convertConversationId(ConversationTypeEnum.P2P.getCode(),
                 offlineMessageContent.getFromId(), offlineMessageContent.getToId()));
-        offlineMessageContent.setMessageKey(offlineMessageContent.getMessageKey());
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
 

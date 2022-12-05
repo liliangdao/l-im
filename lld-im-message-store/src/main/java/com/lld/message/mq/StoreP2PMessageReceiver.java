@@ -3,6 +3,7 @@ package com.lld.message.mq;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.common.constant.Constants;
+import com.lld.message.dao.ImMessageBodyEntity;
 import com.lld.message.model.DoStroeP2PMessageDto;
 import com.lld.message.service.StoreMessageService;
 import com.rabbitmq.client.Channel;
@@ -54,6 +55,7 @@ public class StoreP2PMessageReceiver {
         try {
             JSONObject jsonObject = JSON.parseObject(msg);
             DoStroeP2PMessageDto doStroeP2PMessageDto = jsonObject.toJavaObject(DoStroeP2PMessageDto.class);
+            doStroeP2PMessageDto.setImMessageBodyEntity(jsonObject.getObject("imMessageBody", ImMessageBodyEntity.class));
             storeMessageService.doStoreP2PMessage(doStroeP2PMessageDto);
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {

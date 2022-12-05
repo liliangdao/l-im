@@ -2,6 +2,7 @@ package com.lld.im.service.message.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lld.im.codec.pack.message.MessageReadedAck;
 import com.lld.im.codec.pack.message.MessageReadedPack;
 import com.lld.im.codec.pack.message.RecallMessageNotifyPack;
@@ -173,7 +174,10 @@ public class MessageSyncService {
             return;
         }
 
-        ImMessageBodyEntity body = imMessageBodyMapper.selectById(content.getMessageKey());
+        QueryWrapper<ImMessageBodyEntity> query = new QueryWrapper<>();
+        query.eq("app_id",content.getAppId());
+        query.eq("message_key",content.getMessageKey());
+        ImMessageBodyEntity body = imMessageBodyMapper.selectOne(query);
         if(body == null){
             recallAck(pack,ResponseVO.errorResponse(MessageErrorCode.MESSAGEBODY_IS_NOT_EXIST),content);
             return;
@@ -184,8 +188,9 @@ public class MessageSyncService {
             return;
         }
 
+        //修改messageBody
         body.setDelFlag(DelFlagEnum.DELETE.getCode());
-        imMessageBodyMapper.updateById(body);
+        imMessageBodyMapper.update(body,query);
 
         if(content.getConversationType() == ConversationTypeEnum.P2P.getCode()){
             //修改离线库的消息
@@ -197,7 +202,7 @@ public class MessageSyncService {
             offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
             offlineMessageContent.setConversationId(conversationService.convertConversationId(offlineMessageContent.getConversationType()
                     ,content.getFromId(),content.getToId()));
-            offlineMessageContent.setMessageBody(body.getMessageBody());
+                offlineMessageContent.setMessageBody(body.getMessageBody());
 
             long seq = this.seq.getSeq(content.getAppId() + ":" + Constants.SeqConstants.Message);
             offlineMessageContent.setMessageSequence(seq);
