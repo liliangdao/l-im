@@ -178,14 +178,13 @@ public class MessageStoreService {
 
         offlineMessageContent.setConversationId(conversationService.convertConversationId(ConversationTypeEnum.GROUP.getCode(),
                 offlineMessageContent.getFromId(), offlineMessageContent.getToId()));
-        offlineMessageContent.setMessageKey(offlineMessageContent.getMessageKey());
 
         List<String> groupMemberId = groupMemberService.getGroupMemberId(offlineMessageContent.getToId(), offlineMessageContent.getAppId());
         offlineMessageContent.setMembers(groupMemberId);
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
 
-        String fromKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.groupOfflineMessage + ":" + offlineMessageContent.getFromId();
+        String fromKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + offlineMessageContent.getFromId();
 
         //给发送方插入离线消息
         Long fromCount = zSetOperations.zCard(fromKey);
@@ -197,13 +196,12 @@ public class MessageStoreService {
         zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageKey());
         //给接收方插入离线消息
         for (String member : offlineMessageContent.getMembers()) {
-            String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.groupOfflineMessage + ":" + member;
+            String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + member;
             Long toCount = zSetOperations.zCard(toKey);
             if (toCount > appConfig.getOfflineMessageCount()) {
                 zSetOperations.removeRange(toKey, 0, 0);
             }
             zSetOperations.add(toKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageKey());
-
         }
     }
 

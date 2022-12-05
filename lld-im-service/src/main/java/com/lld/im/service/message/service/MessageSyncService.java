@@ -134,6 +134,7 @@ public class MessageSyncService {
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
         String key = req.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + req.getOperater();
+        //获取最新的一个消息
         Set set = zSetOperations.reverseRange(key, 0, 0);
         Long maxSeq = 0L;
         if(!CollectionUtil.isEmpty(set)){
@@ -144,16 +145,20 @@ public class MessageSyncService {
         }
 
         List<OfflineMessageContent> respList = new ArrayList<>();
-
+        //设置最大的seq
         resp.setMaxSequence(maxSeq);
-        Set<ZSetOperations.TypedTuple> set1 = zSetOperations.rangeByScoreWithScores(key, req.getLastSequence(), maxSeq, 0, req.getMaxLimit());
-        for (ZSetOperations.TypedTuple typedTuple : set1) {
+
+        //根据req.getLastSequence() 往后查询 查询的最大值为maxSeq
+        Set<ZSetOperations.TypedTuple> querySet =
+                zSetOperations.rangeByScoreWithScores(key, req.getLastSequence(), maxSeq, 0, req.getMaxLimit());
+        for (ZSetOperations.TypedTuple typedTuple : querySet) {
             Object value = typedTuple.getValue();
             respList.add(JSONObject.parseObject(value.toString(), OfflineMessageContent.class));
         }
         resp.setDataList(respList);
 
         if(CollectionUtil.isNotEmpty(respList)){
+            //获取最后一条，判断最后一条的seq和maxSeq做对比
             OfflineMessageContent offlineMessageContent = respList.get(respList.size() - 1);
             resp.setCompleted(maxSeq >= offlineMessageContent.getMessageSequence());
         }
