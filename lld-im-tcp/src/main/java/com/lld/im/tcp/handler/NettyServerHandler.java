@@ -51,7 +51,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
 
     private FeignMessageService feignMessageService;
 
-    public NettyServerHandler(String brokerId) {
+    public NettyServerHandler(String brokerId,String url) {
         super();
         this.brokerId = brokerId;
 
@@ -61,7 +61,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                 .options(new Request.Options(1000, 3500))//设置超时时间
                 //.retryer(new Retryer.Default(5000, 5000, 3))
                 .target(FeignMessageService.class,   //代理对象
-                        "http://localhost:8000/v1");//目标地址
+                        url);//目标地址
     }
 
 //    /**

@@ -33,6 +33,8 @@ public class BootstrapConfig {
 
         private Integer loginModel;
 
+        private String logicUrl;
+
         /**
          * redis配置
          */
