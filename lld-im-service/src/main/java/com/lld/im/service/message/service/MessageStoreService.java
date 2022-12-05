@@ -86,7 +86,7 @@ public class MessageStoreService {
         DoStroeGroupMessageDto doStroeGroupMessageDto = new DoStroeGroupMessageDto();
         doStroeGroupMessageDto.setImMessageBody(imMessageBody);
         doStroeGroupMessageDto.setChatMessageContent(chatMessageContent);
-        rabbitTemplate.convertAndSend(Constants.RabbitConstants.StoreP2PMessage,"",
+        rabbitTemplate.convertAndSend(Constants.RabbitConstants.StoreGroupMessage,"",
                 JSONObject.toJSONString(doStroeGroupMessageDto));
         chatMessageContent.setMessageKey(imMessageBody.getMessageKey());
     }
