@@ -8,6 +8,9 @@ import com.lld.im.common.enums.ConversationTypeEnum;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.SyncFromEnum;
 import com.lld.im.common.model.msg.*;
+import com.lld.im.common.model.msg.dto.DoStroeGroupMessageDto;
+import com.lld.im.common.model.msg.dto.DoStroeP2PMessageDto;
+import com.lld.im.common.model.msg.dto.ImMessageBody;
 import com.lld.im.service.conversation.service.ConversationService;
 import com.lld.im.service.group.dao.ImGroupMessageHistoryEntity;
 import com.lld.im.service.group.dao.mapper.ImGroupMessageHistoryMapper;
@@ -16,8 +19,6 @@ import com.lld.im.service.message.dao.ImMessageBodyEntity;
 import com.lld.im.service.message.dao.ImMessageHistoryEntity;
 import com.lld.im.service.message.dao.mapper.ImMessageBodyMapper;
 import com.lld.im.service.message.dao.mapper.ImMessageHistoryMapper;
-import com.lld.im.service.message.model.dto.DoStroeGroupMessageDto;
-import com.lld.im.service.message.model.dto.DoStroeP2PMessageDto;
 import com.lld.im.service.service.seq.Seq;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -80,26 +81,14 @@ public class MessageStoreService {
      * @author lld
      * @since 2022/7/23
      */
-    public Long storeGroupMessage(GroupChatMessageContent chatMessageContent) {
-        ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
-        imMessageBodyMapper.insert(imMessageBodyEntity);
-        ImGroupMessageHistoryEntity imGroupMessageHistoryEntity = extractToGroupMessageHistory(chatMessageContent, imMessageBodyEntity);
-        extractToGroupMessageHistory(chatMessageContent, imMessageBodyEntity);
-        imGroupMessageHistoryMapper.insert(imGroupMessageHistoryEntity);
-        chatMessageContent.setMessageKey(imMessageBodyEntity.getMessageKey());
-        return imMessageBodyEntity.getMessageKey();
-    }
-
-    /**
-     * @param
-     * @return void
-     * @description: 群聊消息持久化
-     * @author lld
-     */
-    public void doStoreGroupMessage(DoStroeGroupMessageDto chatMessageContent) {
-        imMessageBodyMapper.insert(chatMessageContent.getImMessageBodyEntity());
-        ImGroupMessageHistoryEntity imGroupMessageHistoryEntity = extractToGroupMessageHistory(chatMessageContent.getChatMessageContent(), chatMessageContent.getImMessageBodyEntity());
-        imGroupMessageHistoryMapper.insert(imGroupMessageHistoryEntity);
+    public void storeGroupMessage(GroupChatMessageContent chatMessageContent) {
+        ImMessageBody imMessageBody = extractMessageBody(chatMessageContent);
+        DoStroeGroupMessageDto doStroeGroupMessageDto = new DoStroeGroupMessageDto();
+        doStroeGroupMessageDto.setImMessageBody(imMessageBody);
+        doStroeGroupMessageDto.setChatMessageContent(chatMessageContent);
+        rabbitTemplate.convertAndSend(Constants.RabbitConstants.StoreP2PMessage,"",
+                JSONObject.toJSONString(doStroeGroupMessageDto));
+        chatMessageContent.setMessageKey(imMessageBody.getMessageKey());
     }
 
     /**
@@ -109,36 +98,15 @@ public class MessageStoreService {
      * @author lld
      * @since 2022/7/23
      */
-    public Long storeP2PMessage(ChatMessageContent chatMessageContent) {
-        ImMessageBodyEntity imMessageBodyEntity = extractMessageBody(chatMessageContent);
-
-        //TODO 发送mq消息异步存储
+    public void storeP2PMessage(ChatMessageContent chatMessageContent) {
+        ImMessageBody imMessageBodyEntity = extractMessageBody(chatMessageContent);
         DoStroeP2PMessageDto doStroeP2PMessageDto = new DoStroeP2PMessageDto();
         doStroeP2PMessageDto.setChatMessageContent(chatMessageContent);
-        doStroeP2PMessageDto.setImMessageBodyEntity(imMessageBodyEntity);
+        doStroeP2PMessageDto.setImMessageBody(imMessageBodyEntity);
         rabbitTemplate.convertAndSend(Constants.RabbitConstants.StoreP2PMessage,"",
                 JSONObject.toJSONString(doStroeP2PMessageDto));
-
-//        imMessageBodyMapper.insert(imMessageBodyEntity);
-//        List<ImMessageHistoryEntity> imMessageHistoryEntities = extractToP2PMessageHistory(chatMessageContent, imMessageBodyEntity);
-//        imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
-//        chatMessageContent.setMessageKey(imMessageBodyEntity.getMessageKey());
-        return imMessageBodyEntity.getMessageKey();
+        chatMessageContent.setMessageKey(imMessageBodyEntity.getMessageKey());
     }
-
-    /**
-     * @param
-     * @return void
-     * @description: 消息持久化。
-     * @author lld
-     */
-    public void doStoreP2PMessage(DoStroeP2PMessageDto chatMessageContent) {
-        imMessageBodyMapper.insert(chatMessageContent.getImMessageBodyEntity());
-        List<ImMessageHistoryEntity> imMessageHistoryEntities
-                = extractToP2PMessageHistory(chatMessageContent.getChatMessageContent(), chatMessageContent.getImMessageBodyEntity());
-        imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
-    }
-
 
     /**
      * @param
@@ -264,22 +232,9 @@ public class MessageStoreService {
         return list;
     }
 
-    public ImGroupMessageHistoryEntity extractToGroupMessageHistory(GroupChatMessageContent content, ImMessageBodyEntity imMessageBodyEntity) {
-        ImGroupMessageHistoryEntity fromHistory = new ImGroupMessageHistoryEntity();
-        BeanUtils.copyProperties(content, fromHistory);
-        fromHistory.setGroupId(content.getGroupId());
-//        long seq = this.seq.getSeq("");
-        fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
-        fromHistory.setSequence(content.getMessageSequence());
-        fromHistory.setCreateTime(System.currentTimeMillis());
+    public ImMessageBody extractMessageBody(MessageContent content) {
 
-        return fromHistory;
-    }
-
-
-    public ImMessageBodyEntity extractMessageBody(MessageContent content) {
-
-        ImMessageBodyEntity body = new ImMessageBodyEntity();
+        ImMessageBody body = new ImMessageBody();
         body.setAppId(content.getAppId());
         body.setCreateTime(System.currentTimeMillis());
         body.setMessageBody(content.getMessageBody());

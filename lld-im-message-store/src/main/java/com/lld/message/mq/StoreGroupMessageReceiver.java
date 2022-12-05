@@ -3,7 +3,7 @@ package com.lld.message.mq;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lld.im.common.constant.Constants;
-import com.lld.message.model.DoStroeP2PMessageDto;
+import com.lld.message.model.DoStroeGroupMessageDto;
 import com.lld.message.service.StoreMessageService;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
@@ -23,9 +23,9 @@ import java.util.Map;
  * @description:
  **/
 @Component
-public class StoreMessageReceiver {
+public class StoreGroupMessageReceiver {
 
-    private static Logger logger = LoggerFactory.getLogger(StoreMessageReceiver.class);
+    private static Logger logger = LoggerFactory.getLogger(StoreGroupMessageReceiver.class);
 
     @Autowired
     StoreMessageService storeMessageService;
@@ -36,8 +36,8 @@ public class StoreMessageReceiver {
      * @throws Exception
      */
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(value = Constants.RabbitConstants.StoreP2PMessage, durable = "true"),
-            exchange = @Exchange(value = Constants.RabbitConstants.StoreP2PMessage, durable = "true")
+            value = @Queue(value = Constants.RabbitConstants.StoreGroupMessage, durable = "true"),
+            exchange = @Exchange(value = Constants.RabbitConstants.StoreGroupMessage, durable = "true")
     ), concurrency = "1")
     @RabbitHandler
     public void onMessage(@Payload Message message,
@@ -53,8 +53,8 @@ public class StoreMessageReceiver {
 
         try {
             JSONObject jsonObject = JSON.parseObject(msg);
-            DoStroeP2PMessageDto doStroeP2PMessageDto = jsonObject.toJavaObject(DoStroeP2PMessageDto.class);
-            storeMessageService.doStoreP2PMessage(doStroeP2PMessageDto);
+            DoStroeGroupMessageDto doStroeP2PMessageDto = jsonObject.toJavaObject(DoStroeGroupMessageDto.class);
+            storeMessageService.doStoreGroupMessage(doStroeP2PMessageDto);
             channel.basicAck(deliveryTag, false);
         } catch (Exception e) {
             logger.error("处理消息出现异常：{}", e.getMessage());

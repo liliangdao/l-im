@@ -119,13 +119,13 @@ public class P2PMessageService {
         }
 
 //        //校验权限
-//        ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
-//        if(!responseVO.isOk()){
-//            ack(chatMessageData, responseVO);
-//            return;
-//        }
+        ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
+        if(!responseVO.isOk()){
+            ack(chatMessageData, responseVO);
+            return;
+        }
         //回调
-        ResponseVO responseVO = new ResponseVO();
+//        ResponseVO responseVO = new ResponseVO();
         if(appConfig.isSendMessageAfterCallback()){
             responseVO = callbackService.beforeCallback(chatMessageData.getAppId(), Constants.CallbackCommand.SendMessageBefore
                     , JSONObject.toJSONString(chatMessageData));
@@ -157,9 +157,8 @@ public class P2PMessageService {
      * @since 2022/9/18
      */
     public void  doProcessMessage(ChatMessageContent chatMessageData){
-        //插入历史库和msgBody TODO 改为异步存储，这里只分配id
-        Long messageKey = messageStoreService.storeP2PMessage(chatMessageData);
-        chatMessageData.setMessageKey(messageKey);
+        //插入历史库和msgBody
+        messageStoreService.storeP2PMessage(chatMessageData);
         //回包
         ack(chatMessageData,ResponseVO.successResponse());
 
@@ -196,7 +195,7 @@ public class P2PMessageService {
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Message);
         message.setMessageSequence(seq);
 
-        Long messageKey = messageStoreService.storeP2PMessage(message);
+        messageStoreService.storeP2PMessage(message);
 
         //插入离线库redis
         OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
@@ -204,7 +203,7 @@ public class P2PMessageService {
         offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
         messageStoreService.storeOffLineMessage(offlineMessageContent);
 
-        sendMessageResp.setMessageKey(messageKey);
+        sendMessageResp.setMessageKey(message.getMessageKey());
         sendMessageResp.setMessageId(req.getMessageId());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
 

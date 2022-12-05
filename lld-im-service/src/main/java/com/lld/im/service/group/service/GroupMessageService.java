@@ -91,7 +91,7 @@ public class GroupMessageService {
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Message);
         message.setMessageSequence(seq);
 
-        Long messageKey = messageStoreService.storeGroupMessage(message);
+        messageStoreService.storeGroupMessage(message);
 
         //插入离线库redis
         OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
@@ -99,7 +99,7 @@ public class GroupMessageService {
         offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
         messageStoreService.storeGroupOffLineMessage(offlineMessageContent);
 
-        sendMessageResp.setMessageKey(messageKey);
+        sendMessageResp.setMessageKey(message.getMessageKey());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
         sendMessageResp.setMessageId(req.getMessageId());
 
@@ -122,8 +122,8 @@ public class GroupMessageService {
             //落库+回包+分发（发送给同步端和接收方的所有端）
             threadPoolExecutor.execute(() -> {
                 //插入历史库和msgBody
-                Long messageKey = messageStoreService.storeGroupMessage(chatMessageData);
-                chatMessageData.setMessageKey(messageKey);
+                messageStoreService.storeGroupMessage(chatMessageData);
+                chatMessageData.setMessageKey(chatMessageData.getMessageKey());
                 //回包
                 ack(chatMessageData,ResponseVO.successResponse());
 

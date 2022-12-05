@@ -2,10 +2,14 @@ package com.lld.message.service;
 
 import com.lld.im.common.enums.SyncFromEnum;
 import com.lld.im.common.model.msg.ChatMessageContent;
+import com.lld.im.common.model.msg.GroupChatMessageContent;
+import com.lld.message.dao.ImGroupMessageHistoryEntity;
 import com.lld.message.dao.ImMessageBodyEntity;
 import com.lld.message.dao.ImMessageHistoryEntity;
+import com.lld.message.dao.mapper.ImGroupMessageHistoryMapper;
 import com.lld.message.dao.mapper.ImMessageBodyMapper;
 import com.lld.message.dao.mapper.ImMessageHistoryMapper;
+import com.lld.message.model.DoStroeGroupMessageDto;
 import com.lld.message.model.DoStroeP2PMessageDto;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +32,9 @@ public class StoreMessageService {
     @Autowired
     ImMessageHistoryMapper imMessageHistoryMapper;
 
+    @Autowired
+    ImGroupMessageHistoryMapper imGroupMessageHistoryMapper;
+
     /**
      * @param
      * @return void
@@ -39,6 +46,18 @@ public class StoreMessageService {
         List<ImMessageHistoryEntity> imMessageHistoryEntities
                 = extractToP2PMessageHistory(chatMessageContent.getChatMessageContent(), chatMessageContent.getImMessageBodyEntity());
         imMessageHistoryMapper.insertBatchSomeColumn(imMessageHistoryEntities);
+    }
+
+    /**
+     * @param
+     * @return void
+     * @description: 群聊消息持久化
+     * @author lld
+     */
+    public void doStoreGroupMessage(DoStroeGroupMessageDto chatMessageContent) {
+        imMessageBodyMapper.insert(chatMessageContent.getImMessageBodyEntity());
+        ImGroupMessageHistoryEntity imGroupMessageHistoryEntity = extractToGroupMessageHistory(chatMessageContent.getChatMessageContent(), chatMessageContent.getImMessageBodyEntity());
+        imGroupMessageHistoryMapper.insert(imGroupMessageHistoryEntity);
     }
 
     public List<ImMessageHistoryEntity> extractToP2PMessageHistory(ChatMessageContent content, ImMessageBodyEntity imMessageBodyEntity) {
@@ -62,5 +81,17 @@ public class StoreMessageService {
         }
 
         return list;
+    }
+
+    public ImGroupMessageHistoryEntity extractToGroupMessageHistory(GroupChatMessageContent content, ImMessageBodyEntity imMessageBodyEntity) {
+        ImGroupMessageHistoryEntity fromHistory = new ImGroupMessageHistoryEntity();
+        BeanUtils.copyProperties(content, fromHistory);
+        fromHistory.setGroupId(content.getGroupId());
+//        long seq = this.seq.getSeq("");
+        fromHistory.setMessageKey(imMessageBodyEntity.getMessageKey());
+        fromHistory.setSequence(content.getMessageSequence());
+        fromHistory.setCreateTime(System.currentTimeMillis());
+
+        return fromHistory;
     }
 }
