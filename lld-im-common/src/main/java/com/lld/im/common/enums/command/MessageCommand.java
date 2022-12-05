@@ -8,8 +8,14 @@ public enum MessageCommand implements Command {
     //单聊消息收发  1103
     MSG_P2P(0x44F),
 
+    //直播群聊消息下发  1018
+    MSG_GROUP_LIVE(0x3FA),
+
     //单聊消息收发同步消息  1108
     MSG_P2P_SYNC(0x454),
+
+    //群聊消息收发同步消息   1109
+    MSG_GROUP_SYNC(0x455),
 
     //发送消息已读   1106
     MSG_READED(0x452),
@@ -25,6 +31,9 @@ public enum MessageCommand implements Command {
 
     //群聊消息ACK
     GROUP_MSG_ACK(0x417),
+
+    //批量转发消息ACK
+    BATCH_MSG_ACK(0x419),
 
     //消息已读回包  1107
     MSG_READED_ACK(0x453),
