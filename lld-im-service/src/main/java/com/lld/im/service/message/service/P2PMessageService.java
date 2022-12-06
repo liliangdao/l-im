@@ -121,7 +121,7 @@ public class P2PMessageService {
         //校验权限已经迁移至tcp服务
 
         //回调
-        ResponseVO responseVO = new ResponseVO();
+        ResponseVO responseVO = ResponseVO.successResponse();
         if(appConfig.isSendMessageAfterCallback()){
             responseVO = callbackService.beforeCallback(chatMessageData.getAppId(), Constants.CallbackCommand.SendMessageBefore
                     , JSONObject.toJSONString(chatMessageData));

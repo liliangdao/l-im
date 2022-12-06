@@ -99,6 +99,7 @@ public class GroupMessageService {
 
         OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
         BeanUtils.copyProperties(message,offlineMessageContent);
+        offlineMessageContent.setToId(req.getGroupId());
         offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
         messageStoreService.storeGroupOffLineMessage(offlineMessageContent,groupMemberId);
 
@@ -135,10 +136,10 @@ public class GroupMessageService {
 
                 //插入离线库
                 OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+                BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
                 offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
                 offlineMessageContent.setToId(chatMessageData.getGroupId());
                 offlineMessageContent.setDelFlag(DelFlagEnum.NORMAL.getCode());
-                BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
                 messageStoreService.storeGroupOffLineMessage(offlineMessageContent,groupMemberId);
 
                 //同步给发送方其他端
