@@ -174,13 +174,10 @@ public class MessageStoreService {
 
     }
 
-    public void storeGroupOffLineMessage(OfflineMessageContent offlineMessageContent) {
+    public void storeGroupOffLineMessage(OfflineMessageContent offlineMessageContent,List<String> memberId) {
 
         offlineMessageContent.setConversationId(conversationService.convertConversationId(ConversationTypeEnum.GROUP.getCode(),
                 offlineMessageContent.getFromId(), offlineMessageContent.getToId()));
-
-        List<String> groupMemberId = groupMemberService.getGroupMemberId(offlineMessageContent.getToId(), offlineMessageContent.getAppId());
-        offlineMessageContent.setMembers(groupMemberId);
 
         ZSetOperations zSetOperations = redisTemplate.opsForZSet();
 
@@ -195,7 +192,7 @@ public class MessageStoreService {
 
         zSetOperations.add(fromKey, JSONObject.toJSONString(offlineMessageContent), offlineMessageContent.getMessageKey());
         //给接收方插入离线消息
-        for (String member : offlineMessageContent.getMembers()) {
+        for (String member : memberId) {
             String toKey = offlineMessageContent.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + member;
             Long toCount = zSetOperations.zCard(toKey);
             if (toCount > appConfig.getOfflineMessageCount()) {

@@ -94,10 +94,13 @@ public class GroupMessageService {
         messageStoreService.storeGroupMessage(message);
 
         //插入离线库redis
+        List<String> groupMemberId = groupMemberService.getGroupMemberId(req.getGroupId(), req.getAppId());
+        message.setMembers(groupMemberId);
+
         OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
         BeanUtils.copyProperties(message,offlineMessageContent);
         offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
-        messageStoreService.storeGroupOffLineMessage(offlineMessageContent);
+        messageStoreService.storeGroupOffLineMessage(offlineMessageContent,groupMemberId);
 
         sendMessageResp.setMessageKey(message.getMessageKey());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
@@ -136,7 +139,7 @@ public class GroupMessageService {
                 offlineMessageContent.setToId(chatMessageData.getGroupId());
                 offlineMessageContent.setDelFlag(DelFlagEnum.NORMAL.getCode());
                 BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
-                messageStoreService.storeGroupOffLineMessage(offlineMessageContent);
+                messageStoreService.storeGroupOffLineMessage(offlineMessageContent,groupMemberId);
 
                 //同步给发送方其他端
                 syncToSender(chatMessageData,chatMessageData,chatMessageData.getOfflinePushInfo());

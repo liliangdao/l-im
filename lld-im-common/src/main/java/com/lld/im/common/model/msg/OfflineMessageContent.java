@@ -14,8 +14,6 @@ public class OfflineMessageContent {
 
     private Long messageKey;
 
-    private List<String> members;
-
     private Integer conversationType;
 
     private String conversationId;

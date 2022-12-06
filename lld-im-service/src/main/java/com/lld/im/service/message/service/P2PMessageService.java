@@ -118,14 +118,10 @@ public class P2PMessageService {
             return;
         }
 
-//        //校验权限
-        ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
-        if(!responseVO.isOk()){
-            ack(chatMessageData, responseVO);
-            return;
-        }
+        //校验权限已经迁移至tcp服务
+
         //回调
-//        ResponseVO responseVO = new ResponseVO();
+        ResponseVO responseVO = new ResponseVO();
         if(appConfig.isSendMessageAfterCallback()){
             responseVO = callbackService.beforeCallback(chatMessageData.getAppId(), Constants.CallbackCommand.SendMessageBefore
                     , JSONObject.toJSONString(chatMessageData));
@@ -138,10 +134,9 @@ public class P2PMessageService {
             chatMessageData.setMessageSequence(seq);
 
             //落库+回包+分发（发送给同步端和接收方的所有端）
-//            threadPoolExecutor.execute(() -> {
-//                  doProcessMessage(chatMessageData);
-//            });
-            doProcessMessage(chatMessageData);
+            threadPoolExecutor.execute(() -> {
+                  doProcessMessage(chatMessageData);
+            });
             logger.info("消息處理完成：{}" , (chatMessageData.getMessageKey())  + ":" + chatMessageData.getMessageId());
         } else {
             ack(chatMessageData, responseVO);
