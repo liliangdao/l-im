@@ -446,11 +446,20 @@
                     ta.value = ta.value + "\n" + data.fromId + "：" + data.messageBody;
                 }
 
-                data.fromId = data.toId;
-                data.conversationId = "0_" + data.toId + "_" + data.fromId;
-                data.conversationType = 0;
+                // data.fromId = data.toId;
+                // data.conversationId = "0_" + data.toId + "_" + data.fromId;
+                // data.conversationType = 0;
+
+                var rAck = {
+                    "fromId":data.toId,
+                    "toId":data.fromId,
+                    "messageKey":data.messageKey,
+                    "messageId":data.messageId,
+                    "messageSequence":data.messageSequence,
+                }
+
                 let messageReciver = new ByteBuffer();
-                var jsonData = JSON.stringify(data);
+                var jsonData = JSON.stringify(rAck);
                 let bodyLen = jsonData.length;
                 messageReciver.int32(1107)
                     .int32(version).int32(clientType)

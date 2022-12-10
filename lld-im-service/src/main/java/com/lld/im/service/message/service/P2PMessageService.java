@@ -89,7 +89,7 @@ public class P2PMessageService {
 
     }
 
-    public void process(ChatMessageContent chatMessageData) {
+     public void process(ChatMessageContent chatMessageData) {
 
         String fromId = chatMessageData.getFromId();
         String toId = chatMessageData.getToId();

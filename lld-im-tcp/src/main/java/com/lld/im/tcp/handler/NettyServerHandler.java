@@ -184,7 +184,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                 }else{
                     req.setToId(jsonObject.getString("groupId"));
                 }
-                ResponseVO responseVO = feignMessageService.checkSendMessage(req);
+                ResponseVO responseVO = feignMessageService
+                        .checkSendMessage(req);
 
                 if(responseVO.isOk()){
                     MqMessageProducer.sendMessageByCommand(msg,command);
@@ -241,4 +242,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 //        logger.info("有客户端上线了 ： {}",ctx.channel().id().asLongText());
     }
+
+
 }
