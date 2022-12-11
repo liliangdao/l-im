@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -15,7 +16,6 @@ public interface ImConversationSetMapper extends BaseMapper<ImConversationSetEnt
      * @description 插入/更新會話
      * @author chackylee
      * @date 2022/7/29 16:49
-     * @param [entity] 
      * @return int
     */
     @Insert(" insert into im_conversation_set " +
@@ -27,6 +27,15 @@ public interface ImConversationSetMapper extends BaseMapper<ImConversationSetEnt
             "  sequence = VALUES (sequence) , " +
             "  readed_sequence = VALUES (readed_sequence) ")
     public int markConversation(ImConversationSetEntity entity);
+
+    @Update(" UPDATE im_conversation_set set readed_sequence = #{readedSequence}" +
+            " and sequence = #{sequence} where conversation_id = #{conversationId} and app_id = #{appId} and readed_sequence < #{readedSequence}")
+    public int readMessage(ImConversationSetEntity entity);
+
+    @Update(" UPDATE im_conversation_set set revicer_sequence = #{revicerSequence}" +
+            " and sequence = #{sequence} where conversation_id = #{conversationId} and app_id = #{appId} and revicer_sequence < #{revicerSequence}")
+    public int receiverMessage(ImConversationSetEntity entity);
+
 
     @Insert(" insert into im_conversation_set " +
             "(conversation_id , conversation_type , from_id , to_id ,is_mute,is_top,sequence,readed_sequence,revicer_sequence,app_id)" +

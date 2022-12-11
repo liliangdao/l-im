@@ -1,5 +1,6 @@
 package com.lld.im.service.group.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.pack.message.ChatMessageAck;
 import com.lld.im.codec.pack.group.GroupMessagePack;
 import com.lld.im.common.ResponseVO;
@@ -82,12 +83,12 @@ public class GroupMessageService {
 
     }
 
-    public SendMessageResp send(SendGroupMessageReq req){
+    public SendMessageResp send(SendGroupMessageReq req) {
 
         SendMessageResp sendMessageResp = new SendMessageResp();
 
         GroupChatMessageContent message = new GroupChatMessageContent();
-        BeanUtils.copyProperties(req,message);
+        BeanUtils.copyProperties(req, message);
         long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Message);
         message.setMessageSequence(seq);
 
@@ -98,17 +99,17 @@ public class GroupMessageService {
         message.setMembers(groupMemberId);
 
         OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
-        BeanUtils.copyProperties(message,offlineMessageContent);
+        BeanUtils.copyProperties(message, offlineMessageContent);
         offlineMessageContent.setToId(req.getGroupId());
         offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
-        messageStoreService.storeGroupOffLineMessage(offlineMessageContent,groupMemberId);
+        messageStoreService.storeGroupOffLineMessage(offlineMessageContent, groupMemberId);
 
         sendMessageResp.setMessageKey(message.getMessageKey());
         sendMessageResp.setMessageTime(System.currentTimeMillis());
         sendMessageResp.setMessageId(req.getMessageId());
 
-        dispatchMessage(message,req.getOfflinePushInfo());
-        syncToSender(message,message,req.getOfflinePushInfo());
+        dispatchMessage(message, req.getOfflinePushInfo());
+        syncToSender(message, message, req.getOfflinePushInfo());
 
         return sendMessageResp;
     }
@@ -117,40 +118,37 @@ public class GroupMessageService {
         long t0 = System.currentTimeMillis();
         String fromId = chatMessageData.getFromId();
         String toId = chatMessageData.getGroupId();
+        long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" +
+                Constants.SeqConstants.Message + ":" + chatMessageData.getGroupId());
+        chatMessageData.setMessageSequence(seq);
+        //落库+回包+分发（发送给同步端和接收方的所有端）
+        threadPoolExecutor.execute(() -> {
+            //插入历史库和msgBody
+            messageStoreService.storeGroupMessage(chatMessageData);
+            chatMessageData.setMessageKey(chatMessageData.getMessageKey());
+            //回包
+            ack(chatMessageData, ResponseVO.successResponse());
 
-        ResponseVO responseVO = imServerpermissionCheck(fromId, toId, chatMessageData.getAppId());
-        if (responseVO.isOk()) {
-            long seq = this.seq.getSeq(chatMessageData.getAppId() + ":" +
-                    Constants.SeqConstants.Message + ":" + chatMessageData.getGroupId());
-            chatMessageData.setMessageSequence(seq);
-            //落库+回包+分发（发送给同步端和接收方的所有端）
-            threadPoolExecutor.execute(() -> {
-                //插入历史库和msgBody
-                messageStoreService.storeGroupMessage(chatMessageData);
-                chatMessageData.setMessageKey(chatMessageData.getMessageKey());
-                //回包
-                ack(chatMessageData,ResponseVO.successResponse());
+            List<String> groupMemberId = groupMemberService.getGroupMemberId(toId, chatMessageData.getAppId());
+            chatMessageData.setMembers(groupMemberId);
 
-                List<String> groupMemberId = groupMemberService.getGroupMemberId(toId, chatMessageData.getAppId());
-                chatMessageData.setMembers(groupMemberId);
+            //插入离线库
+            OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
+            BeanUtils.copyProperties(chatMessageData, offlineMessageContent);
+            offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
+            offlineMessageContent.setToId(chatMessageData.getGroupId());
+            offlineMessageContent.setDelFlag(DelFlagEnum.NORMAL.getCode());
+            messageStoreService.storeGroupOffLineMessage(offlineMessageContent, groupMemberId);
 
-                //插入离线库
-                OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
-                BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
-                offlineMessageContent.setConversationType(ConversationTypeEnum.GROUP.getCode());
-                offlineMessageContent.setToId(chatMessageData.getGroupId());
-                offlineMessageContent.setDelFlag(DelFlagEnum.NORMAL.getCode());
-                messageStoreService.storeGroupOffLineMessage(offlineMessageContent,groupMemberId);
+            //同步给发送方其他端
+            syncToSender(chatMessageData, chatMessageData, chatMessageData.getOfflinePushInfo());
 
-                //同步给发送方其他端
-                syncToSender(chatMessageData,chatMessageData,chatMessageData.getOfflinePushInfo());
-
-                //消息分发 给同步端和接收方
-                dispatchMessage(chatMessageData,chatMessageData.getOfflinePushInfo());
-            });
-        } else {
-            ack(chatMessageData, responseVO);
-        }
+            //消息分发 给同步端和接收方
+            dispatchMessage(chatMessageData, chatMessageData.getOfflinePushInfo());
+        });
+//        } else {
+//            ack(chatMessageData, responseVO);
+//        }
     }
 
     /**
@@ -161,7 +159,7 @@ public class GroupMessageService {
      * @date 2022/7/22 16:29
      */
     private void ack(GroupChatMessageContent content, ResponseVO result) {
-        logger.debug("result = {}",result);
+        logger.debug("result = {}", result);
         logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
         ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence());
         result.setData(ackData);
@@ -169,10 +167,10 @@ public class GroupMessageService {
     }
 
     /**
+     * @return com.lld.im.common.ResponseVO
      * @description 校验群聊发送限制
      * @author chackylee
      * @date 2022/8/17 14:33
-     * @return com.lld.im.common.ResponseVO
      */
     public ResponseVO imServerpermissionCheck(String fromId, String groupId, Integer appId) {
 
@@ -193,25 +191,25 @@ public class GroupMessageService {
         BeanUtils.copyProperties(messageContent, groupMessageContent);
 
         ResponseVO<List<GroupMemberDto>> groupMember = groupMemberService.getGroupMember(groupId, messageContent.getAppId());
-        if(groupMember.isOk()){
+        if (groupMember.isOk()) {
             List<GroupMemberDto> data = groupMember.getData();
 
-            for(GroupMemberDto d : data){
-                if(d.getMemberId().equals(messageContent.getFromId())){
+            for (GroupMemberDto d : data) {
+                if (d.getMemberId().equals(messageContent.getFromId())) {
                     continue;
                 }
 
-                if(d.getRole() == GroupMemberRoleEnum.LEAVE.getCode()){
+                if (d.getRole() == GroupMemberRoleEnum.LEAVE.getCode()) {
                     continue;
                 }
 
                 List<ClientInfo> successResults = new ArrayList<>();
-                if(messageContent.getFromId().equals(d.getMemberId())){
-                    messageProducer.sendToUserExceptClient(d.getMemberId(),GroupEventCommand.MSG_GROUP,
-                            groupMessageContent,messageContent);
-                }else{
+                if (messageContent.getFromId().equals(d.getMemberId())) {
+                    messageProducer.sendToUserExceptClient(d.getMemberId(), GroupEventCommand.MSG_GROUP,
+                            groupMessageContent, messageContent);
+                } else {
                     successResults = messageProducer.sendToUser(d.getMemberId()
-                            , GroupEventCommand.MSG_GROUP, groupMessageContent,messageContent.getAppId());
+                            , GroupEventCommand.MSG_GROUP, groupMessageContent, messageContent.getAppId());
                 }
 
                 // 如果成功的session列表中不包括手机，则需要推送离线消息。
@@ -224,8 +222,8 @@ public class GroupMessageService {
 
     }
 
-    private void syncToSender(GroupChatMessageContent content,ClientInfo clientInfo, OfflinePushInfo offlinePushInfo) {
-        messageProducer.sendToUserExceptClient(content.getFromId(),GroupEventCommand.MSG_GROUP,content,clientInfo);
+    private void syncToSender(GroupChatMessageContent content, ClientInfo clientInfo, OfflinePushInfo offlinePushInfo) {
+        messageProducer.sendToUserExceptClient(content.getFromId(), GroupEventCommand.MSG_GROUP, content, clientInfo);
     }
 
 

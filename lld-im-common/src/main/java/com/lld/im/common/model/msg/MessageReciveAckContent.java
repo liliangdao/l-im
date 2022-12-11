@@ -15,8 +15,11 @@ public class MessageReciveAckContent extends ClientInfo {
 
     private int conversationType;
 
-    //原消息的发送方
+    //原来消息的接收方
     private String fromId;
+
+    //原来消息的发送方
+    private String toId;
 
     private Long messageKey;
 

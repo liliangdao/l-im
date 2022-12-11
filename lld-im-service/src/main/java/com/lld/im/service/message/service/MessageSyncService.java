@@ -101,7 +101,8 @@ public class MessageSyncService {
     }
 
     /**
-     * @description: 消息接收方ack，待考虑多个client的情况。如果使用服务端重传机制，可以不做此处理。
+     * @description: 消息接收方ack，待考虑多个client的情况。
+     * 如果使用服务端重传机制，可以不做此处理。
      * @param
      * @return void
      * @author lld

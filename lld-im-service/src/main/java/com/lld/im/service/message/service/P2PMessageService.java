@@ -109,7 +109,7 @@ public class P2PMessageService {
                 BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
                 offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
                 messageStoreService.storeOffLineMessage(offlineMessageContent);
-                List<ClientInfo> clientInfos = dispatchMessage(p2pMessage, chatMessageData.getOfflinePushInfo());
+                List<ClientInfo> clientInfos = dispatchMessage(p2pMessage , chatMessageData.getOfflinePushInfo());
                 if(clientInfos.isEmpty()){
                     //服务端代替客户端发送消息确认ack给发送方
                     revicerAck(chatMessageData,true);
@@ -154,10 +154,6 @@ public class P2PMessageService {
     public void  doProcessMessage(ChatMessageContent chatMessageData){
         //插入历史库和msgBody
         messageStoreService.storeP2PMessage(chatMessageData);
-        //回包
-        ack(chatMessageData,ResponseVO.successResponse());
-
-        syncToSender(chatMessageData,chatMessageData,chatMessageData.getOfflinePushInfo());
 
         //插入离线库redis
         OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
@@ -165,9 +161,12 @@ public class P2PMessageService {
         offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
         messageStoreService.storeOffLineMessage(offlineMessageContent);
 
+        //回包
+        ack(chatMessageData,ResponseVO.successResponse());
+        syncToSender(chatMessageData,chatMessageData,chatMessageData.getOfflinePushInfo());
+
         //消息分发
         List<ClientInfo> clientInfos = dispatchMessage(chatMessageData, chatMessageData.getOfflinePushInfo());
-
         messageStoreService.setMessageFromMessageIdCache(chatMessageData);
 
         if(clientInfos.isEmpty()){
