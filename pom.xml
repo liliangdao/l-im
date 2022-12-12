@@ -21,6 +21,7 @@
         <module>lld-im-common</module>
         <module>lld-im-codec</module>
         <module>lld-im-message-store</module>
+        <module>lld-im-service</module>
     </modules>
 
     <properties>

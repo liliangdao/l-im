@@ -6,7 +6,6 @@
         <groupId>com.lld</groupId>
         <artifactId>lld-im</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.lld.im</groupId>
     <artifactId>lld-im-service</artifactId>
