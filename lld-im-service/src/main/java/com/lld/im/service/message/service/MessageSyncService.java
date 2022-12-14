@@ -111,13 +111,13 @@ public class MessageSyncService {
     public void receiveMark(MessageReciveAckContent message) {
         shareThreadPool.submit(() -> {
             conversationService.messageMarkRecive(message);
-            messageProducer.sendToUser(message.getFromId(),MessageCommand.MSG_READED_ACK,message,message.getAppId());
+            messageProducer.sendToUser(message.getFromId(),MessageCommand.MSG_RECIVE_ACK,message,message.getAppId());
         });
     }
 
     private void ack(ClientInfo clientInfo, MessageReadedAck readAck, String fromId) {
         ResponseVO<Object> wrappedResp = ResponseVO.successResponse(readAck);
-        messageProducer.sendToUserAppointedClient(fromId, MessageCommand.MSG_READED_ACK, wrappedResp,
+        messageProducer.sendToUserAppointedClient(fromId, MessageCommand.MSG_RECIVE_ACK, wrappedResp,
                 new ClientInfo(clientInfo.getAppId(),clientInfo.getClientType(),clientInfo.getImei()));
     }
 

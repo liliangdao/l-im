@@ -415,6 +415,7 @@
         //客户端收到服务器消息的时候就会执行这个回调方法
         socket.onmessage = function (event) {
             var ta = document.getElementById("responseText");
+            var userId = document.getElementById("userId").value;
 
             var bytebuf = new ByteBuffer(event.data);
             let byteBuffer = bytebuf.int32().int32().unpack();
@@ -450,23 +451,48 @@
                 // data.conversationId = "0_" + data.toId + "_" + data.fromId;
                 // data.conversationType = 0;
 
-                var rAck = {
-                    "fromId":data.toId,
-                    "toId":data.fromId,
-                    "messageKey":data.messageKey,
-                    "messageId":data.messageId,
-                    "messageSequence":data.messageSequence,
+                if(userId != data.fromId){
+                    var rAck = {
+                        "fromId":userId,
+                        "toId":data.fromId,
+                        "messageKey":data.messageKey,
+                        "messageId":data.messageId,
+                        "messageSequence":data.messageSequence,
+                    }
+
+                    let messageReciver = new ByteBuffer();
+                    var jsonData = JSON.stringify(rAck);
+                    let bodyLen = jsonData.length;
+                    messageReciver.int32(1107)
+                        .int32(version).int32(clientType)
+                        .int32(messageType).int32(appId)
+                        .int32(imeiLen).int32(bodyLen).vstring(imei,imeiLen)
+                        .vstring(jsonData, bodyLen);
+                    socket.send(messageReciver.pack());
                 }
 
-                let messageReciver = new ByteBuffer();
-                var jsonData = JSON.stringify(rAck);
-                let bodyLen = jsonData.length;
-                messageReciver.int32(1107)
-                    .int32(version).int32(clientType)
-                    .int32(messageType).int32(appId)
-                    .int32(imeiLen).int32(bodyLen).vstring(imei,imeiLen)
-                    .vstring(jsonData, bodyLen);
-                socket.send(messageReciver.pack());
+                if(clientType == 1 ){
+                    let messageReader = new ByteBuffer();
+                    var toId = data.fromId;
+                    if(data.fromId == userId){
+                        toId = data.toId;
+                    }
+                    var readedData = {
+                        "fromId":userId,
+                        "toId":toId,
+                        "conversationType":0,
+                        "messageSequence":data.messageSequence,
+                    }
+                    var readData = JSON.stringify(readedData);
+                    let readBodyLen = readData.length;
+                    messageReader.int32(1106)
+                        .int32(version).int32(clientType)
+                        .int32(messageType).int32(appId)
+                        .int32(imeiLen).int32(readBodyLen).vstring(imei,imeiLen)
+                        .vstring(readData, readBodyLen);
+                    socket.send(messageReader.pack());
+                }
+
             }else if(command == 9999){
                 var msg = eval("(" + msgBody + ")");
                 console.log(msg)

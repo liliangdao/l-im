@@ -35,9 +35,6 @@ public enum MessageCommand implements Command {
     //批量转发消息ACK
     BATCH_MSG_ACK(0x419),
 
-    //消息已读回包  1107
-    MSG_READED_ACK(0x453),
-
     //消息撤回 1050
     MSG_RECALL(0x41A),
 
@@ -52,9 +49,6 @@ public enum MessageCommand implements Command {
 
     //批量消息转发 1120
     MSG_BATCH(0x460),
-
-    //单聊消息接收确认  1046
-    MSG_P2P_RECEIVED(0x416),
 
     //群聊消息接收确认 1047
     MSG_GROUP_RECEIVED(0x417),

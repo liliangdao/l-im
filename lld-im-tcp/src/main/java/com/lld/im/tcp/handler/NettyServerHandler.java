@@ -172,7 +172,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             //PING
             ctx.channel().attr(AttributeKey.valueOf(Constants.ReadTime))
                     .set(System.currentTimeMillis());
-        } else if (command == MessageCommand.MSG_P2P.getCommand() || command == GroupEventCommand.MSG_GROUP.getCommand()) {
+        } else if (command == MessageCommand.MSG_P2P.getCommand()
+                || command == GroupEventCommand.MSG_GROUP.getCommand()) {
             try {
                 CheckSendMessageReq req = new CheckSendMessageReq();
                 req.setCommand(command);
