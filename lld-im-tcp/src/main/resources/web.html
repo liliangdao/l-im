@@ -493,7 +493,36 @@
                     socket.send(messageReader.pack());
                 }
 
-            }else if(command == 9999){
+            }else if(command == 2104){
+                var d = JSON.parse(msgBody)
+                var data = d.data;
+                let userId = document.getElementById('userId').value;
+
+                if(clientType == 1){
+                    let messageReader = new ByteBuffer();
+                    var toId = data.fromId;
+                    if(data.fromId == userId){
+                        toId = data.toId;
+                    }
+                    var readedData = {
+                        "fromId":userId,
+                        "toId":data.fromId,
+                        "groupId":data.groupId,
+                        "conversationType":1,
+                        "messageSequence":data.messageSequence,
+                    }
+                    var readData = JSON.stringify(readedData);
+                    let readBodyLen = readData.length;
+                    messageReader.int32(2106)
+                        .int32(version).int32(clientType)
+                        .int32(messageType).int32(appId)
+                        .int32(imeiLen).int32(readBodyLen).vstring(imei,imeiLen)
+                        .vstring(readData, readBodyLen);
+                    socket.send(messageReader.pack());
+                }
+            }
+
+            else if(command == 9999){
                 var msg = eval("(" + msgBody + ")");
                 console.log(msg)
                 console.log(userId)
@@ -559,7 +588,7 @@
 
             var data = {"userId": userId, "appId": 10000, "clientType": clientType, "imei": imei,"customStatus":null,"customClientName":""};
             var jsonData = JSON.stringify(data);
-			console.log(jsonData);
+            console.log(jsonData);
 
             var bodyLen = jsonData.length;
             var imeiLen = getLen(imei);
@@ -606,15 +635,15 @@
             var messageType = 0x0;
 
             var userId = userId;
-			
-			if(command == null || command == ''){
-				command = 1103;
-			}
 
-			if(imei == null){
+            if(command == null || command == ''){
+                command = 1103;
+            }
+
+            if(imei == null){
                 imei = "web"
             }
-			if(appId == null){
+            if(appId == null){
                 appId = '10000'
             }
             appId = parseInt(appId);
@@ -628,21 +657,21 @@
             }
 
             var messageId = uuid();
-			if(msg === 'lld'){
+            if(msg === 'lld'){
                 messageId = msg;
             }
-			var messageData = {};
+            var messageData = {};
             if(command == 1103){
-				messageData = {
-					"messageId": messageId,
-					"fromId": userId,
-					"toId": toId,
-					"appId": appId,
-					"clientType": clientType,
-					"imei": imei,
-					"messageBody": msg
-				}
-			}else if (command == 2104){
+                messageData = {
+                    "messageId": messageId,
+                    "fromId": userId,
+                    "toId": toId,
+                    "appId": appId,
+                    "clientType": clientType,
+                    "imei": imei,
+                    "messageBody": msg
+                }
+            }else if (command == 2104){
                 messageData = {
                     "messageId": messageId,
                     "fromId": userId,
@@ -653,8 +682,8 @@
                     "messageBody": msg
                 }
             }else{
-				messageData = JSON.parse(msg)
-			}
+                messageData = JSON.parse(msg)
+            }
             // data.data = messageData;
 
             var jsonData = JSON.stringify(messageData);
@@ -700,7 +729,7 @@
     <input type="button" value="login" onclick="login(this.form.userId.value,this.form.toUser.value,this.form.clientType.value
     ,this.form.imei.value,this.form.appId.value);">
 
-	<textarea placeholder="输入command" name="command" style="width: 200px;height: 20px"></textarea>
+    <textarea placeholder="输入command" name="command" style="width: 200px;height: 20px"></textarea>
 
     <textarea placeholder="输入要发送的内容" name="message" style="width: 200px;height: 20px"></textarea>
 
