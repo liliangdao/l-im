@@ -83,4 +83,8 @@ public class AppConfig {
 
     private Integer offlineMessageCount;//离线消息存储条数
 
+    private Integer deleteConversationSyncMode;//删除会话多端同步策略 1多端同步
+
+    private Integer deleteConversationSyncDeleteDataMode;//删除会话是否删除远端会话资料 1删除
+
 }

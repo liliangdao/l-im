@@ -4,13 +4,20 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lld.im.common.ResponseVO;
+import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
+import com.lld.im.common.enums.ConversationErrorCode;
+import com.lld.im.common.enums.command.ConversationEventCommand;
+import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.SyncReq;
 import com.lld.im.common.model.SyncResp;
 import com.lld.im.common.model.msg.MessageReadedContent;
 import com.lld.im.common.model.msg.MessageReciveAckContent;
 import com.lld.im.service.conversation.dao.ImConversationSetEntity;
 import com.lld.im.service.conversation.dao.mapper.ImConversationSetMapper;
+import com.lld.im.service.conversation.model.req.DeleteConversationReq;
+import com.lld.im.service.conversation.model.req.UpdateConversationReq;
+import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.service.seq.Seq;
 import com.lld.im.service.utils.WriteUserSeq;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +46,12 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
 
     @Autowired
     WriteUserSeq writeUserSeq;
+
+    @Autowired
+    MessageProducer messageProducer;
+
+    @Autowired
+    AppConfig appConfig;
 
     public String convertConversationId(int type, String fromId, String toId) {
         //弄成util类抽出来
@@ -123,4 +136,65 @@ public class ConversationService extends ServiceImpl<ImConversationSetMapper, Im
         }
     }
 
+    /**
+     * @description 是否需要删除服务端的会话设置？比如置顶 免打扰，如果需要则修改数据库中数据，不需要则直接判断是否需要同步给其他端
+     * @author chackylee
+     * @date 2022/12/15 9:19
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+    */
+    public ResponseVO deleteConversation(DeleteConversationReq req) {
+//        QueryWrapper<ImConversationSetEntity> query = new QueryWrapper<>();
+//        query.eq("conversation_id", req.getConversationId());
+//        query.eq("app_id", req.getAppId());
+//        ImConversationSetEntity conversationSet = imConversationSetMapper.selectOne(query);
+//        if(conversationSet != null){
+//            conversationSet.setIsTop(0);
+//            conversationSet.setIsMute(0);
+//            long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Conversation);
+//            conversationSet.setSequence(seq);
+//            imConversationSetMapper.update(conversationSet,query);
+//        }
+
+        if(appConfig.getDeleteConversationSyncMode() == 1){
+            messageProducer.sendToUserExceptClient(req.getFromId(), ConversationEventCommand.CONVERSATION_DELETE
+                    ,new Object(),new ClientInfo(req.getAppId(),req.getClientType(),req.getImei()));
+        }
+        return ResponseVO.successResponse();
+    }
+
+    /**
+     * @description 是否需要删除服务端的会话设置？比如置顶 免打扰，如果需要则修改数据库中数据，不需要则直接判断是否需要同步给其他端
+     * @author chackylee
+     * @date 2022/12/15 9:19
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+     */
+    public ResponseVO updateConversation(UpdateConversationReq req) {
+
+        if(req.getIsTop() == null && req.getIsMute() == null){
+            return ResponseVO.errorResponse(ConversationErrorCode.CONVERSATION_UPDATE_PARAM_ERROR);
+        }
+
+        QueryWrapper<ImConversationSetEntity> query = new QueryWrapper<>();
+        query.eq("conversation_id", req.getConversationId());
+        query.eq("app_id", req.getAppId());
+        ImConversationSetEntity conversationSet = imConversationSetMapper.selectOne(query);
+        if(conversationSet != null){
+            long seq = this.seq.getSeq(req.getAppId() + ":" + Constants.SeqConstants.Conversation);
+            if(req.getIsTop() != null){
+
+                conversationSet.setIsTop(req.getIsTop());
+            }
+            if(req.getIsMute() != null){
+                conversationSet.setIsMute(req.getIsMute());
+            }
+            conversationSet.setSequence(seq);
+            imConversationSetMapper.update(conversationSet,query);
+            messageProducer.sendToUserExceptClient(req.getFromId(), ConversationEventCommand.CONVERSATION_UPDATE
+                    ,new Object(),new ClientInfo(req.getAppId(),req.getClientType(),req.getImei()));
+        }
+
+        return ResponseVO.successResponse();
+    }
 }

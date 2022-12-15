@@ -3,6 +3,8 @@ package com.lld.im.common.enums.command;
 
 public enum CommandType  {
 
+    CONVERSATION("5"),
+
     USER("4"),
 
     FRIEND("3"),

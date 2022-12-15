@@ -91,7 +91,9 @@ appConfig:
   sendMessageBeforeCallback: false # 发送单聊消息之前
   sendGroupMessageAfterCallback: false # 发送群聊消息之后
   sendGroupMessageBeforeCallback: false # 发送群聊消息之前
-  offlineMessageCount: 10 #离线消息存储条数
+  offlineMessageCount: 10 # 离线消息存储条数
+  deleteConversationSyncMode: 1 # 删除会话是否多端同步 1多端同步 2不同步
+  deleteConversationSyncDeleteDataMode: 1 # 删除会话是否删除远端会话资料 1删除
 
 
 mqQueueName: 123

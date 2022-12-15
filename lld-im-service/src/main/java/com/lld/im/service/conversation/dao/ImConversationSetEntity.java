@@ -22,9 +22,9 @@ public class ImConversationSetEntity {
 
     private String toId;
 
-    private int isMute;
+    private Integer isMute;
 
-    private int isTop;
+    private Integer isTop;
 
     private Long sequence;
 
