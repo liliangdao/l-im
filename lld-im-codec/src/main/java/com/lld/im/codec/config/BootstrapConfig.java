@@ -35,6 +35,10 @@ public class BootstrapConfig {
 
         private String logicUrl;
 
+        private String sslPath;
+
+        private String sslPassword;
+
         /**
          * redis配置
          */

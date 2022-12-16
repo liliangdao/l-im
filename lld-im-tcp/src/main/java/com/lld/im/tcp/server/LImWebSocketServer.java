@@ -3,6 +3,7 @@ package com.lld.im.tcp.server;
 import com.lld.im.codec.config.BootstrapConfig;
 import com.lld.im.codec.WebSocketMessageDecoder;
 import com.lld.im.codec.WebSocketMessageEncoder;
+import com.lld.im.common.utils.SSLContextUtil;
 import com.lld.im.tcp.handler.NettyServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -12,9 +13,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 
 /**
  * @author: Chackylee
@@ -49,6 +54,15 @@ public class LImWebSocketServer {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
+
+                        SSLContext sslContext = SSLContextUtil.createSSLContext("JKS", config.getSslPath(),config.getSslPassword());
+//                            SSLContext sslContext = SSLContextUtil.createSSLContext("JKS", "D:\\WYProject\\fallrainboot\\demo.liukun.com.keystore","123456");
+//                            SSLContext sslContext = SSLContextUtil.createSSLContext("JKS", "D:\\WYProject\\JgServer\\src\\main\\resources\\wss.jks","netty123");
+                        SSLEngine sslEngine = sslContext.createSSLEngine();
+//                        sslEngine.setNeedClientAuth(false);
+//                        sslEngine.setUseClientMode(false);
+                        pipeline.addFirst("ssl", new SslHandler(sslEngine));
+
                         // websocket 基于http协议，所以要有http编解码器
                         pipeline.addLast("http-codec",new HttpServerCodec());
                         // 对写大数据流的支持
