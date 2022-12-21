@@ -55,13 +55,13 @@ public class LImWebSocketServer {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
 
-                        SSLContext sslContext = SSLContextUtil.createSSLContext("JKS", config.getSslPath(),config.getSslPassword());
+//                        SSLContext sslContext = SSLContextUtil.createSSLContext("JKS", config.getSslPath(),config.getSslPassword());
 //                            SSLContext sslContext = SSLContextUtil.createSSLContext("JKS", "D:\\WYProject\\fallrainboot\\demo.liukun.com.keystore","123456");
 //                            SSLContext sslContext = SSLContextUtil.createSSLContext("JKS", "D:\\WYProject\\JgServer\\src\\main\\resources\\wss.jks","netty123");
-                        SSLEngine sslEngine = sslContext.createSSLEngine();
+//                        SSLEngine sslEngine = sslContext.createSSLEngine();
 //                        sslEngine.setNeedClientAuth(false);
 //                        sslEngine.setUseClientMode(false);
-                        pipeline.addFirst("ssl", new SslHandler(sslEngine));
+//                        pipeline.addFirst("ssl", new SslHandler(sslEngine));
 
                         // websocket 基于http协议，所以要有http编解码器
                         pipeline.addLast("http-codec",new HttpServerCodec());

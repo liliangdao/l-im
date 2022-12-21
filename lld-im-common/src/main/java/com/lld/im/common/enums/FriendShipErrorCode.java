@@ -41,6 +41,8 @@ public enum FriendShipErrorCode implements ApplicationExceptionEnum {
 
     FRIEND_SHIP_GROUP_CREATE_ERROR(30015,"好友分组创建失败"),
 
+    TO_IS_YOUR_FRIEND(30002,"对方已经是你的好友"),
+
     ;
 
     private int code;

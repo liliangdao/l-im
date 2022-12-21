@@ -28,7 +28,7 @@ public interface ImConversationSetMapper extends BaseMapper<ImConversationSetEnt
             "  readed_sequence = VALUES (readed_sequence) ")
     public int markConversation(ImConversationSetEntity entity);
 
-    @Update(" UPDATE im_conversation_set set readed_sequence = #{readedSequence}" +
+    @Update(" UPDATE im_conversation_set set readed_sequence = #{readedSequence} " +
             " and sequence = #{sequence} where conversation_id = #{conversationId} and app_id = #{appId} and readed_sequence < #{readedSequence}")
     public int readMessage(ImConversationSetEntity entity);
 

@@ -244,7 +244,6 @@ public class ImGroupServiceImpl implements ImGroupService {
                 pack, new ClientInfo(req.getAppId(), req.getClientType(), req.getImei()));
         if (appConfig.isModifyGroupAfterCallback()) {
             callbackService.callback(req.getAppId(), Constants.CallbackCommand.UpdateGroupAfter, JSONObject.toJSONString(imGroupDataMapper.selectOne(query)));
-
         }
 
         return ResponseVO.successResponse();

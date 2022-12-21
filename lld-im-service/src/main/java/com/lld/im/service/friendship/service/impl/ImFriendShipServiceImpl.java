@@ -187,6 +187,21 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                     }
                 } else {
                     try {
+
+                        QueryWrapper<ImFriendShipEntity> query = new QueryWrapper<>();
+                        query.eq("app_id",req.getAppId());
+                        query.eq("from_id",req.getFromId());
+                        query.eq("to_id",toId);
+                        ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(query);
+                        if(fromItem != null || (fromItem.getStatus() != null &&
+                                fromItem.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_NO_FRIEND.getStatus())){
+                            resp.setCode(FriendShipErrorCode.TO_IS_YOUR_FRIEND.getCode());
+                            resp.setMsg(FriendShipErrorCode.TO_IS_YOUR_FRIEND.getError());
+                            resp.setToId(toId);
+                            result.add(resp);
+                            continue;
+                        }
+
                         ResponseVO doAddFriend = imFriendShipService.doAddFriend(req, req.getFromId(), dto);
                         resp.setCode(doAddFriend.getCode());
                         resp.setMsg(doAddFriend.getMsg());
@@ -690,6 +705,9 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
                 .eq("app_id", req.getAppId())
                 .eq("to_id", req.getToId());
         ImFriendShipEntity fromItem = imFriendShipMapper.selectOne(queryFrom);
+        if(fromItem == null){
+            return ResponseVO.errorResponse(FriendShipErrorCode.REPEATSHIP_IS_NOT_EXIST);
+        }
         if (fromItem.getStatus() == FriendShipStatusEnum.FRIEND_STATUS_DELETED.getStatus()) {
             throw new ApplicationException(FriendShipErrorCode.FRIEND_IS_DELETED);
         }
@@ -703,6 +721,7 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
         DeleteFriendPack deleteFriendPack = new DeleteFriendPack();
         deleteFriendPack.setFromId(req.getFromId());
         deleteFriendPack.setToId(req.getToId());
+        deleteFriendPack.setSequence(seq);
 
         writeUserSeq.writeUserSeq(req.getAppId(), req.getFromId(), Constants.SeqConstants.FriendshipBlack, seq);
 

@@ -27,6 +27,7 @@ import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.model.req.GetUserInfoReq;
 import com.lld.im.service.user.model.resp.GetUserInfoResp;
 import com.lld.im.service.user.service.ImUserService;
+import com.lld.im.service.utils.WriteUserSeq;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,7 +46,6 @@ import java.util.List;
 @Service
 public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestService {
 
-
     @Autowired
     ImFriendShipRequestMapper imFriendShipRequestMapper;
 
@@ -61,6 +61,9 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
 
     @Autowired
     ImFriendShipService imFriendShipService;
+
+    @Autowired
+    WriteUserSeq writeUserSeq;
 
     @Override
     @Transactional
@@ -102,6 +105,10 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
                         FriendShipErrorCode.ADD_FRIEND_REQUEST_ERROR.getError());
             }
         }
+
+        writeUserSeq.writeUserSeq(request.getAppId(),
+                request.getToId(),Constants.SeqConstants.FriendshipRequest,
+                seq);
 
         //发送好友申请的tcp给接收方
         messageProducer.sendToUser(dto.getToId(), null, "", FriendshipEventCommand.FRIEND_REQUEST,
@@ -160,11 +167,16 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
         query.eq("to_id", req.getFromId());
 
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
+        long seq = this.seq.getSeq(req.getAppId() + Constants.SeqConstants.FriendshipRequest);
         update.setReadStatus(1);
+        update.setSequence(seq);
         imFriendShipRequestMapper.update(update, query);
-
+        writeUserSeq.writeUserSeq(req.getAppId(),
+                req.getFromId(),Constants.SeqConstants.FriendshipRequest,
+                seq);
         ReadAllFriendRequestPack readAllFriendRequestPack = new ReadAllFriendRequestPack();
         readAllFriendRequestPack.setFromId(req.getFromId());
+        readAllFriendRequestPack.setSequence(seq);
         //TCP通知
         messageProducer.sendToUser(req.getFromId(),req.getClientType(),req.getImei(),FriendshipEventCommand
                 .FRIEND_REQUEST_READ,readAllFriendRequestPack,req.getAppId());
@@ -176,7 +188,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
      * @description 审批好友请求 1同意 2拒绝
      * @author chackylee
      * @date 2022/8/3 14:09
-     * @param [req]
+     * @param
      * @return com.lld.im.common.ResponseVO
     */
     @Override
@@ -188,19 +200,22 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
             throw new ApplicationException(FriendShipErrorCode.FRIEND_REQUEST_IS_NOT_EXIST);
         }
 
+        if(!req.getOperater().equals(imFriendShipRequestEntity.getToId())){
+            //只能审批发给自己的好友请求
+            throw new ApplicationException(FriendShipErrorCode.NOT_APPROVER_OTHER_MAN_REQUEST);
+        }
+
         ImFriendShipRequestEntity update = new ImFriendShipRequestEntity();
         long seq = this.seq.getSeq(req.getAppId() + Constants.SeqConstants.FriendshipRequest);
         update.setSequence(seq);
         update.setApproveStatus(req.getStatus());
         update.setUpdateTime(System.currentTimeMillis());
-
         update.setId(req.getId());
         imFriendShipRequestMapper.updateById(update);
 
-        if(!req.getOperater().equals(imFriendShipRequestEntity.getToId())){
-            //只能审批发给自己的好友请求
-            throw new ApplicationException(FriendShipErrorCode.NOT_APPROVER_OTHER_MAN_REQUEST);
-        }
+        writeUserSeq.writeUserSeq(req.getAppId(),
+                req.getOperater(),Constants.SeqConstants.FriendshipRequest,
+                seq);
 
         if(ApproverFriendRequestStatusEnum.AGREE.getCode() == req.getStatus()){
             //同意 ===> 去执行添加好友逻辑
@@ -221,6 +236,7 @@ public class ImFriendShipRequestServiceImpl implements ImFriendShipRequestServic
 
         ApproverFriendRequestPack approverFriendRequestPack = new ApproverFriendRequestPack();
         approverFriendRequestPack.setId(req.getId());
+        approverFriendRequestPack.setSequence(seq);
         approverFriendRequestPack.setStatus(req.getStatus());
         messageProducer.sendToUser(imFriendShipRequestEntity.getToId(),req.getClientType(),req.getImei(),FriendshipEventCommand
         .FRIEND_REQUEST_APPROVER,approverFriendRequestPack,req.getAppId());
