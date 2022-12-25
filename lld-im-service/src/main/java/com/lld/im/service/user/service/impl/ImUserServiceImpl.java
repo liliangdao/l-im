@@ -8,15 +8,13 @@ import com.lld.im.common.config.AppConfig;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.DelFlagEnum;
 import com.lld.im.common.enums.command.UserEventCommand;
+import com.lld.im.service.group.service.ImGroupService;
 import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.user.dao.ImUserDataEntity;
 import com.lld.im.service.user.dao.mapper.ImUserDataMapper;
 import com.lld.im.common.enums.UserErrorCode;
 import com.lld.im.common.exception.ApplicationException;
-import com.lld.im.service.user.model.req.DeleteUserReq;
-import com.lld.im.service.user.model.req.GetUserInfoReq;
-import com.lld.im.service.user.model.req.ImportUserReq;
-import com.lld.im.service.user.model.req.ModifyUserInfoReq;
+import com.lld.im.service.user.model.req.*;
 import com.lld.im.service.user.model.resp.GetUserInfoResp;
 import com.lld.im.service.user.model.resp.ImportUserResp;
 import com.lld.im.service.user.service.ImUserService;
@@ -25,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +50,12 @@ public class ImUserServiceImpl implements ImUserService {
 
     @Autowired
     MessageProducer messageProducer;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    ImGroupService imGroupService;
 
     /**
      * @description 導入用戶
@@ -247,5 +252,13 @@ public class ImUserServiceImpl implements ImUserService {
             throw new ApplicationException(UserErrorCode.MODIFY_USER_ERROR);
         }
 
+    }
+
+    @Override
+    public ResponseVO getUserSequence(GetUserSequenceReq req) {
+        Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries(req.getAppId() + ":" + Constants.RedisConstants.SeqPrefix + ":" + req.getUserId());
+        Long userGroupMaxSeq = imGroupService.getUserGroupMaxSeq(req.getUserId(),null, req.getAppId());
+        entries.put(Constants.SeqConstants.Group,userGroupMaxSeq);
+        return ResponseVO.successResponse(entries);
     }
 }

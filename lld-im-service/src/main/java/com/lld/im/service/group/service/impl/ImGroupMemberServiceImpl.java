@@ -237,8 +237,8 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
      * @date 2022/8/18 10:13
      */
     @Override
-    public ResponseVO<Collection<String>> syncMemberJoinedGroup(SyncReq req) {
-        return ResponseVO.successResponse(imGroupMemberMapper.syncJoinedGroupId(req.getAppId(), req.getOperater(), GroupMemberRoleEnum.LEAVE.getCode()));
+    public ResponseVO<Collection<String>> syncMemberJoinedGroup(String userId,Integer appId) {
+        return ResponseVO.successResponse(imGroupMemberMapper.syncJoinedGroupId(appId, userId, GroupMemberRoleEnum.LEAVE.getCode()));
     }
 
     /**

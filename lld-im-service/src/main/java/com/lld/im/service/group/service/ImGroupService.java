@@ -5,6 +5,8 @@ import com.lld.im.common.model.SyncReq;
 import com.lld.im.service.group.dao.ImGroupEntity;
 import com.lld.im.service.group.model.req.*;
 
+import java.util.Collection;
+
 /**
  * @description:
  * @author: lld
@@ -32,4 +34,6 @@ public interface ImGroupService {
     public ResponseVO getGroup(GetGroupReq req);
 
     public ResponseVO muteGroup(MuteGroupReq req);
+
+    public Long getUserGroupMaxSeq(String userId,Collection<String> groupIds,Integer appId);
 }

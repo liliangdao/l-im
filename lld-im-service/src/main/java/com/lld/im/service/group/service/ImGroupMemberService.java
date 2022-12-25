@@ -30,7 +30,7 @@ public interface ImGroupMemberService {
 
     public ResponseVO<Collection<String>> getMemberJoinedGroup(GetJoinedGroupReq req);
 
-    public ResponseVO<Collection<String>> syncMemberJoinedGroup(SyncReq req);
+    public ResponseVO<Collection<String>> syncMemberJoinedGroup(String userId,Integer appId);
 
     public ResponseVO<List<GroupMemberDto>> getGroupMember(String groupId,Integer appId);
 

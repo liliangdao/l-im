@@ -1,11 +1,8 @@
 package com.lld.im.service.user.service;
 
 import com.lld.im.common.ResponseVO;
-import com.lld.im.service.user.model.req.DeleteUserReq;
-import com.lld.im.service.user.model.req.GetUserInfoReq;
-import com.lld.im.service.user.model.req.ImportUserReq;
+import com.lld.im.service.user.model.req.*;
 import com.lld.im.service.user.dao.ImUserDataEntity;
-import com.lld.im.service.user.model.req.ModifyUserInfoReq;
 import com.lld.im.service.user.model.resp.GetUserInfoResp;
 
 import java.util.List;
@@ -32,4 +29,5 @@ public interface ImUserService {
     public ResponseVO modifyUserInfo(ModifyUserInfoReq req);
 
 
+    public ResponseVO getUserSequence(GetUserSequenceReq req);
 }

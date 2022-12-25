@@ -6,10 +6,7 @@ import com.lld.im.common.route.RouteHandle;
 import com.lld.im.common.route.RouteInfo;
 import com.lld.im.common.utils.RouteInfoParseUtil;
 import com.lld.im.service.service.ImService;
-import com.lld.im.service.user.model.req.DeleteUserReq;
-import com.lld.im.service.user.model.req.ImportUserReq;
-import com.lld.im.service.user.model.req.LoginReq;
-import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
+import com.lld.im.service.user.model.req.*;
 import com.lld.im.service.user.service.ImUserService;
 import com.lld.im.service.user.service.UserStatusService;
 import org.slf4j.Logger;
@@ -72,6 +69,17 @@ public class ImUserController {
             return ResponseVO.successResponse(route);
         }
         return login;
+    }
+
+    /**
+     * @description getSequenceInfo
+     * @author chackylee
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+     */
+    @RequestMapping("/getUserSequence")
+    public ResponseVO getUserSequence(@RequestBody @Validated GetUserSequenceReq req){
+        return ResponseVO.successResponse(imUserService.getUserSequence(req));
     }
 
     /**

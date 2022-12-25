@@ -307,7 +307,7 @@ public class ImGroupServiceImpl implements ImGroupService {
 
         SyncResp resp = new SyncResp();
 
-        ResponseVO<Collection<String>> memberJoinedGroup = groupMemberService.syncMemberJoinedGroup(req);
+        ResponseVO<Collection<String>> memberJoinedGroup = groupMemberService.syncMemberJoinedGroup(req.getOperater(),req.getAppId());
         if (memberJoinedGroup.isOk()) {
 
             Collection<String> data = memberJoinedGroup.getData();
@@ -321,7 +321,7 @@ public class ImGroupServiceImpl implements ImGroupService {
             List<ImGroupEntity> imGroupEntities = imGroupDataMapper.selectList(query);
             if (!CollectionUtil.isEmpty(imGroupEntities)) {
                 ImGroupEntity imGroupEntity = imGroupEntities.get(imGroupEntities.size() - 1);
-                Long memberJoinedGroupMaxSeq = imGroupDataMapper.getMemberJoinedGroupMaxSeq(req.getAppId(), data);
+                Long memberJoinedGroupMaxSeq = this.getUserGroupMaxSeq(req.getOperater(), data,req.getAppId());
                 resp.setCompleted(imGroupEntity.getSequence() >= memberJoinedGroupMaxSeq);
                 resp.setDataList(imGroupEntities);
                 resp.setMaxSequence(memberJoinedGroupMaxSeq);
@@ -330,6 +330,17 @@ public class ImGroupServiceImpl implements ImGroupService {
         }
 
         return memberJoinedGroup;
+    }
+
+    @Override
+    public Long getUserGroupMaxSeq(String userId,Collection<String> groupIds,Integer appId) {
+
+        if(CollectionUtils.isEmpty(groupIds)){
+            ResponseVO<Collection<String>> memberJoinedGroup = groupMemberService.syncMemberJoinedGroup(userId,appId);
+            groupIds = memberJoinedGroup.getData();
+        }
+        Long memberJoinedGroupMaxSeq = imGroupDataMapper.getMemberJoinedGroupMaxSeq(appId, groupIds);
+        return memberJoinedGroupMaxSeq;
     }
 
     /**
