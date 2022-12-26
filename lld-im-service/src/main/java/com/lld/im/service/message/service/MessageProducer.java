@@ -8,6 +8,7 @@ import com.lld.im.common.ClientType;
 import com.lld.im.common.ResponseVO;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.Command;
+import com.lld.im.common.enums.command.GroupEventCommand;
 import com.lld.im.common.enums.command.MessageCommand;
 import com.lld.im.common.model.ClientInfo;
 import com.lld.im.common.model.UserSession;
@@ -97,7 +98,7 @@ public class MessageProducer {
         JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(bizData));
         //msgId要特殊处理，如果是回包消息，data里不需要填充msgId,把里层的msgId赋值给外层。
         //如果是其他类型的消息，data里面和外面的 msgId需要保持一致，如果data里没有msgId,那么需要生成一个插入。
-        if(command == MessageCommand.MSG_ACK || command == MessageCommand.GROUP_MSG_ACK) {
+        if(command == MessageCommand.MSG_ACK || command == GroupEventCommand.GROUP_MSG_ACK) {
             ResponseVO<ChatMessageAck> ackData = (ResponseVO<ChatMessageAck>) bizData;
             String ackMsgId = ackData.getData().getMessageId();
             msgPack.setMessageId(ackMsgId);

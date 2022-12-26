@@ -163,7 +163,7 @@ public class GroupMessageService {
         logger.info("msg ack,msgId = {},msgSeq ={}，checkResult = {}", content.getMessageId(), content.getMessageSequence(), result);
         ChatMessageAck ackData = new ChatMessageAck(content.getMessageId(), content.getMessageSequence());
         result.setData(ackData);
-        messageProducer.sendToUserAppointedClient(content.getFromId(), MessageCommand.GROUP_MSG_ACK, result, content);
+        messageProducer.sendToUserAppointedClient(content.getFromId(), GroupEventCommand.GROUP_MSG_ACK, result, content);
     }
 
     /**
