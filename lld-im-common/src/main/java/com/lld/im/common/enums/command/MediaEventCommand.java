@@ -24,10 +24,10 @@ public enum MediaEventCommand implements Command {
     HANG_UP(6006),
 
     //6007  拒绝
-    REJECT_Call(6007),
+    REJECT_CALL(6007),
 
     //6008  取消呼叫
-    CANCEL_Call(6008),
+    CANCEL_CALL(6008),
 
 
     ;
