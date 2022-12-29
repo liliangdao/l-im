@@ -162,8 +162,9 @@ public class MessageSyncService {
             //获取最后一条，判断最后一条的seq和maxSeq做对比
             OfflineMessageContent offlineMessageContent = respList.get(respList.size() - 1);
             resp.setCompleted(maxSeq >= offlineMessageContent.getMessageSequence());
+            return ResponseVO.successResponse(resp);
         }
-
+        resp.setCompleted(true);
         return ResponseVO.successResponse(resp);
     }
 
