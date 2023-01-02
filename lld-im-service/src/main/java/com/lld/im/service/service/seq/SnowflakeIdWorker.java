@@ -1,110 +1,127 @@
 package com.lld.im.service.service.seq;
 
+
+import cn.hutool.core.date.SystemClock;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author: Chackylee
  * @description:
- * @create: 2022-05-19 10:39
  **/
+@Slf4j
 public class SnowflakeIdWorker {
-    // ==============================Fields==================
-    /** 开始时间截 (2019-08-06) */
-    private final long twepoch = 1565020800000L;
 
-    /** 机器id所占的位数 */
-    private final long workerIdBits = 0L;
+    /**
+     * 初始偏移时间戳
+     */
+    private static final long OFFSET = 1546300800L;
 
-    /** 数据标识id所占的位数 */
-    private final long datacenterIdBits = 5L;
+    /**
+     * 机器id (0~15 保留 16~31作为备份机器)
+     */
+    private static long WORKER_ID;
 
-    /** 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数) */
-    private final long maxWorkerId = -1L ^ (-1L << workerIdBits);
+    /**
+     * 机器id所占位数 (5bit, 支持最大机器数 2^5 = 32)
+     */
+    private static final long WORKER_ID_BITS = 5L;
+    /**
+     * 自增序列所占位数 (16bit, 支持最大每秒生成 2^16 = ‭65536‬)
+     */
+    private static final long SEQUENCE_ID_BITS = 16L;
+    /**
+     * 机器id偏移位数
+     */
+    private static final long WORKER_SHIFT_BITS = SEQUENCE_ID_BITS;
+    /**
+     * 自增序列偏移位数
+     */
+    private static final long OFFSET_SHIFT_BITS = SEQUENCE_ID_BITS + WORKER_ID_BITS;
+    /**
+     * 机器标识最大值 (2^5 / 2 - 1 = 15)
+     */
+    private static final long WORKER_ID_MAX = ((1 << WORKER_ID_BITS) - 1) >> 1;
+    /**
+     * 备份机器ID开始位置 (2^5 / 2 = 16)
+     */
+    private static final long BACK_WORKER_ID_BEGIN = (1 << WORKER_ID_BITS) >> 1;
+    /**
+     * 自增序列最大值 (2^16 - 1 = ‭65535)
+     */
+    private static final long SEQUENCE_MAX = (1 << SEQUENCE_ID_BITS) - 1;
+    /**
+     * 发生时间回拨时容忍的最大回拨时间 (秒)
+     */
+    private static final long BACK_TIME_MAX = 1L;
 
-    /** 支持的最大数据标识id，结果是31 */
-    private final long maxDatacenterId = -1L ^ (-1L << datacenterIdBits);
-
-    /** 序列在id中占的位数 */
-    private final long sequenceBits = 12L;
-
-    /** 机器ID向左移12位 */
-    private final long workerIdShift = sequenceBits;
-
-    /** 数据标识id向左移17位(12+5) */
-    private final long datacenterIdShift = sequenceBits + workerIdBits;
-
-    /** 时间截向左移22位(5+5+12) */
-    private final long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
-
-    /** 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095) */
-    private final long sequenceMask = -1L ^ (-1L << sequenceBits);
-
-//    /** 工作机器ID(0~31) */
-//    private long workerId;
-
-    /** 数据中心ID(0~31) */
-    private long datacenterId;
-
-    /** 毫秒内序列(0~4095) */
-    private long sequence = 0L;
-
-    /** 上次生成ID的时间截 */
-    private long lastTimestamp = -1L;
+    /**
+     * 上次生成ID的时间戳 (秒)
+     */
+    private static long lastTimestamp = 0L;
+    /**
+     * 当前秒内序列 (2^16)
+     */
+    private static long sequence = 0L;
+    /**
+     * 备份机器上次生成ID的时间戳 (秒)
+     */
+    private static long lastTimestampBak = 0L;
+    /**
+     * 备份机器当前秒内序列 (2^16)
+     */
+    private static long sequenceBak = 0L;
 
     //==============================Constructors====================
+
     /**
      * 构造函数
-     * @param datacenterId 数据中心ID (0~31)
+     *
+     * @param workerId     工作ID (0~31)
      */
-    public SnowflakeIdWorker(long datacenterId) {
-//        if (workerId > maxWorkerId || workerId < 0) {
-//            throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
-//        }
-        if (datacenterId > maxDatacenterId || datacenterId < 0) {
-            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
+    public SnowflakeIdWorker(long workerId) {
+        if (workerId < 0 || workerId > WORKER_ID_MAX) {
+            throw new IllegalArgumentException(String.format("cmallshop.workerId范围: 0 ~ %d 目前: %d", WORKER_ID_MAX, workerId));
         }
-//        this.workerId = workerId;
-        this.datacenterId = datacenterId;
+        WORKER_ID = workerId;
     }
 
     // ==============================Methods=================================
+    public static long nextId() {
+        return nextId(SystemClock.now() / 1000);
+    }
+
     /**
-     * 获得下一个ID (该方法是线程安全的)
-     * @return SnowflakeId
+     * 主机器自增序列
+     *
+     * @param timestamp 当前Unix时间戳
+     * @return long
      */
-    public synchronized long nextId() {
-        long timestamp = timeGen();
-
-        //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
+    private static synchronized long nextId(long timestamp) {
+        // 时钟回拨检查
         if (timestamp < lastTimestamp) {
-            throw new RuntimeException(
-                    String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
+            // 发生时钟回拨
+            log.warn("时钟回拨, 启用备份机器ID: now: [{}] last: [{}]", timestamp, lastTimestamp);
+            return nextIdBackup(timestamp);
         }
 
-        //如果是同一时间生成的，则进行毫秒内序列
-        if (lastTimestamp == timestamp) {
-            sequence = (sequence + 1) & sequenceMask;
-            //毫秒内序列溢出
-            if (sequence == 0) {
-                //阻塞到下一个毫秒,获得新的时间戳
-                timestamp = tilNextMillis(lastTimestamp);
-            }
-        }
-        //时间戳改变，毫秒内序列重置
-        else {
+        // 开始下一秒
+        if (timestamp != lastTimestamp) {
+            lastTimestamp = timestamp;
             sequence = 0L;
         }
+        if (0L == (++sequence & SEQUENCE_MAX)) {
+            // 秒内序列用尽
+//            log.warn("秒内[{}]序列用尽, 启用备份机器ID序列", timestamp);
+            sequence--;
+            return nextIdBackup(timestamp);
+        }
 
-        //上次生成ID的时间截
-        lastTimestamp = timestamp;
-
-        //移位并通过或运算拼到一起组成64位的ID
-        return ((timestamp - twepoch) << timestampLeftShift) //
-                | (datacenterId << datacenterIdShift) //
-//                | (workerId << workerIdShift) //
-                | sequence;
+        return ((timestamp - OFFSET) << OFFSET_SHIFT_BITS) | (WORKER_ID << WORKER_SHIFT_BITS) | sequence;
     }
 
     /**
      * 阻塞到下一个毫秒，直到获得新的时间戳
+     *
      * @param lastTimestamp 上次生成ID的时间截
      * @return 当前时间戳
      */
@@ -117,7 +134,37 @@ public class SnowflakeIdWorker {
     }
 
     /**
+     * 备份机器自增序列
+     * @param timestamp timestamp 当前Unix时间戳
+     * @return long
+     */
+    private static long nextIdBackup(long timestamp) {
+        if (timestamp < lastTimestampBak) {
+            if (lastTimestampBak - SystemClock.now() / 1000 <= BACK_TIME_MAX) {
+                timestamp = lastTimestampBak;
+            } else {
+                throw new RuntimeException(String.format("时钟回拨: now: [%d] last: [%d]", timestamp, lastTimestampBak));
+            }
+        }
+
+        if (timestamp != lastTimestampBak) {
+            lastTimestampBak = timestamp;
+            sequenceBak = 0L;
+        }
+
+        if (0L == (++sequenceBak & SEQUENCE_MAX)) {
+            // 秒内序列用尽
+//            logger.warn("秒内[{}]序列用尽, 备份机器ID借取下一秒序列", timestamp);
+            return nextIdBackup(timestamp + 1);
+        }
+
+        return ((timestamp - OFFSET) << OFFSET_SHIFT_BITS) | ((WORKER_ID ^ BACK_WORKER_ID_BEGIN) << WORKER_SHIFT_BITS) | sequenceBak;
+    }
+
+
+    /**
      * 返回以毫秒为单位的当前时间
+     *
      * @return 当前时间(毫秒)
      */
     protected long timeGen() {
