@@ -34,8 +34,9 @@ public class MessageController {
     GroupMessageService groupMessageService;
 
     @RequestMapping("/syncOfflineMessage")
-    public ResponseVO syncOfflineMessage(@RequestBody @Validated SyncReq req, Integer appId)  {
+    public ResponseVO syncOfflineMessage(@RequestBody @Validated SyncReq req, Integer appId,String identifier)  {
         req.setAppId(appId);
+        req.setOperater(identifier);
         return messageSyncService.syncOfflineMessage(req
         );
     }

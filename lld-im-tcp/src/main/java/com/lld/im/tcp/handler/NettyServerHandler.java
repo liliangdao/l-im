@@ -169,7 +169,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             SessionSocketHolder.removeUserSession((NioSocketChannel) ctx.channel());
         }
         else if (command == SystemCommand.PING.getCommand()) {
-            //PING
             ctx.channel().attr(AttributeKey.valueOf(Constants.ReadTime))
                     .set(System.currentTimeMillis());
         } else if (command == MessageCommand.MSG_P2P.getCommand()
