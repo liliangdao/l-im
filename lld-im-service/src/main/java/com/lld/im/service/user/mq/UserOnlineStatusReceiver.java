@@ -3,11 +3,9 @@ package com.lld.im.service.user.mq;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.lld.im.codec.pack.user.UserStatusChangeNotifyPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.UserEventCommand;
 import com.lld.im.service.message.mq.ChatOperateReceiver;
-import com.lld.im.service.user.model.UserOnlineStatusSubscribeContent;
 import com.lld.im.service.user.model.UserStatusChangeNotifyContent;
 import com.lld.im.service.user.service.UserStatusService;
 import com.rabbitmq.client.Channel;
@@ -68,12 +66,19 @@ public class UserOnlineStatusReceiver {
                 }.getType());
                 userStatusServicel.processUserLoginNotify(content);
             }
-            //用户在线状态订阅,临时订阅
-            else if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_SUBSCRIBE.getCommand())) {
-                UserOnlineStatusSubscribeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusSubscribeContent>() {
-                }.getType());
-                userStatusServicel.processUserSubscribeNotify(content);
-            }
+//            //用户在线状态订阅,临时订阅
+//            else if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_SUBSCRIBE.getCommand())) {
+//                SubscribeUserOnlineStatusReq content = JSON.parseObject(msg, new TypeReference<SubscribeUserOnlineStatusReq>() {
+//                }.getType());
+//                userStatusServicel.processUserSubscribeNotify(content);
+//            }
+
+//            //用户设置自定义状态
+//            else if (Objects.equals(command, UserEventCommand.USER_SET_CUSTOMER_STATUS.getCommand())) {
+//                UserSetCustomerStatusContent content = JSON.parseObject(msg, new TypeReference<UserSetCustomerStatusContent>() {
+//                }.getType());
+//                userStatusServicel.userSetCustomerStatus(content);
+//            }
 
             channel.basicAck(deliveryTag,false);
 

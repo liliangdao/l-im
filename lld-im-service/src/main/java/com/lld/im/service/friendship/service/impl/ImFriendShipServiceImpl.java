@@ -636,21 +636,21 @@ public class ImFriendShipServiceImpl implements ImFriendShipService {
     @Override
     public List<String> getAllFriendId(String userId, Integer appId) {
 
-        String redisKey = appId + ":" + Constants.RedisConstants.friendList + ":" + userId;
-        if (stringRedisTemplate.hasKey(redisKey)) {
-            return new ArrayList<>(stringRedisTemplate.opsForSet()
-                    .members(redisKey));
-        }
+//        String redisKey = appId + ":" + Constants.RedisConstants.friendList + ":" + userId;
+//        if (stringRedisTemplate.hasKey(redisKey)) {
+//            return new ArrayList<>(stringRedisTemplate.opsForSet()
+//                    .members(redisKey));
+//        }
 
         List<String> allFriendId = imFriendShipMapper.getAllFriendId(userId, appId);
-        String[] objects = allFriendId.toArray(new String[allFriendId.size()]);
-        stringRedisTemplate.execute((RedisConnection redisConnection) -> {
-            stringRedisTemplate.opsForSet()
-                    .add(redisKey, objects);
-            stringRedisTemplate.expire(redisKey,
-                    5, TimeUnit.MINUTES);
-            return null;
-        });
+//        String[] objects = allFriendId.toArray(new String[allFriendId.size()]);
+//        stringRedisTemplate.execute((RedisConnection redisConnection) -> {
+//            stringRedisTemplate.opsForSet()
+//                    .add(redisKey, objects);
+//            stringRedisTemplate.expire(redisKey,
+//                    5, TimeUnit.MINUTES);
+//            return null;
+//        });
 
         return allFriendId;
     }

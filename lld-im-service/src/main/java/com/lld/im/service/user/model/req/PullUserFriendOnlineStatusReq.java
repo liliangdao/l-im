@@ -1,5 +1,6 @@
 package com.lld.im.service.user.model.req;
 
+import com.lld.im.common.model.RequestBase;
 import lombok.Data;
 
 import java.util.List;
@@ -11,9 +12,6 @@ import java.util.List;
  * @version: 1.0
  */
 @Data
-public class PullUserFriendOnlineStatusReq {
-
-    private String userId;
-
+public class PullUserFriendOnlineStatusReq extends RequestBase {
 
 }

@@ -94,6 +94,8 @@ public class P2PMessageService {
         String fromId = chatMessageData.getFromId();
         String toId = chatMessageData.getToId();
 
+        logger.info("开始处理消息:{}"+chatMessageData.getMessageId());
+
         //从换从中获取消息如果存在直接分发和回包
         MessageContent p2pMessage = messageStoreService.getMessageFromMessageIdCache(chatMessageData.getMessageId(),chatMessageData.getAppId());
         if(chatMessageData.getMessageKey() != null || p2pMessage != null){
@@ -106,7 +108,7 @@ public class P2PMessageService {
                 ack(chatMessageData, ResponseVO.successResponse());
                 //消息分发
                 OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
-                BeanUtils.copyProperties(chatMessageData,offlineMessageContent);
+                BeanUtils.copyProperties(p2pMessage,offlineMessageContent);
                 offlineMessageContent.setConversationType(ConversationTypeEnum.P2P.getCode());
                 messageStoreService.storeOffLineMessage(offlineMessageContent);
                 List<ClientInfo> clientInfos = dispatchMessage(p2pMessage , chatMessageData.getOfflinePushInfo());

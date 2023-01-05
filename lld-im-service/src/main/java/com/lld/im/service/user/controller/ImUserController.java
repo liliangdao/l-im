@@ -78,7 +78,8 @@ public class ImUserController {
      * @return com.lld.im.common.ResponseVO
      */
     @RequestMapping("/getUserSequence")
-    public ResponseVO getUserSequence(@RequestBody @Validated GetUserSequenceReq req){
+    public ResponseVO getUserSequence(@RequestBody @Validated GetUserSequenceReq req,Integer appId){
+        req.setAppId(appId);
         return ResponseVO.successResponse(imUserService.getUserSequence(req));
     }
 
@@ -90,20 +91,49 @@ public class ImUserController {
      * @return com.lld.im.common.ResponseVO
     */
     @RequestMapping("/queryOnlineStatus")
-    public ResponseVO queryOnlineStatus(@RequestBody @Validated PullUserOnlineStatusReq req){
+    public ResponseVO queryOnlineStatus(@RequestBody @Validated PullUserOnlineStatusReq req,Integer appId){
+        req.setAppId(appId);
         return ResponseVO.successResponse(userStatusService.pullAllUserOnlineStatus(req));
     }
 
     /**
      * @description 查询用户好友在线状态
      * @author chackylee
-     * @date 2022/9/30 15:58
      * @param [req]
      * @return com.lld.im.common.ResponseVO
      */
     @RequestMapping("/queryFriendOnlineStatus")
-    public ResponseVO queryFriendOnlineStatus(@RequestBody @Validated PullUserOnlineStatusReq req){
-        return ResponseVO.successResponse(userStatusService.pullAllUserOnlineStatus(req));
+    public ResponseVO queryFriendOnlineStatus(@RequestBody @Validated PullUserFriendOnlineStatusReq req,Integer appId,String identifier ){
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        return ResponseVO.successResponse(userStatusService.pullFriendOnlineStatus(req));
+    }
+
+    /**
+     * @description 临时订阅用户在线状态
+     * @author chackylee
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+     */
+    @RequestMapping("/subscribeUserOnlineStatus")
+    public ResponseVO subscribeUserOnlineStatus(@RequestBody @Validated SubscribeUserOnlineStatusReq req,Integer appId,String identifier){
+        req.setAppId(appId);
+        req.setOperater(identifier);
+        userStatusService.subscribeUserOnlineStatus(req);
+        return ResponseVO.successResponse();
+    }
+
+    /**
+     * @description 设置自定义状态
+     * @author chackylee
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+     */
+    @RequestMapping("/setUserCustomerStatus")
+    public ResponseVO setUserCustomerStatus(@RequestBody @Validated SetUserCustomerStatusReq req,Integer appId,String identifier){
+        req.setOperater(identifier);
+        userStatusService.setUserCustomerStatus(req);
+        return ResponseVO.successResponse();
     }
 
 }
