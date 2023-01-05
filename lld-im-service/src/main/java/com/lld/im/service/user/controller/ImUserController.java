@@ -94,4 +94,16 @@ public class ImUserController {
         return ResponseVO.successResponse(userStatusService.pullAllUserOnlineStatus(req));
     }
 
+    /**
+     * @description 查询用户好友在线状态
+     * @author chackylee
+     * @date 2022/9/30 15:58
+     * @param [req]
+     * @return com.lld.im.common.ResponseVO
+     */
+    @RequestMapping("/queryFriendOnlineStatus")
+    public ResponseVO queryFriendOnlineStatus(@RequestBody @Validated PullUserOnlineStatusReq req){
+        return ResponseVO.successResponse(userStatusService.pullAllUserOnlineStatus(req));
+    }
+
 }

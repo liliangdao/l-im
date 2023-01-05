@@ -24,11 +24,9 @@ public class UserStatusChangeNotifyContent extends ClientInfo {
 
     private Integer clientType;
 
-    //客户端状态由业务传递 登录时可能会传递
+    // 客户端状态由业务传递 登录时可能会传递
     private Integer customStatus;
     //客户端状态字符串 登录时可能会传递
     private String customText;
-
-    private List<UserSession> client;
 
 }

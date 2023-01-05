@@ -62,21 +62,17 @@ public class UserOnlineStatusReceiver {
             JSONObject jsonObject = JSON.parseObject(msg);
             Integer command = jsonObject.getInteger("command");
 
-            //1.用户上下线通知，由管道服务发起
-            if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand())) {
+            //1.用户在线状态变更
+            if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand())) {
                 UserStatusChangeNotifyContent content = JSON.parseObject(msg, new TypeReference<UserStatusChangeNotifyContent>() {
                 }.getType());
                 userStatusServicel.processUserLoginNotify(content);
             }
-            //用户在线状态订阅，一般是临时订阅
+            //用户在线状态订阅,临时订阅
             else if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_SUBSCRIBE.getCommand())) {
                 UserOnlineStatusSubscribeContent content = JSON.parseObject(msg, new TypeReference<UserOnlineStatusSubscribeContent>() {
                 }.getType());
                 userStatusServicel.processUserSubscribeNotify(content);
-            }
-            //用户在线状态变更通知。
-            else if (Objects.equals(command, UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand())) {
-
             }
 
             channel.basicAck(deliveryTag,false);

@@ -64,18 +64,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
                         url);//目标地址
     }
 
-//    /**
-//     * 数据读取完毕处理方法
-//     *
-//     * @param ctx
-//     * @throws Exception
-//     */
-//    @Override
-//    public void channelReadComplete(ChannelHandlerContext ctx) {
-//        ByteBuf buf = Unpooled.copiedBuffer("HelloClient".getBytes(CharsetUtil.UTF_8));
-//        ctx.writeAndFlush(buf);
-//    }
-
     /**
      * 读取数据
      */
@@ -144,6 +132,16 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             RTopic topic = redissonClient.getTopic(Constants.RedisConstants.UserLoginChannel);
             topic.publish(JSON.toJSONString(dto));
 
+            UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
+            pack.setAppId(msg.getMessageHeader().getAppId());
+            pack.setUserId(loginPack.getUserId());
+            pack.setCustomStatus(loginPack.getCustomStatus());
+            pack.setCustomText(loginPack.getCustomText());
+            pack.setStatus(UserPipelineConnectState.ONLINE.getCommand());
+
+            //发送在线状态修改信息-》通知用户
+            MqMessageProducer.sendMessageByCommand(pack,msg.getMessageHeader(),UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand());
+
             //返回给当前端登录成功 -> 仅代表和tcp服务连通
             MessagePack<LoginAckPack> loginSuccess = new MessagePack<>();
             LoginAckPack loginSuccessPack = new LoginAckPack();
@@ -153,16 +151,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Message> {
             loginSuccess.setAppId(msg.getMessageHeader().getAppId());
             loginSuccess.setToId(loginPack.getUserId());
             ctx.writeAndFlush(loginSuccess);
-
-            UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
-            pack.setAppId(msg.getMessageHeader().getAppId());
-            pack.setUserId(loginPack.getUserId());
-            pack.setCustomStatus(loginPack.getCustomStatus());
-            pack.setCustomText(loginPack.getCustomText());
-            pack.setStatus(UserPipelineConnectState.ONLINE.getCommand());
-
-            //发送在线状态修改信息-》通知用户
-            MqMessageProducer.sendMessageByCommand(pack,msg.getMessageHeader(),UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
 
         } else if (command == SystemCommand.LOGOUT.getCommand()) {
             /** 登出事件 **/

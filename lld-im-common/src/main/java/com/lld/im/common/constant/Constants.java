@@ -80,6 +80,11 @@ public class Constants {
          */
         public static final String friendList = "friendList";
 
+        /**
+         * 用户自定义在线状态，格式 ：appId + :userCustomerStatus: + userId。set，value为用户id
+         */
+        public static final String userCustomerStatus = "userCustomerStatus";
+
     }
 
     public static class SeqConstants{

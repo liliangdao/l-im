@@ -102,7 +102,7 @@ public class SessionSocketHolder {
 
         //发送在线状态修改信息-》通知用户
         try {
-            MqMessageProducer.sendMessageByCommand(pack,header, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+            MqMessageProducer.sendMessageByCommand(pack,header, UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -152,7 +152,7 @@ public class SessionSocketHolder {
 
         //发送在线状态修改信息-》通知用户
         try {
-            MqMessageProducer.sendMessageByCommand(pack,header, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY.getCommand());
+            MqMessageProducer.sendMessageByCommand(pack,header, UserEventCommand.USER_ONLINE_STATUS_CHANGE.getCommand());
         }catch (Exception e){
             e.printStackTrace();
         }

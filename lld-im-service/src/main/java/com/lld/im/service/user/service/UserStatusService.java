@@ -1,5 +1,6 @@
 package com.lld.im.service.user.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lld.im.codec.pack.user.UserStatusChangeNotifyPack;
 import com.lld.im.common.constant.Constants;
 import com.lld.im.common.enums.command.UserEventCommand;
@@ -10,16 +11,17 @@ import com.lld.im.service.message.service.MessageProducer;
 import com.lld.im.service.user.model.UserOnlineStatusSubscribeContent;
 import com.lld.im.service.user.model.UserStatusChangeNotifyContent;
 import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
+import com.lld.im.service.user.model.resp.PullAllUserOnlineStatusResp;
 import com.lld.im.service.utils.UserSessionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @description:
@@ -47,25 +49,31 @@ public class UserStatusService {
     /**
      * @param
      * @return void
-     * @description: 用户上线通知。通知自己其他端本端上线，通知给所有好友&&通知给订阅了这个用户的人
+     * @description: 用户上/下线通知。通知自己其他端本端上线，通知给所有好友&&通知给订阅了这个用户的人
      * @author lld
      * @since 2022/9/24
      */
-    public void processUserLoginNotify(UserStatusChangeNotifyContent pack) {
+    public void processUserLoginNotify(UserStatusChangeNotifyContent content) {
 
-        String userKey = pack.getAppId()
-                + ":" + Constants.RedisConstants.subscribe + ":" + pack.getUserId();
-        Set<Object> keys = stringRedisTemplate.opsForHash().keys(userKey);
+        if(StringUtils.isNotEmpty(content.getCustomText()) && content.getCustomStatus() != null){
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("customStatus",content.getCustomStatus());
+            jsonObject.put("customText",content.getCustomText());
+            stringRedisTemplate.opsForValue().set(content.getAppId()+":"+ Constants.RedisConstants.userCustomerStatus + ":" + content.getUserId(),
+                    jsonObject.toJSONString());
+        }
 
-        List<UserSession> userSession = userSessionUtils.getUserSession(pack.getUserId(), pack.getAppId());
+        List<UserSession> userSession = userSessionUtils.getUserSession(content.getUserId(), content.getAppId());
+        UserStatusChangeNotifyPack pack = new UserStatusChangeNotifyPack();
+        BeanUtils.copyProperties(content,pack);
         pack.setClient(userSession);
 
         // 发送给自己的其他端
-        messageProducer.sendToUserExceptClient(pack.getUserId(),UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,pack,
-                new ClientInfo(pack.getAppId(),pack.getClientType(),pack.getImei()));
+        messageProducer.sendToUserExceptClient(content.getUserId(),UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,pack,
+                new ClientInfo(content.getAppId(),content.getClientType(),content.getImei()));
 
         //发送给所有好友自己了
-        List<String> allFriendId = imFriendShipService.getAllFriendId(pack.getUserId(), pack.getAppId());
+        List<String> allFriendId = imFriendShipService.getAllFriendId(content.getUserId(), content.getAppId());
         for (String fid :
                 allFriendId) {
             messageProducer.sendToUser(fid, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,
@@ -73,13 +81,16 @@ public class UserStatusService {
         }
 
         //发生给临时订阅自己的用户
+        String userKey = pack.getAppId()
+                + ":" + Constants.RedisConstants.subscribe + ":" + pack.getUserId();
+        Set<Object> keys = stringRedisTemplate.opsForHash().keys(userKey);
         for (Object key :
                 keys) {
             String filed = (String) key;
             Long expire = Long.valueOf((String) stringRedisTemplate.opsForHash().get(userKey, filed));
             if (expire > 0 && expire > System.currentTimeMillis()) {
                 messageProducer.sendToUser(filed, UserEventCommand.USER_ONLINE_STATUS_CHANGE_NOTIFY,
-                        pack, pack.getAppId());
+                        pack, content.getAppId());
             } else {
                 stringRedisTemplate.opsForHash().delete(userKey, filed);
             }
@@ -89,7 +100,7 @@ public class UserStatusService {
     /**
      * @param
      * @return void
-     * @description: 处理用户订阅某个用户，临时订阅
+     * @description: 临时订阅
      * @author lld
      * @since 2022/9/24
      */
@@ -108,21 +119,20 @@ public class UserStatusService {
     }
 
     /**
-     * @description: 拉取所有订阅的用户在线状态（暂时只拉取所有好友的【持久订阅的】）
+     * @description: 拉取用户在线状态
      * @param
      * @return void
      * @author lld 
-     * @since 2022-09-25
      */
-    public List<List<UserSession>> pullAllUserOnlineStatus(PullUserOnlineStatusReq content) {
-
-        List<List<UserSession>> result = new ArrayList<>();
+    public PullAllUserOnlineStatusResp pullAllUserOnlineStatus(PullUserOnlineStatusReq content) {
+        PullAllUserOnlineStatusResp resp = new PullAllUserOnlineStatusResp();
+        Map<String,List<UserSession>> result = new HashMap<>(content.getUserList().size());
         content.getUserList().forEach(e ->{
             List<UserSession> userSession = userSessionUtils.getUserSession(e, content.getAppId());
-            result.add(userSession);
+            result.put(e,userSession);
         });
-        return result;
-
+        resp.setSession(result);
+        return resp;
     }
 
 }
