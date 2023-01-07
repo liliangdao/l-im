@@ -107,16 +107,16 @@ public class UserStatusService {
      * @author lld
      */
     public void subscribeUserOnlineStatus(SubscribeUserOnlineStatusReq content) {
-        String userKey = content.getAppId()
-                + ":" + Constants.RedisConstants.subscribe + ":" + content.getOperater();
-        Long subExpireTime = 0L;
+                Long subExpireTime = 0L;
         if (content != null && content.getSubTime() > 0) {
             subExpireTime = System.currentTimeMillis() + content.getSubTime();
         }
 
         for (String beSubUserId:
                 content.getSubUserId()) {
-            stringRedisTemplate.opsForHash().put(userKey, beSubUserId, subExpireTime.toString());
+            String userKey = content.getAppId()
+                    + ":" + Constants.RedisConstants.subscribe + ":" + beSubUserId;
+            stringRedisTemplate.opsForHash().put(userKey, content.getOperater(), subExpireTime.toString());
         }
     }
 
