@@ -15,6 +15,7 @@ import com.lld.im.service.user.model.req.SubscribeUserOnlineStatusReq;
 import com.lld.im.service.user.model.UserStatusChangeNotifyContent;
 import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
 import com.lld.im.service.user.model.resp.PullAllUserOnlineStatusResp;
+import com.lld.im.service.user.model.resp.UserOnlineStatusResp;
 import com.lld.im.service.utils.UserSessionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -107,7 +108,8 @@ public class UserStatusService {
      * @author lld
      */
     public void subscribeUserOnlineStatus(SubscribeUserOnlineStatusReq content) {
-                Long subExpireTime = 0L;
+
+        Long subExpireTime = 0L;
         if (content != null && content.getSubTime() > 0) {
             subExpireTime = System.currentTimeMillis() + content.getSubTime();
         }
@@ -124,17 +126,25 @@ public class UserStatusService {
      * @description: 拉取用户在线状态
      * @param
      * @return void
-     * @author lld 
+     * @author lld
      */
-    public PullAllUserOnlineStatusResp pullAllUserOnlineStatus(PullUserOnlineStatusReq content) {
-        PullAllUserOnlineStatusResp resp = new PullAllUserOnlineStatusResp();
-        Map<String,List<UserSession>> result = new HashMap<>(content.getUserList().size());
+    public Map<String,UserOnlineStatusResp> pullAllUserOnlineStatus(PullUserOnlineStatusReq content) {
+        Map<String,UserOnlineStatusResp> result = new HashMap<>(content.getUserList().size());
+
         content.getUserList().forEach(e ->{
             List<UserSession> userSession = userSessionUtils.getUserSession(e, content.getAppId());
-            result.put(e,userSession);
+            UserOnlineStatusResp userOnlineStatusDto = new UserOnlineStatusResp();
+            userOnlineStatusDto.setSession(userSession);
+
+            String s = stringRedisTemplate.opsForValue().get(content + ":" +
+                    Constants.RedisConstants.userCustomerStatus + ":"
+                    + e);
+            JSONObject parse = (JSONObject) JSONObject.parse(s);
+            userOnlineStatusDto.setCustomStatus(parse.getInteger("customStatus"));
+            userOnlineStatusDto.setCustomText(parse.getString("customText"));
+            result.put(e,userOnlineStatusDto);
         });
-        resp.setSession(result);
-        return resp;
+        return result;
     }
 
     /**
@@ -143,16 +153,24 @@ public class UserStatusService {
      * @return void
      * @author lld
      */
-    public PullAllUserOnlineStatusResp pullFriendOnlineStatus(PullUserFriendOnlineStatusReq req) {
-        PullAllUserOnlineStatusResp resp = new PullAllUserOnlineStatusResp();
-        Map<String,List<UserSession>> result = new HashMap<>();
+    public Map<String,UserOnlineStatusResp> pullFriendOnlineStatus(PullUserFriendOnlineStatusReq req) {
+
         List<String> allFriendId = imFriendShipService.getAllFriendId(req.getOperater(), req.getAppId());
+        Map<String,UserOnlineStatusResp> result = new HashMap<>();
         allFriendId.forEach(e ->{
+
             List<UserSession> userSession = userSessionUtils.getUserSession(e, req.getAppId());
-            result.put(e,userSession);
+            UserOnlineStatusResp userOnlineStatusDto = new UserOnlineStatusResp();
+            userOnlineStatusDto.setSession(userSession);
+            String s = stringRedisTemplate.opsForValue().get(req.getAppId() + ":" +
+                    Constants.RedisConstants.userCustomerStatus + ":"
+                    + e);
+            JSONObject parse = (JSONObject) JSONObject.parse(s);
+            userOnlineStatusDto.setCustomStatus(parse.getInteger("customStatus"));
+            userOnlineStatusDto.setCustomText(parse.getString("customText"));
+            result.put(e,userOnlineStatusDto);
         });
-        resp.setSession(result);
-        return resp;
+        return result;
     }
 
     /**

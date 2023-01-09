@@ -7,13 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author: Chackylee
  * @description:
- * @create: 2023-01-05 15:42
- **/
+ * @author: lld
+ * @version: 1.0
+ */
 @Data
-public class PullAllUserOnlineStatusResp {
+public class UserOnlineStatusResp {
 
-    private Map<String,UserOnlineStatusDto> resp;
+    private List<UserSession> session;
 
+    private String customText;
+
+    private Integer customStatus;
 }
