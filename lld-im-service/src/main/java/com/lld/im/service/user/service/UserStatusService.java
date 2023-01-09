@@ -14,9 +14,9 @@ import com.lld.im.service.user.model.req.SetUserCustomerStatusReq;
 import com.lld.im.service.user.model.req.SubscribeUserOnlineStatusReq;
 import com.lld.im.service.user.model.UserStatusChangeNotifyContent;
 import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
-import com.lld.im.service.user.model.resp.PullAllUserOnlineStatusResp;
 import com.lld.im.service.user.model.resp.UserOnlineStatusResp;
 import com.lld.im.service.utils.UserSessionUtils;
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,22 +129,7 @@ public class UserStatusService {
      * @author lld
      */
     public Map<String,UserOnlineStatusResp> pullAllUserOnlineStatus(PullUserOnlineStatusReq content) {
-        Map<String,UserOnlineStatusResp> result = new HashMap<>(content.getUserList().size());
-
-        content.getUserList().forEach(e ->{
-            List<UserSession> userSession = userSessionUtils.getUserSession(e, content.getAppId());
-            UserOnlineStatusResp userOnlineStatusDto = new UserOnlineStatusResp();
-            userOnlineStatusDto.setSession(userSession);
-
-            String s = stringRedisTemplate.opsForValue().get(content + ":" +
-                    Constants.RedisConstants.userCustomerStatus + ":"
-                    + e);
-            JSONObject parse = (JSONObject) JSONObject.parse(s);
-            userOnlineStatusDto.setCustomStatus(parse.getInteger("customStatus"));
-            userOnlineStatusDto.setCustomText(parse.getString("customText"));
-            result.put(e,userOnlineStatusDto);
-        });
-        return result;
+        return getUserOnlineStatus(content.getUserList(),content.getAppId());
     }
 
     /**
@@ -156,22 +141,29 @@ public class UserStatusService {
     public Map<String,UserOnlineStatusResp> pullFriendOnlineStatus(PullUserFriendOnlineStatusReq req) {
 
         List<String> allFriendId = imFriendShipService.getAllFriendId(req.getOperater(), req.getAppId());
-        Map<String,UserOnlineStatusResp> result = new HashMap<>();
-        allFriendId.forEach(e ->{
+        return getUserOnlineStatus(allFriendId,req.getAppId());
+    }
 
-            List<UserSession> userSession = userSessionUtils.getUserSession(e, req.getAppId());
+    private Map<String,UserOnlineStatusResp> getUserOnlineStatus(List<String> userId,Integer appId){
+        Map<String,UserOnlineStatusResp> result = new HashMap<>();
+        userId.forEach(e ->{
+
+            List<UserSession> userSession = userSessionUtils.getUserSession(e, appId);
             UserOnlineStatusResp userOnlineStatusDto = new UserOnlineStatusResp();
             userOnlineStatusDto.setSession(userSession);
-            String s = stringRedisTemplate.opsForValue().get(req.getAppId() + ":" +
+            String s = stringRedisTemplate.opsForValue().get(appId + ":" +
                     Constants.RedisConstants.userCustomerStatus + ":"
                     + e);
             JSONObject parse = (JSONObject) JSONObject.parse(s);
-            userOnlineStatusDto.setCustomStatus(parse.getInteger("customStatus"));
-            userOnlineStatusDto.setCustomText(parse.getString("customText"));
+            if(parse != null){
+                userOnlineStatusDto.setCustomStatus(parse.getInteger("customStatus"));
+                userOnlineStatusDto.setCustomText(parse.getString("customText"));
+            }
             result.put(e,userOnlineStatusDto);
         });
         return result;
     }
+
 
     /**
      * @description: 客户端主动设置自定义状态
