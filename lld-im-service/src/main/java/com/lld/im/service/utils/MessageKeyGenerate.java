@@ -1,6 +1,10 @@
 package com.lld.im.service.utils;
 
 
+import com.lld.im.codec.proto.Message;
+
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -65,34 +69,39 @@ public class MessageKeyGenerate {
         return id;
     }
 
+    public static int getSharding(long mid) {
 
+        Calendar calendar = Calendar.getInstance();
 
-    public void main(String[] args) throws Exception {
-//        String messageTable = getMessageTable(317746708379336705L);
-//        System.out.println(messageTable);
-//        int hashId = Math.abs("kojqmws2k".hashCode())%128;
-//        System.out.println(hashId);
+        mid >>= nodeIdWidth;
+        mid >>= rotateIdWidth;
 
-        ConcurrentHashMap<Long, Integer> messageIds = new ConcurrentHashMap<>();
+        calendar.setTime(new Date(T202001010000 + mid));
 
-        int threadCount = 1000;
-        int loop = 1000000;
-        for (int i = 0; i < threadCount; i++) {
-            new Thread(()->{
-                for (int j = 0; j < loop; j++) {
-                    try {
-                        long mid = generateId();
-                        if(messageIds.put(mid, j) != null) {
-                            System.out.println("Duplicated message id !!!!!!" + mid);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        year %= 4;
+        return (year * 12 + month);
+    }
+
+    public static long getMsgIdFromTimestamp(long timestamp) {
+        long id = timestamp - T202001010000;
+
+        id <<= rotateIdWidth;
+        id <<= nodeIdWidth;
+
+        return id;
+    }
+
+    public static void main(String[] args) {
+        try {
+            Calendar calendar = Calendar.getInstance();
+            MessageKeyGenerate messageKeyGenerate = new MessageKeyGenerate();
+            long msgIdFromTimestamp = getMsgIdFromTimestamp(1678459712000L);
+            System.out.println(getSharding(msgIdFromTimestamp));
+        } catch (Exception e) {
+
         }
-
-        Thread.sleep(1000 * 60 * 10);
     }
 
 }

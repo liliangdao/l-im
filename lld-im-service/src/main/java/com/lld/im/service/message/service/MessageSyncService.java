@@ -219,6 +219,7 @@ public class MessageSyncService {
                     ,content.getFromId(),content.getFromId()));
             redisTemplate.opsForZSet().add(toKey,JSONObject.toJSONString(offlineMessageContent),content.getMessageSequence());
 
+            recallAck(pack,ResponseVO.successResponse(),content);
             //发送给同步端
             messageProducer.sendToUserExceptClient(content.getFromId(), MessageCommand.MSG_RECALL_NOTIFY, pack
                     , content);
@@ -227,6 +228,10 @@ public class MessageSyncService {
         }else{
             List<String> groupMemberId = groupMemberService.getGroupMemberId(content.getToId(), content.getAppId());
             long seq = this.seq.getSeq(content.getAppId() + ":" + Constants.SeqConstants.Message);
+            recallAck(pack,ResponseVO.successResponse(),content);
+            //发送给同步端
+            messageProducer.sendToUserExceptClient(content.getFromId(), MessageCommand.MSG_RECALL_NOTIFY, pack
+                    , content);
             for (String memberId : groupMemberId) {
                 String toKey = content.getAppId() + ":" + Constants.RedisConstants.offlineMessage + ":" + memberId;
                 OfflineMessageContent offlineMessageContent = new OfflineMessageContent();
@@ -241,9 +246,7 @@ public class MessageSyncService {
 
                 groupMessageProducer.producer(content.getFromId(), MessageCommand.MSG_RECALL_NOTIFY, pack,content);
             }
-
         }
-
     }
 
     private void recallAck(RecallMessageNotifyPack recallPack, ResponseVO<Object> success, ClientInfo clientInfo) {
