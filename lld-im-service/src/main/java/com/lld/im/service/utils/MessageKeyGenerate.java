@@ -86,7 +86,7 @@ public class MessageKeyGenerate {
 
         int month = calendar.get(Calendar.MONTH);
         int year = calendar.get(Calendar.YEAR);
-        year %= 4;
+        year %= 3;
         return (year * 12 + month);
     }
 
@@ -114,14 +114,14 @@ public class MessageKeyGenerate {
     }
 
     public static void main(String[] args) throws Exception {
-//        try {
-//            Calendar calendar = Calendar.getInstance();
-//            MessageKeyGenerate messageKeyGenerate = new MessageKeyGenerate();
-//            long msgIdFromTimestamp = getMsgIdFromTimestamp(1678459712000L);
-//            System.out.println(getSharding(msgIdFromTimestamp));
-//        } catch (Exception e) {
-//
-//        }
+        try {
+            Calendar calendar = Calendar.getInstance();
+            MessageKeyGenerate messageKeyGenerate = new MessageKeyGenerate();
+            long msgIdFromTimestamp = getMsgIdFromTimestamp(1678459712000L);
+            System.out.println(getSharding(msgIdFromTimestamp));
+        } catch (Exception e) {
+
+        }
         MessageKeyGenerate messageKeyGenerate = new MessageKeyGenerate();
         for (int i = 0; i < 2; i++) {
             long l = messageKeyGenerate.generateId();
