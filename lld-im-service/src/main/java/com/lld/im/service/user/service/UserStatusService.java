@@ -16,7 +16,6 @@ import com.lld.im.service.user.model.UserStatusChangeNotifyContent;
 import com.lld.im.service.user.model.req.PullUserOnlineStatusReq;
 import com.lld.im.service.user.model.resp.UserOnlineStatusResp;
 import com.lld.im.service.utils.UserSessionUtils;
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

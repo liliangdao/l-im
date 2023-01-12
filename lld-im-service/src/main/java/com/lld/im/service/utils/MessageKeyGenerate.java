@@ -1,11 +1,10 @@
 package com.lld.im.service.utils;
 
 
-import com.lld.im.codec.proto.Message;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -18,12 +17,13 @@ public class MessageKeyGenerate {
     //标识从2020.1.1开始
     private static final long T202001010000 = 1577808000000L;
 
-    private Lock lock = new ReentrantLock();
+//    private Lock lock = new ReentrantLock();
+    AtomicReference<Thread> owner = new AtomicReference<>();
 
     private static volatile int rotateId = 0;
     private static int rotateIdWidth = 15;
-    private static int rotateIdMask = 32767;
 
+    private static int rotateIdMask = 32767;
     private static volatile long timeId = 0;
 
     private int nodeId = 0;
@@ -35,9 +35,14 @@ public class MessageKeyGenerate {
         this.nodeId = nodeId;
     }
 
+    /**
+     * ID = timestamp(43) + nodeId(6) + rotateId(15)
+     */
     public synchronized long generateId() throws Exception {
 
-        lock.lock();
+//        lock.lock();
+        this.lock();
+
         rotateId = rotateId + 1;
 
         long id = System.currentTimeMillis() - T202001010000;
@@ -54,7 +59,7 @@ public class MessageKeyGenerate {
                     //重新给id赋值
                     id = System.currentTimeMillis() - T202001010000;
                 }
-                lock.unlock();
+                this.unLock();
                 return generateId();
             }
         }
@@ -65,7 +70,8 @@ public class MessageKeyGenerate {
         id <<= rotateIdWidth;
         id += rotateId;
 
-        lock.unlock();
+//        lock.unlock();
+        this.unLock();
         return id;
     }
 
@@ -93,14 +99,33 @@ public class MessageKeyGenerate {
         return id;
     }
 
-    public static void main(String[] args) {
-        try {
-            Calendar calendar = Calendar.getInstance();
-            MessageKeyGenerate messageKeyGenerate = new MessageKeyGenerate();
-            long msgIdFromTimestamp = getMsgIdFromTimestamp(1678459712000L);
-            System.out.println(getSharding(msgIdFromTimestamp));
-        } catch (Exception e) {
+    public void lock() {
+        Thread cur = Thread.currentThread();
+        //lock函数将owner设置为当前线程，并且预测原来的值为空。
+        // unlock函数将owner设置为null，并且预测值为当前线程。
+        // 当有第二个线程调用lock操作时由于owner值不为空，导致循环
+        //一直被执行，直至第一个线程调用unlock函数将owner设置为null，第二个线程才能进入临界区。
+        while (!owner.compareAndSet(null, cur)){
+        }
+    }
+    public void unLock() {
+        Thread cur = Thread.currentThread();
+        owner.compareAndSet(cur, null);
+    }
 
+    public static void main(String[] args) throws Exception {
+//        try {
+//            Calendar calendar = Calendar.getInstance();
+//            MessageKeyGenerate messageKeyGenerate = new MessageKeyGenerate();
+//            long msgIdFromTimestamp = getMsgIdFromTimestamp(1678459712000L);
+//            System.out.println(getSharding(msgIdFromTimestamp));
+//        } catch (Exception e) {
+//
+//        }
+        MessageKeyGenerate messageKeyGenerate = new MessageKeyGenerate();
+        for (int i = 0; i < 2; i++) {
+            long l = messageKeyGenerate.generateId();
+            System.out.println(l);
         }
     }
 
