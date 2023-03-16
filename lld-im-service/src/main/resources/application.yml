@@ -7,7 +7,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: frfr46467979+
-    url: jdbc:mysql://43.139.108.123:3306/im-core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
+    url: jdbc:mysql://127.0.0.1:3306/im-core?serverTimezone=UTC&useSSL=false&characterEncoding=UTF8
     username: root
 
   redis:
@@ -21,11 +21,11 @@ spring:
         min-idle: 10
     password:
   rabbitmq:
-    host: 43.139.108.123
+    host: 127.0.0.1
     port: 5672
-    addresses: 43.139.108.123
-    username: admin
-    password: 123456
+    addresses: 127.0.0.1
+    username: guest
+    password: guest
 #    virtual-host:
     listener:
       simple:
@@ -71,7 +71,7 @@ appConfig:
   #  *                            3 允许手机和电脑单设备 + web 同时在线 踢掉非本client+imel的同端设备
   #  *                            4 允许所有端多设备登录 不踢任何设备
   groupMaxMemberCount: 500
-  sendMessageCheckFriend: true # 发送消息是否校验关系链
+  sendMessageCheckFriend: false # 发送消息是否校验关系链
   sendMessageCheckBlack: false # 发送消息是否校验黑名单
   callbackUrl: http://127.0.0.1:8000/callback
   modifyUserAfterCallback: false # 用户资料变更之后回调开关
@@ -91,7 +91,7 @@ appConfig:
   sendMessageBeforeCallback: false # 发送单聊消息之前
   sendGroupMessageAfterCallback: false # 发送群聊消息之后
   sendGroupMessageBeforeCallback: false # 发送群聊消息之前
-  offlineMessageCount: 10 # 离线消息存储条数
+  offlineMessageCount: 1000000 # 离线消息存储条数
   deleteConversationSyncMode: 1 # 删除会话是否多端同步 1多端同步 2不同步
   deleteConversationSyncDeleteDataMode: 1 # 删除会话是否删除远端会话资料 1删除
 
@@ -118,6 +118,3 @@ httpclient:
   connectionRequestTimeout: 2000
   socketTimeout: 5000
   staleConnectionCheckEnabled: true
-
-mpp:
-  entityBasePath: com.lld.im.service.friendship.dao

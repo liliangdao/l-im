@@ -190,6 +190,8 @@ public class ImFriendShipGroupServiceImpl
         group.setGroupId(entity.getGroupId());
         group.setSequence(seq);
         imFriendShipGroupMapper.updateById(group);
+        writeUserSeq.writeUserSeq(appId, fromId, Constants.SeqConstants.FriendshipGroup, seq);
+
         return seq;
     }
 }
